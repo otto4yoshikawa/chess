@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2019/05/04 12:10:00.241.cpp,C:\Users\otto\Documents\RAD Studio\Projects\File3.cpp=C:\Users\otto\Documents\RAD Studio\Projects\wchess4.cpp</Transaction>
+    <Transaction>2019/05/04 12:12:04.491.cbproj,C:\Users\otto\Documents\RAD Studio\Projects\Project1.cbproj=C:\puzzle\chess\wchess4.cbproj</Transaction>
+    <Transaction>2019/05/04 12:12:34.810.cpp,C:\Users\otto\Documents\RAD Studio\Projects\wchess4.cpp=C:\puzzle\chess\wchess4.cpp</Transaction>
+    <Transaction>2019/05/04 12:19:36.282.h,C:\puzzle\chess\File1.h=C:\puzzle\chess\Fgenmove4.h</Transaction>
+    <Transaction>2019/05/04 12:24:04.457.cpp,C:\puzzle\chess\File1.cpp=C:\puzzle\chess\genmove4.cpp</Transaction>
+    <Transaction>2019/05/04 12:24:24.281.h,C:\puzzle\chess\Fgenmove4.h=C:\puzzle\chess\genmove4.h</Transaction>
+  </Transactions>
+</BorlandProject>

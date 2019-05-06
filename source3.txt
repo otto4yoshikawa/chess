@@ -1,0 +1,115 @@
+//
+//  ‚RŸŒ³˜g‚ğ•`‰æ
+//
+void
+DrawFrame(HDC hDC, TRect& rect, BOOL drawBackground)
+{
+  int x1 = rect.left;
+  int x2 = rect.right;
+  int y1 = rect.top;
+  int y2 = rect.bottom;
+
+  //
+  // ˜g‚Ì—ÖŠs‚ğ•`‚«A—v‹‚ª‚ ‚ê‚Î”wŒi‚ğÁ‹‚·‚é
+  //
+  HBRUSH hOldBrush = (HBRUSH)SelectObject(hDC,
+      GetStockObject(drawBackground ? LTGRAY_BRUSH : NULL_BRUSH));
+  HPEN hOldPen = (HPEN)SelectObject(hDC, GetStockObject(WHITE_PEN));
+  Rectangle(hDC, x1, y1, x2, y2);
+
+  //
+  // ˜g‚Ì‚‚¢•”•ª‚Å‚ ‚éƒ‰ƒCƒgƒOƒŒ[‚Ì’·•ûŒ`‚ğ•`‚­
+  //
+  HPEN hPen = CreatePen(PS_SOLID, 1, RGB(192, 192, 192));
+  SelectObject(hDC, hPen);
+  Rectangle(hDC, x1+1, y1+1, x2-1, y2-1);
+  DeleteObject(SelectObject(hDC, GetStockObject(WHITE_PEN)));
+
+  //
+  // ˜g‚Ì‰E‚Æ‰º•”‚Ì–¾‚é‚¢•”•ª‚ğ•`‚­
+  //
+  TPoint points[3];
+  points[0].x = x1 + 2;
+  points[1].y = points[0].y = y2 - 3;
+  points[2].x = points[1].x = x2 - 3;
+  points[2].y = y1 + 2;
+  Polyline(hDC, points, 3);
+
+  //
+  // ˜g‚Ì‰E‚Æ‰º•”‚Ì‰e‚ğ•`‚­
+  //
+  hPen = CreatePen(PS_SOLID, 1, RGB(128, 128, 128));
+  SelectObject(hDC, hPen);
+  points[0].x = x1;
+  points[1].y = points[0].y = y2-1;
+  points[2].x = points[1].x = x2-1;
+  points[2].y = y1;
+  Polyline(hDC, points, 3);
+  SetPixel(hDC, x2-1, y2-1, RGB(128, 128, 128));
+
+  //
+  // ˜g‚Ì¶‚Æã•”‚Ì‰e‚ğ•`‚­
+  //
+  points[1].x = points[0].x = x1 + 2;
+  points[0].y = y2 - 3;
+  points[2].y = points[1].y = y1 + 2;
+  points[2].x = x2 - 3;
+  Polyline(hDC, points, 3);
+  SelectObject(hDC, hOldBrush);
+  DeleteObject(SelectObject(hDC, hOldPen));
+
+  //
+  // ‰e‚Æ–¾‚é‚¢•”•ª‚ªŒğ‚í‚éÎü‚ÌŠp‚ğ–Y‚ê‚Ä‚Í‚¢‚¯‚È‚¢
+  //
+  SetPixel(hDC, x2-1, y1,   RGB(192, 192, 192));
+  SetPixel(hDC, x2-3, y1+2, RGB(192, 192, 192));
+  SetPixel(hDC, x1,   y2-1, RGB(192, 192, 192));
+  SetPixel(hDC, x1+2, y2-3, RGB(192, 192, 192));
+}
+
+//
+//
+//  ‰æ–Ê‚Éƒ{[ƒh‚ğ•\¦
+//
+void
+DrawBoard()
+{
+  unsigned char no;
+  HDC hDC;
+  const SQUARETYPE printno[64] = {
+    0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
+    0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x67,
+    0x57, 0x47, 0x37, 0x27, 0x17, 0x07, 0x06, 0x05,
+    0x04, 0x03, 0x02, 0x01, 0x11, 0x21, 0x31, 0x41,
+    0x51, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x56,
+    0x46, 0x36, 0x26, 0x16, 0x15, 0x14, 0x13, 0x12,
+    0x22, 0x32, 0x42, 0x52, 0x53, 0x54, 0x55, 0x45,
+    0x35, 0x25, 0x24, 0x23, 0x33, 0x43, 0x44, 0x34
+  };
+
+  BoardRect.left = BoardRect.top = BORDERSIZE;
+  BoardRect.right = BoardRect.bottom = BORDERSIZE + 2*MYFRAMESIZE + 8*SQUARE_SIZE;
+
+  hDC = GetDC(hWndMain);
+  DrawFrame(hDC, BoardRect);
+  ReleaseDC(hWndMain, hDC);
+  for (no = 0; no < 64; no++)
+    ClearSquare(printno[no]);
+}
+
+void
+ClearSquare(SQUARETYPE square)
+{
+  TPoint p = GetSquareXY(square);
+  HDC hDC = GetDC(hWndMain);
+
+  HANDLE hOldBrush;
+  if ((square % 8 + square /16) % 2 == 1)
+    hOldBrush = SelectObject(hDC, hWhiteBrush);
+  else
+    hOldBrush = SelectObject(hDC, hBlackBrush);
+  PatBlt(hDC, p.x, p.y, SQUARE_SIZE, SQUARE_SIZE, PATCOPY);
+  SelectObject(hDC, hOldBrush);
+  ReleaseDC(hWndMain, hDC);
+}
+

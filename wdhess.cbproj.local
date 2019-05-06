@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <Transactions>
+    <Transaction>2019/04/24 16:12:26.679.cpp,C:\Users\otto\Documents\RAD Studio\Projects\Unit1.cpp=C:\puzzle\chess\wdhessmain.cpp</Transaction>
+    <Transaction>2019/04/24 16:12:26.679.h,C:\Users\otto\Documents\RAD Studio\Projects\Unit1.h=C:\puzzle\chess\wdhessmain.h</Transaction>
+    <Transaction>2019/04/24 16:12:26.679.dfm,C:\Users\otto\Documents\RAD Studio\Projects\Unit1.dfm=C:\puzzle\chess\wdhessmain.dfm</Transaction>
+    <Transaction>2019/04/24 16:12:40.209.cbproj,C:\Users\otto\Documents\RAD Studio\Projects\Project1.cbproj=C:\puzzle\chess\wdhess.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,529 @@
+//----------------------------------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <vcl.h>
+#include "externs.h"
+void DoPrintf(char *szFormat,...);
+
+//
+//  グローバル変数
+//
+static ATTACKTABTYPE attack[240];
+ATTACKTABTYPE *AttackTab = &attack[120];
+SETOFPIECE BitTab[7] = {0, 1, 2, 4, 8, 0x10, 0x20};
+int DirTab[8] = { 1, -1, 0x10, -0x10, 0x11, -0x11, 0x0f, -0x0f};
+int KnightDir[8] = {0x0E, -0x0E, 0x12, -0x12, 0x1f, -0x1f, 0x21, -0x21};
+int PawnDir[2] = {0x10, -0x10};
+MOVETYPE Next;
+int BufCount, BufPnt;
+MOVETYPE Buffer[81];
+CASTMOVETYPE  CastMove[2][2] = { {{2, 4}, {6, 4}}, {{0x72, 0x74}, {0x76, 0x74}} };
+ /*
+bool convertBoard(PIECE *p) {
+     int i,x,y,type,color;
+      ClearBoard();
+     for (i=0;i<32;i++) {
+         if (p[i].type<0) continue;
+         color=p[i].color;
+         x= p[i].x;
+         y=p[i].y;
+        board[x+y*8].color=(color==1)?white:black;
+        board[x+y*8].piece=type;
+     }
+
+}
+ */
+void
+CalcAttackTab()
+{
+  for (int sq = -0x77; sq <= 0x77; sq++) {
+    AttackTab[sq].pieceset = 0;
+    AttackTab[sq].direction = 0;
+  }
+
+  for (DIRTYPE dir = 7; dir >= 0; dir--) {
+    for (unsigned char i = 1; i < 8; i++) {
+      if (dir < 4)
+        AttackTab[DirTab[dir]*i].pieceset = SETOFPIECE(BitTab[queen]+BitTab[rook]);
+      else
+        AttackTab[DirTab[dir]*i].pieceset = SETOFPIECE(BitTab[queen]+BitTab[bishop]);
+      AttackTab[DirTab[dir]*i].direction = DirTab[dir];
+    }
+    AttackTab[DirTab[dir]].pieceset += SETOFPIECE(BitTab[king]);
+    AttackTab[KnightDir[dir]].pieceset = SETOFPIECE(BitTab[knight]);
+    AttackTab[KnightDir[dir]].direction = KnightDir[dir];
+  }
+}
+
+//
+//  asquare のマス上の apiece の駒が、square のマスを攻撃できるかどうか計算
+//
+short
+PieceAttacks(PIECETYPE apiece, COLORTYPE acolor, SQUARETYPE asquare, SQUARETYPE square)
+{
+  int x = square - asquare;
+  if (apiece == pawn)  //  ポーンの攻撃
+    return abs(x - PawnDir[acolor]) == 1;
+
+  //  他の攻撃: 駒はそのマスに移動可能か?
+  if (AttackTab[x].pieceset & BitTab[apiece]) {
+    if (apiece == king || apiece == knight)
+      return 1;
+
+    //  間にブロックしている駒があるか?
+    EDGESQUARETYPE sq = asquare;
+    do {
+      sq += AttackTab[x].direction;
+    } while (sq != square && Board[sq].piece == empty);
+    return sq == square;
+  }
+  return 0;
+}
+
+//
+//  acolor 側が square のマスのポーンで攻撃できるか計算
+//
+short
+PawnAttacks(COLORTYPE acolor, SQUARETYPE square)
+{
+  EDGESQUARETYPE sq = square - PawnDir[acolor] - 1;  //  左のマス
+  if (!(sq & 0x88))
+    if (Board[sq].piece == pawn && Board[sq].color == acolor)
+      return 1;
+
+  sq += 2;  //  右のマス
+  if (!(sq & 0x88))
+    if (Board[sq].piece == pawn && Board[sq].color == acolor)
+      return 1;
+
+  return 0;
+}
+
+//
+//  acolor 側が square のマスを攻撃できるかどうか計算
+//
+short
+Attacks(COLORTYPE acolor, SQUARETYPE square)
+{
+  if (PawnAttacks(acolor, square))  //  ポーンの攻撃
+    return 1;
+
+  //  他の攻撃:  小さい駒始めてすべての駒を検査
+  for (INDEXTYPE i = OfficerNo[acolor]; i >= 0; i--)
+    if (PieceTab[acolor][i].ipiece != empty)
+      if (PieceAttacks(PieceTab[acolor][i].ipiece, acolor,
+          PieceTab[acolor][i].isquare, square))
+        return 1;
+  return 0;
+}
+
+//
+//  square のマス上に inpiece の駒があって、一度も動いたことがないかどうか検査
+//
+short
+Check(SQUARETYPE square, PIECETYPE inpiece, COLORTYPE incolor)
+{
+  if(Board[square].piece == inpiece && Board[square].color == incolor) {
+    DEPTHTYPE dep = DEPTHTYPE(Depth - 1);
+    while (MovTab[dep].movpiece != empty) {
+      if (MovTab[dep].new1 == square)
+        return 0;
+      dep--;
+    }
+    return 1;
+  }
+  return 0;
+}
+
+//
+//  incolor の色がキャスリングできるかどうか検査
+//
+void
+CalcCastling(COLORTYPE incolor,  CASTDIRTYPE *cast)
+{
+  SQUARETYPE square = 0;
+  int k;
+  if (incolor == black)
+    square = 0x70;
+  k = zero;
+  if (Check(square + 4, king, incolor)) { //  キングを検査
+    if (Check(square, rook, incolor))
+      k += lng;                //  A 列のルークを検査
+    if (Check(square + 7, rook, incolor))
+      k+= shrt;               //  H 列のルークを検査
+  }
+  *cast=  (CASTDIRTYPE)k;
+}
+
+//
+//  移動が、ポーン移動または捕獲移動か検査
+//
+inline short
+RepeatMove(MOVETYPE* move)
+{
+  return move->movpiece != empty && move->movpiece != pawn &&
+         move->content == empty && !move->spe;
+}
+
+//----------------------------------------------------------------------------
+
+//
+//  最後に捕獲するか、ポーンが移動してからの移動数を数える
+//  fiftymovecnt = 100 なら、ゲームは引き分け
+//
+FIFTYTYPE
+FiftyMoveCnt()
+{
+  FIFTYTYPE cnt = 0;
+  while (RepeatMove(&MovTab[Depth - cnt]))
+    cnt++;
+  return cnt;
+}
+
+//
+//  以前にその位置が何回発生したかを計算。
+//  Repetition が３を返したとき、ゲームは引き分け。
+//  MovTab[back..Depth] に最後に実行した移動が格納されている
+//  immediate がセットされていれば、直前の繰り返しのみ検査
+//
+REPEATTYPE
+Repetition(short immediate)
+{
+  DEPTHTYPE lastdep, compdep, tracedep, checkdep, samedepth;
+  SQUARETYPE tracesq, checksq;
+  REPEATTYPE repeatcount;
+
+  repeatcount = 1;
+  lastdep = samedepth = DEPTHTYPE(Depth + 1);  //  現在の位置
+  compdep = DEPTHTYPE(samedepth - 4);      //  比較する最初の位置
+
+  //  MovTab[lastdep..Depth] には以前の関連した移動が格納されている
+  while (RepeatMove(&MovTab[lastdep - 1]) && (compdep < lastdep || !immediate))
+    lastdep--;
+  if (compdep < lastdep)
+    return repeatcount;
+  checkdep = samedepth;
+  for (;;) {
+    checkdep--;
+    checksq = MovTab[checkdep].new1;
+    for (tracedep = DEPTHTYPE(checkdep + 2); tracedep < samedepth; tracedep += DEPTHTYPE(2))
+      if (MovTab[tracedep].old == checksq)
+        goto TEN;
+
+    //  以前の移動を取り消すことになるか、移動をさかのぼって検索
+    tracedep = checkdep;
+    tracesq = MovTab[tracedep].old;
+    do {
+      if (tracedep-2 < lastdep)
+        return repeatcount;
+      tracedep -= (DEPTHTYPE)2;
+      //  以前に移動した駒か検査
+      if (tracesq == MovTab[tracedep].new1)
+        tracesq = MovTab[tracedep].old;
+    } while (tracesq != checksq || tracedep > compdep + 1);
+    if (tracedep < compdep) {  //  compdep を調整
+      compdep = tracedep;
+      if ((samedepth - compdep) % 2 == 1) {
+        if (compdep == lastdep) return repeatcount;
+        compdep --;
+      }
+      checkdep = samedepth;
+    }
+    //  samedep と compdep 間のすべての移動は検査され、
+    //  繰り返しが検出された
+TEN:
+    if (checkdep <= compdep) {
+      repeatcount++;
+      if (compdep - 2 < lastdep) return repeatcount;
+      checkdep = samedepth = compdep;
+      compdep -= (DEPTHTYPE)2;
+    }
+  }
+}
+
+//
+//  移動可能か検査
+//
+//  入力:
+//   move は、違う位置で生成された正しい移動の完全な記述が格納されている
+//   MovTab[Depth-1] に最後に実行した移動が格納されている
+//
+//  出力:
+//   KillMovGen は、移動可能かどうかを返す
+//
+short
+KillMovGen(MOVETYPE* move)
+{
+  SQUARETYPE castsq;
+  PIECETYPE promote;
+  CASTDIRTYPE castdir;
+  CASTTYPE cast;
+  short killmov;
+
+  killmov = 0;
+  if (move->spe && move->movpiece == king) {
+    CalcCastling(Player, &cast);   //  キャスリング
+    if (move->new1 > move->old)
+      castdir = shrt;
+    else
+      castdir = lng;
+
+    if (cast & castdir) {  //  キングとルークは以前に移動したことがあるか
+      castsq = (int)((move->new1 + move->old) / 2);
+      //  マスは空か?
+      if  (Board[move->new1].piece == empty)
+        if (Board[castsq].piece == empty)
+          if (move->new1 > move->old || Board[move->new1-1].piece == empty)
+            //  マスは攻撃されていないか
+            if (!Attacks(Opponent, move->old))
+              if (!Attacks(Opponent, move->new1))
+                if (!Attacks(Opponent, castsq))
+                  killmov = 1;
+    }
+
+  } else {
+    if (move->spe && move->movpiece == pawn) {
+      //  捕獲移動
+      //  相手は、２マス移動したのか?
+      if (MovTab[Depth-1].movpiece == pawn)
+        if (abs(MovTab[Depth-1].new1 - MovTab[Depth-1].old) >= 0x20)
+          if (Board[move->old].piece == pawn && Board[move->old].color == Player)
+            killmov = move->new1 == (MovTab[Depth-1].new1+MovTab[Depth-1].old) / 2;
+    } else {
+      if (move->spe) {            // 通常のテスト
+        promote = move->movpiece; // ポーン昇格
+        move->movpiece = pawn;
+      }
+
+      //  Old と New1 のマスの内容は正しいか?
+      if (Board[move->old].piece == move->movpiece)
+        if (Board[move->old].color == Player)
+          if (Board[move->new1].piece == move->content)
+            if (move->content == empty || Board[move->new1].color == Opponent) {
+              if (move->movpiece == pawn) {  //  移動可能か?
+                if (abs(move->new1 - move->old) < 0x20)
+                  killmov = 1;
+                else
+                  killmov = Board[(move->new1+move->old) / 2].piece == empty;
+              } else
+                killmov = PieceAttacks(move->movpiece, Player,
+              move->old, move->new1);
+            }
+      if (move->spe)
+        move->movpiece = promote;
+    }
+  }
+  return killmov;
+}
+
+//
+//  移動をバッファに格納
+//
+static void
+Generate()
+{
+  BufCount++;
+  Buffer[BufCount] = Next;
+}
+
+//
+//  ポーンの昇格を生成
+//
+static void
+PawnPromotionGen()
+{
+  Next.spe = 1;
+  int promote;
+  for ( promote = queen; promote <= knight; promote++) {
+    Next.movpiece = promote;
+    Generate();
+  }
+  Next.spe = 0;
+}
+
+//
+//  PieceTab を使って new1 の駒の捕獲移動を生成
+//
+static void
+CapMovGen()
+{
+  Next.spe = 0;
+  Next.content = Board[Next.new1].piece;
+  Next.movpiece = pawn;
+  EDGESQUARETYPE nextsq = Next.new1 - PawnDir[Player];
+  for (EDGESQUARETYPE sq = nextsq-1; sq <= nextsq+1; sq++)
+    if (sq != nextsq)
+      if ((sq & 0x88) == 0)
+        if (Board[sq].piece == pawn && Board[sq].color == Player) {
+          Next.old = sq;
+          if (Next.new1 < 8 || Next.new1 >= 0x70)
+            PawnPromotionGen();
+          else
+            Generate();
+        }
+
+  //  その他の捕獲、小さい駒から開始
+  for (INDEXTYPE i = OfficerNo[Player]; i >= 0; i--)
+    if (PieceTab[Player][i].ipiece != empty && PieceTab[Player][i].ipiece != pawn)
+      if (PieceAttacks(PieceTab[Player][i].ipiece, Player,
+          PieceTab[Player][i].isquare, Next.new1)) {
+        Next.old = PieceTab[Player][i].isquare;
+        Next.movpiece = PieceTab[Player][i].ipiece;
+        Generate();
+      }
+}
+
+//
+//  old の駒の無捕獲移動を生成
+//
+static void
+NonCapMovGen()
+{
+  DIRTYPE  first, last, dir;
+  int direction;
+  EDGESQUARETYPE  newsq;
+
+  Next.spe = 0;
+  Next.movpiece = Board[Next.old].piece;
+  Next.content = empty;
+  switch (Next.movpiece) {
+    case king:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = Next.old + DirTab[dir];
+        if (!(newsq & 0x88))
+        if (Board[newsq].piece == empty) {
+          Next.new1 = newsq;
+          Generate();
+        }
+      }
+      break;
+
+    case knight:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = Next.old + KnightDir[dir];
+        if (!(newsq & 0x88))
+        if (Board[newsq].piece == empty) {
+          Next.new1 = newsq;
+          Generate();
+        }
+      }
+      break;
+
+    case queen:
+    case rook:
+    case bishop:
+      first = 7;
+      last = 0;
+      if (Next.movpiece == rook)
+        first = 3;
+      if (Next.movpiece == bishop)
+        last = 4;
+      for (dir = first; dir >= last; dir--) {
+        direction = DirTab[dir];
+        newsq = Next.old + direction;
+        //  その方向で無捕獲移動を生成
+        while (!(newsq & 0x88)) {
+          if (Board[newsq].piece != empty) goto TEN;
+          Next.new1 = newsq;
+          Generate();
+          newsq = Next.new1 + direction;
+        }
+TEN:    continue;
+      }
+      break;
+
+    case pawn:
+      Next.new1 = Next.old + PawnDir[Player];  //  １マス前進
+      if (Board[Next.new1].piece == empty) {
+        if (Next.new1 < 8 || Next.new1 >= 0x70)
+          PawnPromotionGen();
+        else {
+          Generate();
+          if (Next.old < 0x18 || Next.old >= 0x60) {
+            Next.new1 += (Next.new1 - Next.old); // ２マス前進
+            if (Board[Next.new1].piece == empty)
+              Generate();
+          }
+        }
+      }
+  }
+}
+
+//
+//  移動生成
+//  InitMovGen は、すべての可能な移動を生成して、Buffer に格納する。
+//  MovGen は、１つ１つ移動を生成してそれらを Next に格納する。
+//
+//  入力:
+//    Player には移動する色が格納されている
+//    MovTab[Depth-1] に最後に実行した移動が格納されている
+//
+//  出力:
+//    Buffer に生成された移動を格納する
+//
+//    移動は次の順序で生成される:
+//      捕獲移動
+//      キャスリング移動
+//      無捕獲移動
+//      通過捕獲
+//
+
+void
+InitMovGen()
+{
+  int castdir;
+  EDGESQUARETYPE sq;
+  int index;
+
+  BufCount = BufPnt = 0;
+  //  大きい駒の捕獲から開始してすべての捕獲を生成
+  for (index = 1; index <= PawnNo[Opponent]; index++)
+    if (PieceTab[Opponent][index].ipiece != empty) {
+      Next.new1 = PieceTab[Opponent][index].isquare;
+      CapMovGen();
+    }
+
+  Next.spe = 1;
+  Next.movpiece = king;
+  Next.content = empty;
+  for (castdir = lng-1; castdir <= shrt-1; castdir++) {
+    Next.new1 = CastMove[Player][castdir].castnew;
+    Next.old = CastMove[Player][castdir].castold;
+    if (KillMovGen(&Next)) Generate();
+  }
+
+  //  無捕獲移動を生成、ポーンから開始
+  for (index = PawnNo[Player]; index >= 0; index--)
+    if (PieceTab[Player][index].ipiece != empty) {
+      Next.old = PieceTab[Player][index].isquare;
+      NonCapMovGen();
+    }
+  if (MovTab[Depth-1].movpiece == pawn)  //  通過捕獲
+    if (abs(MovTab[Depth-1].new1 - MovTab[Depth-1].old) >= 0x20) {
+      Next.spe = 1;
+      Next.movpiece = pawn;
+      Next.content = empty;
+      Next.new1 = (MovTab[Depth-1].new1 + MovTab[Depth-1].old) / 2;
+      for (sq = MovTab[Depth-1].new1-1; sq <= MovTab[Depth-1].new1+1;
+              sq++)
+        if (sq != MovTab[Depth-1].new1)
+          if (!(sq & 0x88)) {
+            Next.old = sq;
+            if (KillMovGen(&Next)) Generate();
+          }
+    }
+}
+
+//
+//  バッファから取得した次の移動を Next に置く。移動が無ければ、
+//  ZeroMove を生成。
+//
+void MovGen()
+{
+  if (BufPnt >= BufCount)
+    Next = ZeroMove;
+  else {
+    BufPnt++;
+    Next = Buffer[BufPnt];
+  }
+}

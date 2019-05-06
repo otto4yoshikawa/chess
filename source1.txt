@@ -1,0 +1,4650 @@
+/----------------------------------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/defs.h>
+#include "wcdefs.h"
+#include "externs.h"
+
+//
+//  グローバル変数
+//            
+int OfficerNo[2], PawnNo[2];
+
+//
+//  ボードをクリアしてボードモジュールを初期化
+//
+void
+ClearBoard()
+{
+  SQUARETYPE square;
+  for (square = 0; square <= 0x77; square++) {
+    Board[square].piece = empty;
+    Board[square].color = white;
+  }
+}
+
+//
+//  ボードと駒テーブルのインデックスをクリア
+//
+void
+ClearIndex()
+{
+  SQUARETYPE square;
+  COLORTYPE col;
+  INDEXTYPE index;
+
+  for (square = 0; square <= 0x77; square++)
+    Board[square].index = 16;
+  for (col = white; col <= black; ((int)col)++)
+    for (index = 0; index < 16; index++)
+      PieceTab[col][index].ipiece = empty;
+  OfficerNo[white] = PawnNo[white] = -1;
+  OfficerNo[black] = PawnNo[black] = -1;
+}
+
+//
+//  スクラッチから駒テーブルを計算
+//
+void
+CalcPieceTab()
+{
+  SQUARETYPE square;
+  PIECETYPE piece1;
+
+  ClearIndex();
+
+  for (piece1 = king; piece1 <= pawn; ((int)piece1)++) {
+    if (piece1 == pawn) {
+      OfficerNo[white] = PawnNo[white];
+      OfficerNo[black] = PawnNo[black];
+    }
+    square = 0;
+    do {
+      if (Board[square].piece == piece1) {
+        PawnNo[Board[square].color]++;
+        PieceTab[Board[square].color][PawnNo[Board[square].color]].ipiece = piece1;
+        PieceTab[Board[square].color][PawnNo[Board[square].color]].isquare = square;
+        Board[square].index = short(PawnNo[Board[square].color]);
+      }
+      square ^=  0x77;
+      if (!(square & 4)) {
+        if (square >= 0x70)
+          square = (square + 0x11) & 0x73;
+        else
+          square += 0x10;
+      }
+    } while (square);
+  }
+}
+
+//
+//  ボード上の駒を新しい位置に移動
+//
+inline void
+MovePiece(SQUARETYPE new1, SQUARETYPE old)
+{
+  BOARDTYPE b;
+  b = Board[new1];
+  Board[new1] = Board[old];
+  Board[old] = b;
+  PieceTab[Board[new1].color][Board[new1].index].isquare = new1;
+}
+
+//
+//  ルークのキャスリング移動の計算
+//
+void GenCastSquare(SQUARETYPE new1, SQUARETYPE* castsquare,
+                    SQUARETYPE* cornersquare)
+{
+  if ((new1 & 7) >= 4) {        // ショートキャッスル
+    *castsquare = new1 - 1;
+    *cornersquare = new1 + 1;
+
+  } else {                      // ロングキャッスル
+    *castsquare = new1 + 1;
+    *cornersquare = new1 - 2;
+  }
+}
+
+//
+//  この関数は、駒を捕獲する時に使用。insquare は空でないこと
+//
+inline void
+DeletePiece(SQUARETYPE insquare)
+{
+  Board[insquare].piece = empty;
+  PieceTab[Board[insquare].color][Board[insquare].index].ipiece = empty;
+}
+
+//
+//  捕獲した駒を戻す
+//
+inline void
+InsertPTabPiece(PIECETYPE inpiece, COLORTYPE incolor,
+   SQUARETYPE insquare)
+{
+    Board[insquare].piece = PieceTab[incolor][Board[insquare].index].ipiece
+            = inpiece;
+    Board[insquare].color = incolor;
+    PieceTab[incolor][Board[insquare].index].isquare = insquare;
+}
+
+//
+//  ポーンが昇格するときに使用
+//
+inline void
+ChangeType(PIECETYPE newtype, SQUARETYPE insquare)
+{
+  Board[insquare].piece
+    = PieceTab[Board[insquare].color][Board[insquare].index].ipiece = newtype;
+  if (OfficerNo[Board[insquare].color] < Board[insquare].index)
+      OfficerNo[Board[insquare].color] = Board[insquare].index;
+}
+
+//
+//  移動を行うか、元に戻し(resetmove が true のときは元に戻し)、
+//  ボードと駒テーブルを更新する。Player は移動するプレーヤー
+//  の色が、Opponent は相手の色が格納されていなければならない。
+//
+//  MovePiece、DeletePiece、InsertPTabPiece、ChangeType は
+//  ボードモジュールの更新に使用される。
+//
+void
+Perform(MOVETYPE* move, BOOL resetmove)
+{
+  SQUARETYPE castsquare, cornersquare, epsquare;
+
+  if (resetmove){
+    MovePiece(move->old, move->new1);
+    if (move->content != empty)
+      InsertPTabPiece(move->content, Opponent, move->new1);
+
+  } else {
+    if (move->content != empty)
+      DeletePiece(move->new1);
+    MovePiece(move->new1, move->old);
+  }
+
+  if (move->spe) {
+    if (move->movpiece == king) {
+      GenCastSquare(move->new1, &castsquare, &cornersquare);
+      if (resetmove)
+        MovePiece(cornersquare, castsquare);
+      else
+        MovePiece(castsquare, cornersquare);
+
+    } else {
+      if (move->movpiece == pawn) {
+        epsquare = (move->new1 & 7) + (move->old & 0x70); // 通過捕獲
+        if (resetmove)
+          InsertPTabPiece(pawn, Opponent, epsquare);
+        else
+          DeletePiece(epsquare);
+      } else {
+        if (resetmove)
+          ChangeType(pawn, move->old);
+        else
+          ChangeType(move->movpiece,move->new1);
+      }
+    }
+  }
+}
+
+//
+// ２つの移動内容の比較
+//
+BOOL
+EqMove(MOVETYPE* a, MOVETYPE* b)
+{
+  return a->movpiece == b->movpiece && a->new1 == b->new1 &&
+    a->old == b->old && a->content == b->content && a->spe == b->spe;
+}
+----------------------------------------------------------
+/----------------------------------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/static.h>
+#include <owl/inputdia.h>
+#include <bwcc.h>
+#include <string.h>
+#include <stdio.h>
+#include "wcdefs.h"
+#include "info.h"
+#include "wchess.h"
+#include "edit.h"
+#include "colors.h"
+#include "externs.h"
+
+#define min(x, y)   (((x) < (y)) ? (x) : (y))
+#define max(x, y)   (((x) > (y)) ? (x) : (y))
+
+DEFINE_RESPONSE_TABLE1(TColorsDialog, TDialog)
+  EV_WM_CTLCOLOR,
+  EV_WM_VSCROLL,
+  EV_WM_DRAWITEM,
+  EV_COMMAND(IDOK, CmOk),
+  EV_MESSAGE(CL_KILLFOCUS, EvKillFocus),
+END_RESPONSE_TABLE;
+
+TColorsDialog::TColorsDialog(TWindow* parent, const char* name)
+  : TWindow(parent),
+    TDialog(parent, name)
+{
+}
+
+TColorsDialog::~TColorsDialog()
+{
+  DeleteObject(hSBBrush[Red]);
+  DeleteObject(hSBBrush[Green]);
+  DeleteObject(hSBBrush[Blue]);
+}
+
+inline void
+TColorsDialog::CLSetFocus(HWND hWnd)
+{
+  SendMessage(WM_NEXTDLGCTL, WPARAM(hWnd), 1);
+  ::SendMessage(hWnd, EM_SETSEL, 0, MAKELONG(0, 32767));
+}
+
+BOOL
+TColorsDialog::GetColorValue(WORD id)
+{
+  int  newVal;
+  bool ok;
+  BYTE *curVal;
+  HWND hScroller, hButton;
+
+  newVal = GetDlgItemInt(id, &ok, TRUE);
+
+  switch (id) {
+    case IDD_WEDITRED:
+      curVal = &WSqColors[0];
+      hScroller = GetDlgItem(IDD_WRED);
+      hButton = WhiteSq;
+      break;
+    case IDD_WEDITGREEN:
+      curVal = &WSqColors[1];
+      hScroller = GetDlgItem(IDD_WGREEN);
+      hButton = WhiteSq;
+      break;
+    case IDD_WEDITBLUE:
+      curVal = &WSqColors[2];
+      hScroller = GetDlgItem(IDD_WBLUE);
+      hButton = WhiteSq;
+      break;
+    case IDD_BEDITRED:
+      curVal = &BSqColors[0];
+      hScroller = GetDlgItem(IDD_BRED);
+      hButton = BlackSq;
+      break;
+    case IDD_BEDITGREEN:
+      curVal = &BSqColors[1];
+      hScroller = GetDlgItem(IDD_BGREEN);
+      hButton = BlackSq;
+      break;
+    case IDD_BEDITBLUE:
+      curVal = &BSqColors[2];
+      hScroller = GetDlgItem(IDD_BBLUE);
+      hButton = BlackSq;
+      break;
+    }
+
+  if (ok)
+    ok = (newVal > 255) ? FALSE : ((newVal < 0 ) ? FALSE : TRUE);
+  else
+    newVal = *curVal;
+
+  if (!ok) {
+    Error("0 から 255 までの数値を入力してください.");
+    CLSetFocus(GetDlgItem(id));
+
+  } else if (newVal != *curVal) {
+    *curVal = (BYTE)newVal;
+    ::SetScrollPos(hScroller, SB_CTL, *curVal, TRUE);
+    ::InvalidateRect(hButton, 0, FALSE);
+  }
+  return ok;
+}
+
+void
+TColorsDialog::CmOk()
+{
+  MSG msg;
+  while (PeekMessage(&msg, HWindow, CL_KILLFOCUS, CL_KILLFOCUS, PM_NOREMOVE))
+    continue;
+
+  if (GetColorValue(IDD_WEDITRED) && GetColorValue(IDD_WEDITGREEN) &&
+      GetColorValue(IDD_WEDITBLUE) && GetColorValue(IDD_BEDITRED) &&
+      GetColorValue(IDD_BEDITGREEN) && GetColorValue(IDD_BEDITBLUE)) {
+
+    WhiteSquareColor = TColor(WSqColors[0], WSqColors[1], WSqColors[2]);
+    BlackSquareColor = TColor(BSqColors[0], BSqColors[1], BSqColors[2]);
+    CloseWindow(IDOK);
+  }
+}
+
+void
+TColorsDialog::SetupWindow()
+{
+  TDialog::SetupWindow();
+
+  WSqColors[0] = WhiteSquareColor.Red();
+  WSqColors[1] = WhiteSquareColor.Green();
+  WSqColors[2] = WhiteSquareColor.Blue();
+  BSqColors[0] = BlackSquareColor.Red();
+  BSqColors[1] = BlackSquareColor.Green();
+  BSqColors[2] = BlackSquareColor.Blue();
+
+  SetDlgItemInt(IDD_WEDITRED, WSqColors[0], FALSE);
+  SetDlgItemInt(IDD_WEDITGREEN, WSqColors[1], FALSE);
+  SetDlgItemInt(IDD_WEDITBLUE, WSqColors[2], FALSE);
+
+  ::SetScrollRange(GetDlgItem(IDD_WRED), SB_CTL, 0, 255, FALSE);
+  ::SetScrollPos(GetDlgItem(IDD_WRED), SB_CTL, WSqColors[0], FALSE);
+  ::SetScrollRange(GetDlgItem(IDD_WGREEN), SB_CTL, 0, 255, FALSE);
+  ::SetScrollPos(GetDlgItem(IDD_WGREEN), SB_CTL, WSqColors[1], FALSE);
+  ::SetScrollRange(GetDlgItem(IDD_WBLUE), SB_CTL, 0, 255, FALSE);
+  ::SetScrollPos(GetDlgItem(IDD_WBLUE), SB_CTL, WSqColors[2], FALSE);
+
+  SetDlgItemInt(IDD_BEDITRED, BSqColors[0], FALSE);
+  SetDlgItemInt(IDD_BEDITGREEN, BSqColors[1], FALSE);
+  SetDlgItemInt(IDD_BEDITBLUE, BSqColors[2], FALSE);
+
+  ::SetScrollRange(GetDlgItem(IDD_BRED), SB_CTL, 0, 255, FALSE);
+  ::SetScrollPos(GetDlgItem(IDD_BRED), SB_CTL, BSqColors[0], FALSE);
+  ::SetScrollRange(GetDlgItem(IDD_BGREEN), SB_CTL, 0, 255, FALSE);
+  ::SetScrollPos(GetDlgItem(IDD_BGREEN), SB_CTL, BSqColors[1], FALSE);
+  ::SetScrollRange(GetDlgItem(IDD_BBLUE), SB_CTL, 0, 255, FALSE);
+  ::SetScrollPos(GetDlgItem(IDD_BBLUE), SB_CTL, BSqColors[2], FALSE);
+
+  RWID = ::GetDlgCtrlID(GetDlgItem(IDD_WRED));
+  GWID = ::GetDlgCtrlID(GetDlgItem(IDD_WGREEN));
+  BWID = ::GetDlgCtrlID(GetDlgItem(IDD_WBLUE));
+
+  RBID = ::GetDlgCtrlID(GetDlgItem(IDD_BRED));
+  GBID = ::GetDlgCtrlID(GetDlgItem(IDD_BGREEN));
+  BBID = ::GetDlgCtrlID(GetDlgItem(IDD_BBLUE));
+
+  WStatic = ::GetDlgCtrlID(WhiteSq = GetDlgItem(IDD_WHITECOLOR));
+  BStatic = ::GetDlgCtrlID(BlackSq = GetDlgItem(IDD_BLACKCOLOR));
+
+  hSBBrush[Red] = CreateSolidBrush(RGB(255, 0, 0));
+  hSBBrush[Green] = CreateSolidBrush(RGB(0, 255, 0));
+  hSBBrush[Blue] = CreateSolidBrush(RGB(0, 0, 255));
+}
+
+HBRUSH
+TColorsDialog::EvCtlColor(HDC hDC, HWND hWndChild, UINT ctlType)
+{
+  int id = ::GetDlgCtrlID(hWndChild);
+  if (ctlType == CTLCOLOR_SCROLLBAR) {
+    if (id == RWID || id == RBID)
+      return hSBBrush[Red];
+    if (id == GWID || id == GBID)
+      return hSBBrush[Green];
+    if (id == BWID || id == BBID)
+      return hSBBrush[Blue];
+    }
+  return TDialog::EvCtlColor(hDC, hWndChild, ctlType);
+}
+
+void
+TColorsDialog::EvVScroll(UINT scrollCode, UINT thumbPos, HWND hWndCtl)
+{
+  int   id = ::GetDlgCtrlID(hWndCtl);
+  BYTE* color;
+  HWND  hScroller, hButton;
+  int   dlgitem;
+
+  if (id == RWID) {
+    color = &WSqColors[0];
+    hScroller = GetDlgItem(IDD_WRED);
+    dlgitem = IDD_WEDITRED;
+    hButton = WhiteSq;
+
+  } else if (id == RBID) {
+    color = &BSqColors[0];
+    hScroller = GetDlgItem(IDD_BRED);
+    dlgitem = IDD_BEDITRED;
+    hButton = BlackSq;
+
+  } else if (id == BBID) {
+    color = &BSqColors[2];
+    hScroller = GetDlgItem(IDD_BBLUE);
+    dlgitem = IDD_BEDITBLUE;
+    hButton = BlackSq;
+
+  } else if (id == BWID) {
+    color = &WSqColors[2];
+    hScroller = GetDlgItem(IDD_WBLUE);
+    dlgitem = IDD_WEDITBLUE;
+    hButton = WhiteSq;
+
+  } else if (id == GBID) {
+    color = &BSqColors[1];
+    hScroller = GetDlgItem(IDD_BGREEN);
+    dlgitem = IDD_BEDITGREEN;
+    hButton = BlackSq;
+
+  } else if (id == GWID) {
+    color = &WSqColors[1];
+    hScroller = GetDlgItem(IDD_WGREEN);
+    dlgitem = IDD_WEDITGREEN;
+    hButton = WhiteSq;
+
+  } else
+      return;
+
+  switch (scrollCode) {
+    case SB_PAGEDOWN:
+      *color += (BYTE)15;
+    case SB_LINEDOWN:
+      *color = (BYTE)min(255, *color + 1);
+      break;
+    case SB_PAGEUP:
+      *color -= (BYTE)15;
+    case SB_LINEUP:
+      *color = (BYTE)max(0, *color - 1);
+      break;
+    case SB_TOP:
+      *color = 0;
+      break;
+    case SB_BOTTOM:
+      *color = 255;
+      break;
+    case SB_THUMBPOSITION:
+    case SB_THUMBTRACK:
+      *color = (BYTE)thumbPos;
+  }
+  ::SetScrollPos(hScroller, SB_CTL, *color, TRUE);
+  SetDlgItemInt(dlgitem, *color, FALSE);
+  ::InvalidateRect(hButton, 0, FALSE);
+}
+
+void
+TColorsDialog::EvDrawItem(UINT ctlID, DRAWITEMSTRUCT far& drawInfo)
+{
+  if (drawInfo.itemAction != ODA_DRAWENTIRE)
+    return;
+
+  BYTE   *colors;
+  if (ctlID == WStatic)
+    colors = WSqColors;
+  else if (ctlID == BStatic)
+    colors = BSqColors;
+  else
+    return;
+
+  HANDLE hOldBrush = SelectObject(drawInfo.hDC,
+    CreateSolidBrush(RGB(colors[0], colors[1], colors[2])));
+
+  TRect* r = (TRect*)&drawInfo.rcItem;
+
+  ::Rectangle(drawInfo.hDC, r->left, r->top, r->right, r->bottom);
+  DeleteObject(SelectObject(drawInfo.hDC, hOldBrush));
+}
+
+LRESULT
+TColorsDialog::EvKillFocus(WPARAM wParam, LPARAM)
+{
+  WORD id = (WORD)wParam;
+  HWND focus = GetFocus();
+
+  if (GetDlgItem(id) == focus || GetDlgItem(IDCANCEL) == focus ||
+      GetActiveWindow() != HWindow)
+    return 0;
+  GetColorValue(id);
+  return 1;
+}
+
+LRESULT
+TColorsDialog::EvCommand(UINT id, HWND hWndCtl, UINT notifyCode)
+{
+  if (hWndCtl && notifyCode == EN_KILLFOCUS) {
+    if (::SendMessage(hWndCtl, EM_GETMODIFY, 0, 0))
+      PostMessage(CL_KILLFOCUS, id);
+    return 1;
+  }
+  return TDialog::EvCommand(id, hWndCtl, notifyCode);
+}
+------------------------------------------------
+//----------------------------------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/defs.h>
+#include <stdio.h>
+#include <string.h>
+#include <bwcc.h>
+#include "wcdefs.h"
+#include "wchess.h"
+#include "info.h"
+#include "externs.h"
+
+
+//
+//  グローバル変数
+//
+BOARDIDTYPE Display[0x78];
+char *PieceLetter = " KQRBNP";
+char buf[280];   //  汎用文字列バッファ、各所で使用
+
+//
+//  静的グローバル変数
+//
+static TRect BoardRect;
+
+//
+//  指定した駒のビットマップハンドル
+//
+HBITMAP
+GetBitmapHandle(PIECETYPE piece, COLORTYPE pcolor)
+{
+  if (!piece)
+    return 0;
+  return PieceBmpArray[piece - 1][pcolor];
+}
+
+
+//
+//  情報表示ウィンドウのすべての情報を消去
+//
+void
+ClearInfoWindow()
+{
+  TInfo->Reset();
+}
+
+//
+//  プレイする側の色を表示
+//
+void
+ColorToPlay(COLORTYPE color)
+{
+  TInfo->SetTurnText(color == white ? "白" : "黒");
+}
+
+void
+Message(char* str)
+{
+  TInfo->SetMessageText(str);
+}
+
+void
+Error(char* str)
+{
+  if (SoundOn)
+    MessageBeep(0);
+  strcpy(buf, str);
+  SendMessage(hWndMain, WM_COMMAND, EM_ERROR, 0L);
+}
+
+void
+Warning(char* str)
+{
+  if (SoundOn)
+    MessageBeep(0);
+  Message(str);
+}
+
+//
+//  駒の移動を文字列に変換
+//
+char*
+MoveStr(MOVETYPE* move)
+{
+  static char str[7];
+
+  strcpy(str, "   ");
+  if (move->movpiece != empty) {
+    if (move->spe && move->movpiece == king) { //  キャスリング
+      if (move->new1 > move->old)
+        strcpy(str, "O-O  ");
+      else
+        strcpy(str, "O-O-O ");
+
+    } else {
+      str[0] = PieceLetter[move->movpiece];
+      str[1] = char('a' + move->old % 16);
+      str[2] = char('1' + move->old / 16);
+      str[3] = move->content == empty ? '-' : 'x';
+      str[4] = char('a' + move->new1 % 16);
+      str[5] = char('1' + move->new1 / 16);
+    }
+  }
+  return str;
+}
+
+
+void
+PrintMove(int moveno, COLORTYPE programcolor, MOVETYPE* move, double time)
+{
+  int minutes = (int)(time / 60.0);
+
+  sprintf(buf, "%2.2d:%#04.1f %3.3d. %s", minutes, time - minutes * 60.0, moveno / 2 + 1, MoveStr(move));
+  if (programcolor == white)
+    TInfo->SetWhiteInfoText(buf);
+  else
+    TInfo->SetBlackInfoText(buf);
+}
+
+//
+//  ３次元枠を描画
+//
+void
+DrawFrame(HDC hDC, TRect& rect, BOOL drawBackground)
+{
+  int x1 = rect.left;
+  int x2 = rect.right;
+  int y1 = rect.top;
+  int y2 = rect.bottom;
+
+  //
+  // 枠の輪郭を描き、要求があれば背景を消去する
+  //
+  HBRUSH hOldBrush = (HBRUSH)SelectObject(hDC,
+      GetStockObject(drawBackground ? LTGRAY_BRUSH : NULL_BRUSH));
+  HPEN hOldPen = (HPEN)SelectObject(hDC, GetStockObject(WHITE_PEN));
+  Rectangle(hDC, x1, y1, x2, y2);
+
+  //
+  // 枠の高い部分であるライトグレーの長方形を描く
+  //
+  HPEN hPen = CreatePen(PS_SOLID, 1, RGB(192, 192, 192));
+  SelectObject(hDC, hPen);
+  Rectangle(hDC, x1+1, y1+1, x2-1, y2-1);
+  DeleteObject(SelectObject(hDC, GetStockObject(WHITE_PEN)));
+
+  //
+  // 枠の右と下部の明るい部分を描く
+  //
+  TPoint points[3];
+  points[0].x = x1 + 2;
+  points[1].y = points[0].y = y2 - 3;
+  points[2].x = points[1].x = x2 - 3;
+  points[2].y = y1 + 2;
+  Polyline(hDC, points, 3);
+
+  //
+  // 枠の右と下部の影を描く
+  //
+  hPen = CreatePen(PS_SOLID, 1, RGB(128, 128, 128));
+  SelectObject(hDC, hPen);
+  points[0].x = x1;
+  points[1].y = points[0].y = y2-1;
+  points[2].x = points[1].x = x2-1;
+  points[2].y = y1;
+  Polyline(hDC, points, 3);
+  SetPixel(hDC, x2-1, y2-1, RGB(128, 128, 128));
+
+  //
+  // 枠の左と上部の影を描く
+  //
+  points[1].x = points[0].x = x1 + 2;
+  points[0].y = y2 - 3;
+  points[2].y = points[1].y = y1 + 2;
+  points[2].x = x2 - 3;
+  Polyline(hDC, points, 3);
+  SelectObject(hDC, hOldBrush);
+  DeleteObject(SelectObject(hDC, hOldPen));
+
+  //
+  // 影と明るい部分が交わる斜線の角を忘れてはいけない
+  //
+  SetPixel(hDC, x2-1, y1,   RGB(192, 192, 192));
+  SetPixel(hDC, x2-3, y1+2, RGB(192, 192, 192));
+  SetPixel(hDC, x1,   y2-1, RGB(192, 192, 192));
+  SetPixel(hDC, x1+2, y2-3, RGB(192, 192, 192));
+}
+
+//
+//  現在のレベルを表示
+//
+void
+PrintCurLevel()
+{
+  extern BOOL MultiMove;
+
+  if (MultiMove)
+    strcpy(buf, "２人用");
+  else {
+    switch (Level) {
+      case normal:
+        sprintf(buf, "%1.0f 秒 / 手", AverageTime);
+        break;
+      case fullgametime:
+        sprintf(buf, "%2.2f 分 / 試合", AverageTime);
+        break;
+      case easygame:
+        strcpy(buf, "やさしい");
+        break;
+      case infinite :
+        strcpy(buf, "無限先読み");
+        break;
+      case plysearch :
+        sprintf(buf, "先読み深さ = %d", MaxLevel);
+        break;
+      case matesearch:
+        strcpy(buf, "詰めを読む");
+        break;
+      case matching :
+        strcpy(buf, "対等な時間");
+        break;
+    }
+  }
+  TInfo->SetLevelText(buf);
+}
+
+TPoint
+GetSquareXY(SQUARETYPE square)
+{
+  if (Turned)
+    square ^= 0x77;
+  return TPoint((square % 8) * SQUARE_SIZE + BORDERSIZE + MYFRAMESIZE,
+                (7 - square / 16) * SQUARE_SIZE + BORDERSIZE + MYFRAMESIZE);
+}
+
+void
+ClearSquare(SQUARETYPE square)
+{
+  TPoint p = GetSquareXY(square);
+  HDC hDC = GetDC(hWndMain);
+
+  HANDLE hOldBrush;
+  if ((square % 8 + square /16) % 2 == 1)
+    hOldBrush = SelectObject(hDC, hWhiteBrush);
+  else
+    hOldBrush = SelectObject(hDC, hBlackBrush);
+  PatBlt(hDC, p.x, p.y, SQUARE_SIZE, SQUARE_SIZE, PATCOPY);
+  SelectObject(hDC, hOldBrush);
+  ReleaseDC(hWndMain, hDC);
+}
+
+void
+ClearDisplay()
+{
+  ClearInfoWindow();
+  for (SQUARETYPE sq = 0; sq <= 0x77; sq++)
+    Display[sq].piece = empty;
+}
+
+//
+//  画面にボードを表示
+//
+void
+DrawBoard()
+{
+  unsigned char no;
+  HDC hDC;
+  const SQUARETYPE printno[64] = {
+    0x00, 0x10, 0x20, 0x30, 0x40, 0x50, 0x60, 0x70,
+    0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x67,
+    0x57, 0x47, 0x37, 0x27, 0x17, 0x07, 0x06, 0x05,
+    0x04, 0x03, 0x02, 0x01, 0x11, 0x21, 0x31, 0x41,
+    0x51, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x56,
+    0x46, 0x36, 0x26, 0x16, 0x15, 0x14, 0x13, 0x12,
+    0x22, 0x32, 0x42, 0x52, 0x53, 0x54, 0x55, 0x45,
+    0x35, 0x25, 0x24, 0x23, 0x33, 0x43, 0x44, 0x34
+  };
+
+  BoardRect.left = BoardRect.top = BORDERSIZE;
+  BoardRect.right = BoardRect.bottom = BORDERSIZE + 2*MYFRAMESIZE + 8*SQUARE_SIZE;
+
+  hDC = GetDC(hWndMain);
+  DrawFrame(hDC, BoardRect);
+  ReleaseDC(hWndMain, hDC);
+  for (no = 0; no < 64; no++)
+    ClearSquare(printno[no]);
+}
+
+
+void
+PrintPiece(SQUARETYPE square, PIECETYPE piece, COLORTYPE color, DWORD Rop)
+{
+  if (piece == empty)
+   return;
+
+  HBITMAP hBitmap = PieceBmpArray[piece-1][color];
+  HBITMAP hMaskBmp = MaskArray[piece-1];
+
+  HDC hDC = GetDC(hWndMain);
+  HDC hMemoryDC = CreateCompatibleDC(hDC);
+
+  BITMAP bitmap;
+  GetObject(hBitmap, sizeof(BITMAP), &bitmap);
+  HANDLE hOldBmp = SelectObject(hMemoryDC, hMaskBmp);
+  TPoint p = GetSquareXY(square);
+
+  BitBlt(hDC, p.x, p.y, bitmap.bmWidth, bitmap.bmHeight, hMemoryDC, 0, 0, SRCAND);
+  SelectObject(hMemoryDC, hBitmap);
+  BitBlt(hDC, p.x, p.y, bitmap.bmWidth, bitmap.bmHeight, hMemoryDC, 0, 0, Rop);
+  SelectObject(hMemoryDC, hOldBmp);
+  DeleteDC(hMemoryDC);
+  ReleaseDC(hWndMain, hDC);
+}
+
+void
+InitDisplay()
+{
+  for (SQUARETYPE square = 0; square <= 0x77; square++)
+    if (!(square & 0x88))
+      if (Board[square].piece != Display[square].piece ||
+          Board[square].piece != empty &&
+          Board[square].color != Display[square].color) {
+        Display[square].piece = Board[square].piece;
+        Display[square].color = Board[square].color;
+      }
+}
+
+//
+//  効き筋にある駒の枠を表示。
+//  Defended が TRUE (守護されている)なら黒、そうでなければ赤。
+//
+static void
+FrameSquare(SQUARETYPE square, BOOL Defended)
+{
+  HDC hDC;
+  hDC = GetDC(hWndMain);
+
+  TPoint p = GetSquareXY(square);
+  HANDLE hOldBrush = SelectObject(hDC, GetStockObject(NULL_BRUSH));
+  HANDLE hOldPen = SelectObject(hDC,
+    Defended ? GetStockObject(BLACK_PEN) : CreatePen(PS_SOLID,1,RGB(192, 0, 0)));
+
+  Rectangle(hDC, p.x+1, p.y+1, p.x+SQUARE_SIZE-1, p.y+SQUARE_SIZE-1);
+  SelectObject(hDC, hOldBrush);
+  SelectObject(hDC, hOldPen);
+  ReleaseDC(hWndMain, hDC);
+}
+
+void
+HideAttacks()
+{
+  for (SQUARETYPE square = 0; square <= 0x77; square++)
+    if (!(square & 0x88)) {
+      if (Board[square].attacked) {
+        Board[square].attacked = FALSE;
+        ClearSquare(square);
+        PrintPiece(square, Board[square].piece, Board[square].color, SRCINVERT);
+      }
+    }
+}
+
+void
+ShowAttacks()
+{
+  for (SQUARETYPE square = 0; square <= 0x77; square++)
+    if (!(square & 0x88)) {
+      if (Attacks(ComputerColor, square) && Board[square].color != ComputerColor && Board[square].piece != empty) {
+        Board[square].attacked = TRUE;
+        if (Attacks((COLORTYPE)!ComputerColor, square))
+          FrameSquare(square, TRUE);
+        else
+          FrameSquare(square, FALSE);
+
+      } else if (Board[square].attacked) {
+        Board[square].attacked = FALSE;
+        ClearSquare(square);
+        PrintPiece(square, Board[square].piece, Board[square].color, SRCINVERT);
+      }
+    }
+}
+
+void
+UpdateBoard()
+{
+  for (SQUARETYPE square = 0; square <= 0x77; square++)
+    if (!(square & 0x88))
+      if (Board[square].piece != Display[square].piece ||
+          Board[square].piece != empty &&
+          Board[square].color != Display[square].color) {
+        if (Display[square].piece != empty)
+          ClearSquare(square);
+        Display[square].piece = Board[square].piece;
+        Display[square].color = Board[square].color;
+        if (Board[square].piece != empty)
+          PrintPiece(square, Board[square].piece,Board[square].color, SRCINVERT);
+      }
+  if (Level == easygame && !Editing)
+    ShowAttacks();
+}
+
+static void DrawAlphaNum();
+
+void
+PrintBoard()
+{
+  DrawBoard();
+  for (SQUARETYPE square = 0; square <= 0x77; square++)
+    if (!(square & 0x88)) {
+      if (Display[square].piece != empty)
+        PrintPiece(square, Display[square].piece, Display[square].color, SRCINVERT);
+    }
+  DrawAlphaNum();
+  if (Level == easygame && !Editing)
+    ShowAttacks();
+}
+
+//
+//  渡された座標の位置にあるマスを見つけ、そこが player の色の
+//  駒かどうか調べる。
+//
+SQUARETYPE
+GetValidSquare(TPoint p, COLORTYPE player, BOOL CheckPiece)
+{
+  for (SQUARETYPE square = 0; square <= 0x77; square++) {
+    if (!(square & 0x88)) {
+      TPoint point = GetSquareXY(square);
+      TRect  sqrect(point, TSize(SQUARE_SIZE, SQUARE_SIZE));
+      if (sqrect.Contains(p)) {
+        if ((Display[square].color == player && Display[square].piece != empty) || !CheckPiece)
+          return square;
+      }
+    }
+  }
+  return -1;
+}
+
+void
+DrawNormalBitmap(SQUARETYPE square)
+{
+  ClearSquare(square);
+  PrintPiece(square, Display[square].piece, Display[square].color, SRCINVERT);
+}
+
+void
+DrawInvertedBitmap(SQUARETYPE square)
+{
+  PrintPiece(square, Display[square].piece, Display[square].color, NOTSRCERASE);
+}
+
+void
+OpeningLibMsg()
+{
+  TInfo->SetMessageText("ｵｰﾌﾟﾆﾝｸﾞ使用");
+}
+
+void
+PrintNodes(NODEVAL* nodes, double time)
+{
+  double nodereal = nodes->nodebase * MAXINT + nodes->nodeoffset;
+  char buf[80];
+  if (time) {
+    sprintf(buf, "%7.1f", nodereal/time);
+    TInfo->SetSecondsText(buf);
+  }
+  sprintf(buf, "%7.0f ", nodereal);
+  TInfo->SetNodeText(buf);
+}
+
+//
+//  画面に最善手を表示
+//
+void
+PrintBestMove(MOVETYPE *mainline, MAXTYPE mainevalu)
+{
+  if (ShowBestLine == FALSE)
+    return;
+
+  *buf = 0;
+  DEPTHTYPE dep = 0;
+  while (dep < 7 && mainline[dep].movpiece != empty) {
+   strcat(buf, MoveStr(&mainline[dep++]));
+   strcat(buf, " ");
+  }
+  TInfo->SetBestLineText(buf);
+  sprintf(buf, "%7.2f", mainevalu/256.0);
+  TInfo->SetValueText(buf);
+}
+
+void
+ClearBestLine()
+{
+  TInfo->SetBestLineText("");
+}
+
+void
+ClearMessage()
+{
+  TInfo->SetMessageText("");
+}
+
+static char * CharArray[] = { "a","b", "c", "d", "e", "f", "g", "h" };
+static char * NumArray[] = { "1", "2", "3", "4", "5", "6", "7", "8" };
+
+static void
+DrawBump(HDC hDC, int x, int y)
+{
+  int x2 = x + CHARSIZE + 2;
+  int y2 = y-- + LINESIZE + 1;
+  x -= 2;
+
+  HANDLE hOldBrush = SelectObject(hDC, GetStockObject(LTGRAY_BRUSH));
+  HANDLE hOldPen = SelectObject(hDC, GetStockObject(WHITE_PEN));
+
+  Rectangle(hDC, x, y, x2, y2);
+
+  SelectObject(hDC, CreatePen(PS_SOLID, 1, RGB(128, 128, 128)));
+  TPoint points[3];
+  points[0].x = ++x;
+  points[1].y = points[0].y = y2;
+  points[2].x = points[1].x = x2;
+  points[2].y = ++y;
+  Polyline(hDC, points, 3);
+
+  SelectObject(hDC, hOldBrush);
+  DeleteObject(SelectObject(hDC, hOldPen));
+}
+
+static void
+DrawAlphaNum()
+{
+  HDC hDC = GetDC(hWndMain);
+
+  int xPos = (BORDERSIZE + MYFRAMESIZE)/2 - CHARSIZE/2;
+  int yPos = BORDERSIZE + SQUARE_SIZE/2 - LINESIZE/2;
+
+  SetBkColor(hDC, RGB(192, 192, 192));
+
+  int i;
+  for (i = 7; i >= 0; i--) {
+    DrawBump(hDC, xPos, yPos);
+    if (Turned)
+      TextOut(hDC, xPos, yPos, NumArray[7-i], 1);
+    else
+      TextOut(hDC, xPos, yPos, NumArray[i], 1);
+    yPos += SQUARE_SIZE;
+  }
+
+  xPos = BORDERSIZE + SQUARE_SIZE/2 - CHARSIZE/2;
+  yPos = BORDERSIZE + 8*SQUARE_SIZE + 2*MYFRAMESIZE + 1;
+
+  for (i = 0; i < 8; i++) {
+    DrawBump(hDC, xPos, yPos);
+    if (Turned)
+      TextOut(hDC, xPos, yPos, CharArray[7-i], 1);
+    else
+      TextOut(hDC, xPos, yPos, CharArray[i], 1);
+    xPos += SQUARE_SIZE;
+  }
+  ReleaseDC(hWndMain, hDC);
+}
+
+void
+SetClassWindowCursor(HWND hWnd, HCURSOR hCursor)
+{
+#if defined(BI_PLAT_WIN32)
+  SetClassLong(hWnd, GCL_HCURSOR, long(hCursor));
+#else
+  SetClassWord(hWnd, GCW_HCURSOR, WORD(hCursor));
+#endif
+  SetCursor(hCursor);
+}
+^// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/defs.h>
+#include <math.h>
+//#include "wcdefs.h"
+#include "externs.h"
+
+//
+//  グローバル変数
+//
+static ATTACKTABTYPE attack[240];
+ATTACKTABTYPE *AttackTab = &attack[120];
+SETOFPIECE BitTab[7] = {0, 1, 2, 4, 8, 0x10, 0x20};
+int DirTab[8] = { 1, -1, 0x10, -0x10, 0x11, -0x11, 0x0f, -0x0f};
+int KnightDir[8] = {0x0E, -0x0E, 0x12, -0x12, 0x1f, -0x1f, 0x21, -0x21};
+int PawnDir[2] = {0x10, -0x10};
+MOVETYPE Next;
+int BufCount, BufPnt;
+MOVETYPE Buffer[81];
+CASTMOVETYPE  CastMove[2][2] = { {{2, 4}, {6, 4}}, {{0x72, 0x74}, {0x76, 0x74}} };
+
+
+void
+CalcAttackTab()
+{
+  for (int sq = -0x77; sq <= 0x77; sq++) {
+    AttackTab[sq].pieceset = 0;
+    AttackTab[sq].direction = 0;
+  }
+
+  for (DIRTYPE dir = 7; dir >= 0; dir--) {
+    for (unsigned char i = 1; i < 8; i++) {
+      if (dir < 4)
+        AttackTab[DirTab[dir]*i].pieceset = SETOFPIECE(BitTab[queen]+BitTab[rook]);
+      else
+        AttackTab[DirTab[dir]*i].pieceset = SETOFPIECE(BitTab[queen]+BitTab[bishop]);
+      AttackTab[DirTab[dir]*i].direction = DirTab[dir];
+    }
+    AttackTab[DirTab[dir]].pieceset += SETOFPIECE(BitTab[king]);
+    AttackTab[KnightDir[dir]].pieceset = SETOFPIECE(BitTab[knight]);
+    AttackTab[KnightDir[dir]].direction = KnightDir[dir];
+  }
+}
+
+//
+//  asquare のマス上の apiece の駒が、square のマスを攻撃できるかどうか計算
+//
+short
+PieceAttacks(PIECETYPE apiece, COLORTYPE acolor, SQUARETYPE asquare, SQUARETYPE square)
+{
+  int x = square - asquare;
+  if (apiece == pawn)  //  ポーンの攻撃
+    return abs(x - PawnDir[acolor]) == 1;
+
+  //  他の攻撃: 駒はそのマスに移動可能か?
+  if (AttackTab[x].pieceset & BitTab[apiece]) {
+    if (apiece == king || apiece == knight)
+      return 1;
+
+    //  間にブロックしている駒があるか?
+    EDGESQUARETYPE sq = asquare;
+    do {
+      sq += AttackTab[x].direction;
+    } while (sq != square && Board[sq].piece == empty);
+    return sq == square;
+  }
+  return 0;
+}
+
+//
+//  acolor 側が square のマスのポーンで攻撃できるか計算
+//
+short
+PawnAttacks(COLORTYPE acolor, SQUARETYPE square)
+{
+  EDGESQUARETYPE sq = square - PawnDir[acolor] - 1;  //  左のマス
+  if (!(sq & 0x88))
+    if (Board[sq].piece == pawn && Board[sq].color == acolor)
+      return 1;
+
+  sq += 2;  //  右のマス
+  if (!(sq & 0x88))
+    if (Board[sq].piece == pawn && Board[sq].color == acolor)
+      return 1;
+
+  return 0;
+}
+
+//
+//  acolor 側が square のマスを攻撃できるかどうか計算
+//
+short
+Attacks(COLORTYPE acolor, SQUARETYPE square)
+{
+  if (PawnAttacks(acolor, square))  //  ポーンの攻撃
+    return 1;
+
+  //  他の攻撃:  小さい駒始めてすべての駒を検査
+  for (INDEXTYPE i = OfficerNo[acolor]; i >= 0; i--)
+    if (PieceTab[acolor][i].ipiece != empty)
+      if (PieceAttacks(PieceTab[acolor][i].ipiece, acolor,
+          PieceTab[acolor][i].isquare, square))
+        return 1;
+  return 0;
+}
+
+//
+//  square のマス上に inpiece の駒があって、一度も動いたことがないかどうか検査
+//
+short
+Check(SQUARETYPE square, PIECETYPE inpiece, COLORTYPE incolor)
+{
+  if(Board[square].piece == inpiece && Board[square].color == incolor) {
+    DEPTHTYPE dep = DEPTHTYPE(Depth - 1);
+    while (MovTab[dep].movpiece != empty) {
+      if (MovTab[dep].new1 == square)
+        return 0;
+      dep--;
+    }
+    return 1;
+  }
+  return 0;
+}
+
+//
+//  incolor の色がキャスリングできるかどうか検査
+//
+void
+CalcCastling(COLORTYPE incolor,  CASTDIRTYPE *cast)
+{
+  SQUARETYPE square = 0;
+
+  if (incolor == black)
+    square = 0x70;
+  *cast = zero;
+  if (Check(square + 4, king, incolor)) { //  キングを検査
+    if (Check(square, rook, incolor))
+      ((int)*cast) += lng;                //  A 列のルークを検査
+    if (Check(square + 7, rook, incolor))
+      ((int)*cast) += shrt;               //  H 列のルークを検査
+  }
+}
+
+//
+//  移動が、ポーン移動または捕獲移動か検査
+//
+inline short
+RepeatMove(MOVETYPE* move)
+{
+  return move->movpiece != empty && move->movpiece != pawn &&
+         move->content == empty && !move->spe;
+}
+
+//----------------------------------------------------------------------------
+
+//
+//  最後に捕獲するか、ポーンが移動してからの移動数を数える
+//  fiftymovecnt = 100 なら、ゲームは引き分け
+//
+FIFTYTYPE
+FiftyMoveCnt()
+{
+  FIFTYTYPE cnt = 0;
+  while (RepeatMove(&MovTab[Depth - cnt]))
+    cnt++;
+  return cnt;
+}
+
+//
+//  以前にその位置が何回発生したかを計算。
+//  Repetition が３を返したとき、ゲームは引き分け。
+//  MovTab[back..Depth] に最後に実行した移動が格納されている
+//  immediate がセットされていれば、直前の繰り返しのみ検査
+//
+REPEATTYPE
+Repetition(short immediate)
+{
+  DEPTHTYPE lastdep, compdep, tracedep, checkdep, samedepth;
+  SQUARETYPE tracesq, checksq;
+  REPEATTYPE repeatcount;
+
+  repeatcount = 1;
+  lastdep = samedepth = DEPTHTYPE(Depth + 1);  //  現在の位置
+  compdep = DEPTHTYPE(samedepth - 4);      //  比較する最初の位置
+
+  //  MovTab[lastdep..Depth] には以前の関連した移動が格納されている
+  while (RepeatMove(&MovTab[lastdep - 1]) && (compdep < lastdep || !immediate))
+    lastdep--;
+  if (compdep < lastdep)
+    return repeatcount;
+  checkdep = samedepth;
+  for (;;) {
+    checkdep--;
+    checksq = MovTab[checkdep].new1;
+    for (tracedep = DEPTHTYPE(checkdep + 2); tracedep < samedepth; tracedep += DEPTHTYPE(2))
+      if (MovTab[tracedep].old == checksq)
+        goto TEN;
+
+    //  以前の移動を取り消すことになるか、移動をさかのぼって検索
+    tracedep = checkdep;
+    tracesq = MovTab[tracedep].old;
+    do {
+      if (tracedep-2 < lastdep)
+        return repeatcount;
+      tracedep -= (DEPTHTYPE)2;
+      //  以前に移動した駒か検査
+      if (tracesq == MovTab[tracedep].new1)
+        tracesq = MovTab[tracedep].old;
+    } while (tracesq != checksq || tracedep > compdep + 1);
+    if (tracedep < compdep) {  //  compdep を調整
+      compdep = tracedep;
+      if ((samedepth - compdep) % 2 == 1) {
+        if (compdep == lastdep) return repeatcount;
+        compdep --;
+      }
+      checkdep = samedepth;
+    }
+    //  samedep と compdep 間のすべての移動は検査され、
+    //  繰り返しが検出された
+TEN:
+    if (checkdep <= compdep) {
+      repeatcount++;
+      if (compdep - 2 < lastdep) return repeatcount;
+      checkdep = samedepth = compdep;
+      compdep -= (DEPTHTYPE)2;
+    }
+  }
+}
+
+//
+//  移動可能か検査
+//
+//  入力:
+//   move は、違う位置で生成された正しい移動の完全な記述が格納されている
+//   MovTab[Depth-1] に最後に実行した移動が格納されている
+//
+//  出力:
+//   KillMovGen は、移動可能かどうかを返す
+//
+short
+KillMovGen(MOVETYPE* move)
+{
+  SQUARETYPE castsq;
+  PIECETYPE promote;
+  CASTDIRTYPE castdir;
+  CASTTYPE cast;
+  short killmov;
+
+  killmov = 0;
+  if (move->spe && move->movpiece == king) {
+    CalcCastling(Player, &cast);   //  キャスリング
+    if (move->new1 > move->old)
+      castdir = shrt;
+    else
+      castdir = lng;
+
+    if (cast & castdir) {  //  キングとルークは以前に移動したことがあるか
+      castsq = (int)((move->new1 + move->old) / 2);
+      //  マスは空か?
+      if  (Board[move->new1].piece == empty)
+        if (Board[castsq].piece == empty)
+          if (move->new1 > move->old || Board[move->new1-1].piece == empty)
+            //  マスは攻撃されていないか
+            if (!Attacks(Opponent, move->old))
+              if (!Attacks(Opponent, move->new1))
+                if (!Attacks(Opponent, castsq))
+                  killmov = 1;
+    }
+
+  } else {
+    if (move->spe && move->movpiece == pawn) {
+      //  捕獲移動
+      //  相手は、２マス移動したのか?
+      if (MovTab[Depth-1].movpiece == pawn)
+        if (abs(MovTab[Depth-1].new1 - MovTab[Depth-1].old) >= 0x20)
+          if (Board[move->old].piece == pawn && Board[move->old].color == Player)
+            killmov = move->new1 == (MovTab[Depth-1].new1+MovTab[Depth-1].old) / 2;
+    } else {
+      if (move->spe) {            // 通常のテスト
+        promote = move->movpiece; // ポーン昇格
+        move->movpiece = pawn;
+      }
+
+      //  Old と New1 のマスの内容は正しいか?
+      if (Board[move->old].piece == move->movpiece)
+        if (Board[move->old].color == Player)
+          if (Board[move->new1].piece == move->content)
+            if (move->content == empty || Board[move->new1].color == Opponent) {
+              if (move->movpiece == pawn) {  //  移動可能か?
+                if (abs(move->new1 - move->old) < 0x20)
+                  killmov = 1;
+                else
+                  killmov = Board[(move->new1+move->old) / 2].piece == empty;
+              } else
+                killmov = PieceAttacks(move->movpiece, Player,
+              move->old, move->new1);
+            }
+      if (move->spe)
+        move->movpiece = promote;
+    }
+  }
+  return killmov;
+}
+
+//
+//  移動をバッファに格納
+//
+static void
+Generate()
+{
+  BufCount++;
+  Buffer[BufCount] = Next;
+}
+
+//
+//  ポーンの昇格を生成
+//
+static void
+PawnPromotionGen()
+{
+  Next.spe = 1;
+  for (PIECETYPE promote = queen; promote <= knight; ((int)promote)++) {
+    Next.movpiece = promote;
+    Generate();
+  }
+  Next.spe = 0;
+}
+
+//
+//  PieceTab を使って new1 の駒の捕獲移動を生成
+//
+static void
+CapMovGen()
+{
+  Next.spe = 0;
+  Next.content = Board[Next.new1].piece;
+  Next.movpiece = pawn;
+  EDGESQUARETYPE nextsq = Next.new1 - PawnDir[Player];
+  for (EDGESQUARETYPE sq = nextsq-1; sq <= nextsq+1; sq++)
+    if (sq != nextsq)
+      if ((sq & 0x88) == 0)
+        if (Board[sq].piece == pawn && Board[sq].color == Player) {
+          Next.old = sq;
+          if (Next.new1 < 8 || Next.new1 >= 0x70)
+            PawnPromotionGen();
+          else
+            Generate();
+        }
+
+  //  その他の捕獲、小さい駒から開始
+  for (INDEXTYPE i = OfficerNo[Player]; i >= 0; i--)
+    if (PieceTab[Player][i].ipiece != empty && PieceTab[Player][i].ipiece != pawn)
+      if (PieceAttacks(PieceTab[Player][i].ipiece, Player,
+          PieceTab[Player][i].isquare, Next.new1)) {
+        Next.old = PieceTab[Player][i].isquare;
+        Next.movpiece = PieceTab[Player][i].ipiece;
+        Generate();
+      }
+}
+
+//
+//  old の駒の無捕獲移動を生成
+//
+static void
+NonCapMovGen()
+{
+  DIRTYPE  first, last, dir;
+  int direction;
+  EDGESQUARETYPE  newsq;
+
+  Next.spe = 0;
+  Next.movpiece = Board[Next.old].piece;
+  Next.content = empty;
+  switch (Next.movpiece) {
+    case king:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = Next.old + DirTab[dir];
+        if (!(newsq & 0x88))
+        if (Board[newsq].piece == empty) {
+          Next.new1 = newsq;
+          Generate();
+        }
+      }
+      break;
+
+    case knight:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = Next.old + KnightDir[dir];
+        if (!(newsq & 0x88))
+        if (Board[newsq].piece == empty) {
+          Next.new1 = newsq;
+          Generate();
+        }
+      }
+      break;
+
+    case queen:
+    case rook:
+    case bishop:
+      first = 7;
+      last = 0;
+      if (Next.movpiece == rook)
+        first = 3;
+      if (Next.movpiece == bishop)
+        last = 4;
+      for (dir = first; dir >= last; dir--) {
+        direction = DirTab[dir];
+        newsq = Next.old + direction;
+        //  その方向で無捕獲移動を生成
+        while (!(newsq & 0x88)) {
+          if (Board[newsq].piece != empty) goto TEN;
+          Next.new1 = newsq;
+          Generate();
+          newsq = Next.new1 + direction;
+        }
+TEN:    continue;
+      }
+      break;
+
+    case pawn:
+      Next.new1 = Next.old + PawnDir[Player];  //  １マス前進
+      if (Board[Next.new1].piece == empty) {
+        if (Next.new1 < 8 || Next.new1 >= 0x70)
+          PawnPromotionGen();
+        else {
+          Generate();
+          if (Next.old < 0x18 || Next.old >= 0x60) {
+            Next.new1 += (Next.new1 - Next.old); // ２マス前進
+            if (Board[Next.new1].piece == empty)
+              Generate();
+          }
+        }
+      }
+  }
+}
+
+//
+//  移動生成
+//  InitMovGen は、すべての可能な移動を生成して、Buffer に格納する。
+//  MovGen は、１つ１つ移動を生成してそれらを Next に格納する。
+//
+//  入力:
+//    Player には移動する色が格納されている
+//    MovTab[Depth-1] に最後に実行した移動が格納されている
+//
+//  出力:
+//    Buffer に生成された移動を格納する
+//
+//    移動は次の順序で生成される:
+//      捕獲移動
+//      キャスリング移動
+//      無捕獲移動
+//      通過捕獲
+//
+
+void
+InitMovGen()
+{
+  CASTDIRTYPE castdir;
+  EDGESQUARETYPE sq;
+  INDEXTYPE index;
+
+  BufCount = BufPnt = 0;
+  //  大きい駒の捕獲から開始してすべての捕獲を生成
+  for (index = 1; index <= PawnNo[Opponent]; index++)
+    if (PieceTab[Opponent][index].ipiece != empty) {
+      Next.new1 = PieceTab[Opponent][index].isquare;
+      CapMovGen();
+    }
+
+  Next.spe = 1;
+  Next.movpiece = king;
+  Next.content = empty;
+  for (castdir = CASTDIRTYPE(lng-1); castdir <= shrt-1; ((int)castdir)++) {
+    Next.new1 = CastMove[Player][castdir].castnew;
+    Next.old = CastMove[Player][castdir].castold;
+    if (KillMovGen(&Next)) Generate();
+  }
+
+  //  無捕獲移動を生成、ポーンから開始
+  for (index = PawnNo[Player]; index >= 0; index--)
+    if (PieceTab[Player][index].ipiece != empty) {
+      Next.old = PieceTab[Player][index].isquare;
+      NonCapMovGen();
+    }
+  if (MovTab[Depth-1].movpiece == pawn)  //  通過捕獲
+    if (abs(MovTab[Depth-1].new1 - MovTab[Depth-1].old) >= 0x20) {
+      Next.spe = 1;
+      Next.movpiece = pawn;
+      Next.content = empty;
+      Next.new1 = (MovTab[Depth-1].new1 + MovTab[Depth-1].old) / 2;
+      for (sq = MovTab[Depth-1].new1-1; sq <= MovTab[Depth-1].new1+1;
+              sq++)
+        if (sq != MovTab[Depth-1].new1)
+          if (!(sq & 0x88)) {
+            Next.old = sq;
+            if (KillMovGen(&Next)) Generate();
+          }
+    }
+}
+
+//
+//  バッファから取得した次の移動を Next に置く。移動が無ければ、
+//  ZeroMove を生成。
+//
+void MovGen()
+{
+  if (BufPnt >= BufCount)
+    Next = ZeroMove;
+  else {
+    BufPnt++;
+    Next = Buffer[BufPnt];
+  }
+}
+------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/defs.h>
+#include <math.h>
+//#include "wcdefs.h"
+#include "externs.h"
+
+//
+//  グローバル変数
+//
+static ATTACKTABTYPE attack[240];
+ATTACKTABTYPE *AttackTab = &attack[120];
+SETOFPIECE BitTab[7] = {0, 1, 2, 4, 8, 0x10, 0x20};
+int DirTab[8] = { 1, -1, 0x10, -0x10, 0x11, -0x11, 0x0f, -0x0f};
+int KnightDir[8] = {0x0E, -0x0E, 0x12, -0x12, 0x1f, -0x1f, 0x21, -0x21};
+int PawnDir[2] = {0x10, -0x10};
+MOVETYPE Next;
+int BufCount, BufPnt;
+MOVETYPE Buffer[81];
+CASTMOVETYPE  CastMove[2][2] = { {{2, 4}, {6, 4}}, {{0x72, 0x74}, {0x76, 0x74}} };
+
+
+void
+CalcAttackTab()
+{
+  for (int sq = -0x77; sq <= 0x77; sq++) {
+    AttackTab[sq].pieceset = 0;
+    AttackTab[sq].direction = 0;
+  }
+
+  for (DIRTYPE dir = 7; dir >= 0; dir--) {
+    for (unsigned char i = 1; i < 8; i++) {
+      if (dir < 4)
+        AttackTab[DirTab[dir]*i].pieceset = SETOFPIECE(BitTab[queen]+BitTab[rook]);
+      else
+        AttackTab[DirTab[dir]*i].pieceset = SETOFPIECE(BitTab[queen]+BitTab[bishop]);
+      AttackTab[DirTab[dir]*i].direction = DirTab[dir];
+    }
+    AttackTab[DirTab[dir]].pieceset += SETOFPIECE(BitTab[king]);
+    AttackTab[KnightDir[dir]].pieceset = SETOFPIECE(BitTab[knight]);
+    AttackTab[KnightDir[dir]].direction = KnightDir[dir];
+  }
+}
+
+//
+//  asquare のマス上の apiece の駒が、square のマスを攻撃できるかどうか計算
+//
+short
+PieceAttacks(PIECETYPE apiece, COLORTYPE acolor, SQUARETYPE asquare, SQUARETYPE square)
+{
+  int x = square - asquare;
+  if (apiece == pawn)  //  ポーンの攻撃
+    return abs(x - PawnDir[acolor]) == 1;
+
+  //  他の攻撃: 駒はそのマスに移動可能か?
+  if (AttackTab[x].pieceset & BitTab[apiece]) {
+    if (apiece == king || apiece == knight)
+      return 1;
+
+    //  間にブロックしている駒があるか?
+    EDGESQUARETYPE sq = asquare;
+    do {
+      sq += AttackTab[x].direction;
+    } while (sq != square && Board[sq].piece == empty);
+    return sq == square;
+  }
+  return 0;
+}
+
+//
+//  acolor 側が square のマスのポーンで攻撃できるか計算
+//
+short
+PawnAttacks(COLORTYPE acolor, SQUARETYPE square)
+{
+  EDGESQUARETYPE sq = square - PawnDir[acolor] - 1;  //  左のマス
+  if (!(sq & 0x88))
+    if (Board[sq].piece == pawn && Board[sq].color == acolor)
+      return 1;
+
+  sq += 2;  //  右のマス
+  if (!(sq & 0x88))
+    if (Board[sq].piece == pawn && Board[sq].color == acolor)
+      return 1;
+
+  return 0;
+}
+
+//
+//  acolor 側が square のマスを攻撃できるかどうか計算
+//
+short
+Attacks(COLORTYPE acolor, SQUARETYPE square)
+{
+  if (PawnAttacks(acolor, square))  //  ポーンの攻撃
+    return 1;
+
+  //  他の攻撃:  小さい駒始めてすべての駒を検査
+  for (INDEXTYPE i = OfficerNo[acolor]; i >= 0; i--)
+    if (PieceTab[acolor][i].ipiece != empty)
+      if (PieceAttacks(PieceTab[acolor][i].ipiece, acolor,
+          PieceTab[acolor][i].isquare, square))
+        return 1;
+  return 0;
+}
+
+//
+//  square のマス上に inpiece の駒があって、一度も動いたことがないかどうか検査
+//
+short
+Check(SQUARETYPE square, PIECETYPE inpiece, COLORTYPE incolor)
+{
+  if(Board[square].piece == inpiece && Board[square].color == incolor) {
+    DEPTHTYPE dep = DEPTHTYPE(Depth - 1);
+    while (MovTab[dep].movpiece != empty) {
+      if (MovTab[dep].new1 == square)
+        return 0;
+      dep--;
+    }
+    return 1;
+  }
+  return 0;
+}
+
+//
+//  incolor の色がキャスリングできるかどうか検査
+//
+void
+CalcCastling(COLORTYPE incolor,  CASTDIRTYPE *cast)
+{
+  SQUARETYPE square = 0;
+
+  if (incolor == black)
+    square = 0x70;
+  *cast = zero;
+  if (Check(square + 4, king, incolor)) { //  キングを検査
+    if (Check(square, rook, incolor))
+      ((int)*cast) += lng;                //  A 列のルークを検査
+    if (Check(square + 7, rook, incolor))
+      ((int)*cast) += shrt;               //  H 列のルークを検査
+  }
+}
+
+//
+//  移動が、ポーン移動または捕獲移動か検査
+//
+inline short
+RepeatMove(MOVETYPE* move)
+{
+  return move->movpiece != empty && move->movpiece != pawn &&
+         move->content == empty && !move->spe;
+}
+
+//----------------------------------------------------------------------------
+
+//
+//  最後に捕獲するか、ポーンが移動してからの移動数を数える
+//  fiftymovecnt = 100 なら、ゲームは引き分け
+//
+FIFTYTYPE
+FiftyMoveCnt()
+{
+  FIFTYTYPE cnt = 0;
+  while (RepeatMove(&MovTab[Depth - cnt]))
+    cnt++;
+  return cnt;
+}
+
+//
+//  以前にその位置が何回発生したかを計算。
+//  Repetition が３を返したとき、ゲームは引き分け。
+//  MovTab[back..Depth] に最後に実行した移動が格納されている
+//  immediate がセットされていれば、直前の繰り返しのみ検査
+//
+REPEATTYPE
+Repetition(short immediate)
+{
+  DEPTHTYPE lastdep, compdep, tracedep, checkdep, samedepth;
+  SQUARETYPE tracesq, checksq;
+  REPEATTYPE repeatcount;
+
+  repeatcount = 1;
+  lastdep = samedepth = DEPTHTYPE(Depth + 1);  //  現在の位置
+  compdep = DEPTHTYPE(samedepth - 4);      //  比較する最初の位置
+
+  //  MovTab[lastdep..Depth] には以前の関連した移動が格納されている
+  while (RepeatMove(&MovTab[lastdep - 1]) && (compdep < lastdep || !immediate))
+    lastdep--;
+  if (compdep < lastdep)
+    return repeatcount;
+  checkdep = samedepth;
+  for (;;) {
+    checkdep--;
+    checksq = MovTab[checkdep].new1;
+    for (tracedep = DEPTHTYPE(checkdep + 2); tracedep < samedepth; tracedep += DEPTHTYPE(2))
+      if (MovTab[tracedep].old == checksq)
+        goto TEN;
+
+    //  以前の移動を取り消すことになるか、移動をさかのぼって検索
+    tracedep = checkdep;
+    tracesq = MovTab[tracedep].old;
+    do {
+      if (tracedep-2 < lastdep)
+        return repeatcount;
+      tracedep -= (DEPTHTYPE)2;
+      //  以前に移動した駒か検査
+      if (tracesq == MovTab[tracedep].new1)
+        tracesq = MovTab[tracedep].old;
+    } while (tracesq != checksq || tracedep > compdep + 1);
+    if (tracedep < compdep) {  //  compdep を調整
+      compdep = tracedep;
+      if ((samedepth - compdep) % 2 == 1) {
+        if (compdep == lastdep) return repeatcount;
+        compdep --;
+      }
+      checkdep = samedepth;
+    }
+    //  samedep と compdep 間のすべての移動は検査され、
+    //  繰り返しが検出された
+TEN:
+    if (checkdep <= compdep) {
+      repeatcount++;
+      if (compdep - 2 < lastdep) return repeatcount;
+      checkdep = samedepth = compdep;
+      compdep -= (DEPTHTYPE)2;
+    }
+  }
+}
+
+//
+//  移動可能か検査
+//
+//  入力:
+//   move は、違う位置で生成された正しい移動の完全な記述が格納されている
+//   MovTab[Depth-1] に最後に実行した移動が格納されている
+//
+//  出力:
+//   KillMovGen は、移動可能かどうかを返す
+//
+short
+KillMovGen(MOVETYPE* move)
+{
+  SQUARETYPE castsq;
+  PIECETYPE promote;
+  CASTDIRTYPE castdir;
+  CASTTYPE cast;
+  short killmov;
+
+  killmov = 0;
+  if (move->spe && move->movpiece == king) {
+    CalcCastling(Player, &cast);   //  キャスリング
+    if (move->new1 > move->old)
+      castdir = shrt;
+    else
+      castdir = lng;
+
+    if (cast & castdir) {  //  キングとルークは以前に移動したことがあるか
+      castsq = (int)((move->new1 + move->old) / 2);
+      //  マスは空か?
+      if  (Board[move->new1].piece == empty)
+        if (Board[castsq].piece == empty)
+          if (move->new1 > move->old || Board[move->new1-1].piece == empty)
+            //  マスは攻撃されていないか
+            if (!Attacks(Opponent, move->old))
+              if (!Attacks(Opponent, move->new1))
+                if (!Attacks(Opponent, castsq))
+                  killmov = 1;
+    }
+
+  } else {
+    if (move->spe && move->movpiece == pawn) {
+      //  捕獲移動
+      //  相手は、２マス移動したのか?
+      if (MovTab[Depth-1].movpiece == pawn)
+        if (abs(MovTab[Depth-1].new1 - MovTab[Depth-1].old) >= 0x20)
+          if (Board[move->old].piece == pawn && Board[move->old].color == Player)
+            killmov = move->new1 == (MovTab[Depth-1].new1+MovTab[Depth-1].old) / 2;
+    } else {
+      if (move->spe) {            // 通常のテスト
+        promote = move->movpiece; // ポーン昇格
+        move->movpiece = pawn;
+      }
+
+      //  Old と New1 のマスの内容は正しいか?
+      if (Board[move->old].piece == move->movpiece)
+        if (Board[move->old].color == Player)
+          if (Board[move->new1].piece == move->content)
+            if (move->content == empty || Board[move->new1].color == Opponent) {
+              if (move->movpiece == pawn) {  //  移動可能か?
+                if (abs(move->new1 - move->old) < 0x20)
+                  killmov = 1;
+                else
+                  killmov = Board[(move->new1+move->old) / 2].piece == empty;
+              } else
+                killmov = PieceAttacks(move->movpiece, Player,
+              move->old, move->new1);
+            }
+      if (move->spe)
+        move->movpiece = promote;
+    }
+  }
+  return killmov;
+}
+
+//
+//  移動をバッファに格納
+//
+static void
+Generate()
+{
+  BufCount++;
+  Buffer[BufCount] = Next;
+}
+
+//
+//  ポーンの昇格を生成
+//
+static void
+PawnPromotionGen()
+{
+  Next.spe = 1;
+  for (PIECETYPE promote = queen; promote <= knight; ((int)promote)++) {
+    Next.movpiece = promote;
+    Generate();
+  }
+  Next.spe = 0;
+}
+
+//
+//  PieceTab を使って new1 の駒の捕獲移動を生成
+//
+static void
+CapMovGen()
+{
+  Next.spe = 0;
+  Next.content = Board[Next.new1].piece;
+  Next.movpiece = pawn;
+  EDGESQUARETYPE nextsq = Next.new1 - PawnDir[Player];
+  for (EDGESQUARETYPE sq = nextsq-1; sq <= nextsq+1; sq++)
+    if (sq != nextsq)
+      if ((sq & 0x88) == 0)
+        if (Board[sq].piece == pawn && Board[sq].color == Player) {
+          Next.old = sq;
+          if (Next.new1 < 8 || Next.new1 >= 0x70)
+            PawnPromotionGen();
+          else
+            Generate();
+        }
+
+  //  その他の捕獲、小さい駒から開始
+  for (INDEXTYPE i = OfficerNo[Player]; i >= 0; i--)
+    if (PieceTab[Player][i].ipiece != empty && PieceTab[Player][i].ipiece != pawn)
+      if (PieceAttacks(PieceTab[Player][i].ipiece, Player,
+          PieceTab[Player][i].isquare, Next.new1)) {
+        Next.old = PieceTab[Player][i].isquare;
+        Next.movpiece = PieceTab[Player][i].ipiece;
+        Generate();
+      }
+}
+
+//
+//  old の駒の無捕獲移動を生成
+//
+static void
+NonCapMovGen()
+{
+  DIRTYPE  first, last, dir;
+  int direction;
+  EDGESQUARETYPE  newsq;
+
+  Next.spe = 0;
+  Next.movpiece = Board[Next.old].piece;
+  Next.content = empty;
+  switch (Next.movpiece) {
+    case king:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = Next.old + DirTab[dir];
+        if (!(newsq & 0x88))
+        if (Board[newsq].piece == empty) {
+          Next.new1 = newsq;
+          Generate();
+        }
+      }
+      break;
+
+    case knight:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = Next.old + KnightDir[dir];
+        if (!(newsq & 0x88))
+        if (Board[newsq].piece == empty) {
+          Next.new1 = newsq;
+          Generate();
+        }
+      }
+      break;
+
+    case queen:
+    case rook:
+    case bishop:
+      first = 7;
+      last = 0;
+      if (Next.movpiece == rook)
+        first = 3;
+      if (Next.movpiece == bishop)
+        last = 4;
+      for (dir = first; dir >= last; dir--) {
+        direction = DirTab[dir];
+        newsq = Next.old + direction;
+        //  その方向で無捕獲移動を生成
+        while (!(newsq & 0x88)) {
+          if (Board[newsq].piece != empty) goto TEN;
+          Next.new1 = newsq;
+          Generate();
+          newsq = Next.new1 + direction;
+        }
+TEN:    continue;
+      }
+      break;
+
+    case pawn:
+      Next.new1 = Next.old + PawnDir[Player];  //  １マス前進
+      if (Board[Next.new1].piece == empty) {
+        if (Next.new1 < 8 || Next.new1 >= 0x70)
+          PawnPromotionGen();
+        else {
+          Generate();
+          if (Next.old < 0x18 || Next.old >= 0x60) {
+            Next.new1 += (Next.new1 - Next.old); // ２マス前進
+            if (Board[Next.new1].piece == empty)
+              Generate();
+          }
+        }
+      }
+  }
+}
+
+//
+//  移動生成
+//  InitMovGen は、すべての可能な移動を生成して、Buffer に格納する。
+//  MovGen は、１つ１つ移動を生成してそれらを Next に格納する。
+//
+//  入力:
+//    Player には移動する色が格納されている
+//    MovTab[Depth-1] に最後に実行した移動が格納されている
+//
+//  出力:
+//    Buffer に生成された移動を格納する
+//
+//    移動は次の順序で生成される:
+//      捕獲移動
+//      キャスリング移動
+//      無捕獲移動
+//      通過捕獲
+//
+
+void
+InitMovGen()
+{
+  CASTDIRTYPE castdir;
+  EDGESQUARETYPE sq;
+  INDEXTYPE index;
+
+  BufCount = BufPnt = 0;
+  //  大きい駒の捕獲から開始してすべての捕獲を生成
+  for (index = 1; index <= PawnNo[Opponent]; index++)
+    if (PieceTab[Opponent][index].ipiece != empty) {
+      Next.new1 = PieceTab[Opponent][index].isquare;
+      CapMovGen();
+    }
+
+  Next.spe = 1;
+  Next.movpiece = king;
+  Next.content = empty;
+  for (castdir = CASTDIRTYPE(lng-1); castdir <= shrt-1; ((int)castdir)++) {
+    Next.new1 = CastMove[Player][castdir].castnew;
+    Next.old = CastMove[Player][castdir].castold;
+    if (KillMovGen(&Next)) Generate();
+  }
+
+  //  無捕獲移動を生成、ポーンから開始
+  for (index = PawnNo[Player]; index >= 0; index--)
+    if (PieceTab[Player][index].ipiece != empty) {
+      Next.old = PieceTab[Player][index].isquare;
+      NonCapMovGen();
+    }
+  if (MovTab[Depth-1].movpiece == pawn)  //  通過捕獲
+    if (abs(MovTab[Depth-1].new1 - MovTab[Depth-1].old) >= 0x20) {
+      Next.spe = 1;
+      Next.movpiece = pawn;
+      Next.content = empty;
+      Next.new1 = (MovTab[Depth-1].new1 + MovTab[Depth-1].old) / 2;
+      for (sq = MovTab[Depth-1].new1-1; sq <= MovTab[Depth-1].new1+1;
+              sq++)
+        if (sq != MovTab[Depth-1].new1)
+          if (!(sq & 0x88)) {
+            Next.old = sq;
+            if (KillMovGen(&Next)) Generate();
+          }
+    }
+}
+
+//
+//  バッファから取得した次の移動を Next に置く。移動が無ければ、
+//  ZeroMove を生成。
+//
+void MovGen()
+{
+  if (BufPnt >= BufCount)
+    Next = ZeroMove;
+  else {
+    BufPnt++;
+    Next = Buffer[BufPnt];
+  }
+}
+------------------------------------
+//----------------------------------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/defs.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include "wcdefs.h"
+#include "externs.h"
+
+
+struct SAVERESTORE {
+  COLORTYPE Player, Opponent, ProgramColor;
+  BOOL Turned;
+  BOOL MultiMove, AutoPlay, SingleStep;
+  LEVELTYPE Level;
+  double AverageTime;
+  BOOL MaxLevel;
+  int MoveNo;
+  double ChessClockTotalTime, BlackTotalTime, WhiteTotalTime;
+  int PieceValue[7];
+};
+
+static BOOL
+SaveBoard(char* savefile)
+{
+  FILE*        gameboard;
+  SAVERESTORE* save;
+
+  save = new SAVERESTORE;
+  if (!save) {
+    MessageBox(hWndMain, "実行するのに必要なﾒﾓﾘが足りません",
+      "OWL Chess", MB_OK | MB_ICONHAND);
+    return 0;
+  }
+  if ((gameboard = fopen(savefile, "wb")) == 0) {
+    sprintf(buf, "%s がｵｰﾌﾟﾝできません(書き込み用)", savefile);
+    MessageBox(hWndMain, buf, "OWL Chess", MB_OK | MB_ICONHAND);
+    delete save;
+    return 0;
+  }
+
+  save->Player = Player;
+  save->Opponent = Opponent;
+  save->ProgramColor = ProgramColor;
+  save->Turned = Turned;
+  save->MultiMove = MultiMove;
+  save->AutoPlay = AutoPlay;
+  save->SingleStep = SingleStep;
+  save->Level = Level;
+  save->AverageTime = AverageTime;
+  save->MaxLevel = MaxLevel;
+  save->MoveNo = MoveNo;
+  save->ChessClockTotalTime = ChessClock.totaltime;
+  save->BlackTotalTime = ChessTime[black].totaltime;
+  save->WhiteTotalTime = ChessTime[white].totaltime;
+  memcpy(save->PieceValue, PieceValue, 7 * sizeof(int));
+  fwrite(save, sizeof(*save), 1, gameboard);
+  fwrite(Board, sizeof(Board), 1, gameboard);
+  fclose(gameboard);
+  delete save;
+  return 1;
+}
+
+void
+SaveGame(char* savefile)
+{
+  if (strlen(savefile) > 0)
+    if (!SaveBoard(savefile))
+      Error("保存中にｴﾗｰが発生しました");
+}
+
+void
+LoadBoard(char* loadfile)
+{
+  FILE*        load;
+  SAVERESTORE* restore;
+
+  restore = new SAVERESTORE;
+
+  if (!restore) {
+    MessageBox(hWndMain, "実行するのに必要なﾒﾓﾘが足りません",
+      "OWL Chess", MB_OK | MB_ICONHAND);
+    return;
+  }
+
+  if ((load = fopen(loadfile, "rb")) == 0)
+      Error("ﾌｧｲﾙが見つかりません");
+
+  else {
+    fread(restore, sizeof(SAVERESTORE), 1, load);
+    fread(Board, sizeof(Board), 1, load);
+    fclose(load);
+    Player = restore->Player;
+    Opponent = restore->Opponent;
+    ProgramColor = restore->ProgramColor;
+    Turned = restore->Turned;
+    MultiMove = restore->MultiMove;
+    AutoPlay = restore->AutoPlay;
+    SingleStep = restore->SingleStep;
+    Level = restore->Level;
+    AverageTime = restore->AverageTime;
+    MaxLevel = restore->MaxLevel;
+    MoveNo = restore->MoveNo;
+    ChessClock.totaltime = restore->ChessClockTotalTime;
+    ChessTime[black].totaltime = restore->BlackTotalTime ;
+    ChessTime[white].totaltime = restore->WhiteTotalTime;
+    memcpy(PieceValue, restore->PieceValue, 7 * sizeof(int));
+    ClearDisplay();
+    InitDisplay();
+    InvalidateRect(hWndMain, 0, TRUE);
+    PrintCurLevel();
+    ResetNewPos();
+  }
+  delete restore;
+}
+
+//----------------------------------------------------------------------------
+
+void
+RestoreGame(char* loadfile)
+{
+  if (strlen(loadfile))
+    LoadBoard(loadfile);
+  else
+    Error("ｹﾞｰﾑﾌｧｲﾙを読み込めませんでした");
+}
+--------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/defs.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dos.h>
+#include <stdio.h>
+#include "wcdefs.h"
+#include "wchess.h"
+#include "externs.h"
+#include "info.h"
+
+#undef max
+#undef min
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+
+BOOL      ComputerThinking = false;
+BOOL      GotValidMove = false;
+COLORTYPE Player, Opponent;
+DEPTHTYPE Depth;
+LINETYPE  MainLine;
+MAXTYPE   MainEvalu;
+int       MaxDepth;
+int       LegalMoves;
+PIECETAB  PieceTab[2][16];
+WORD      MessageToPost;
+BOOL      NoComputerMove = false;
+
+extern double WantedTime;
+
+static MOVETYPE movetemp[MAXPLY - BACK + 2];
+
+MOVETYPE* MovTab = &movetemp[-BACK];
+
+#define TOLERANCE       8
+#define IF_EQMOVE(a, b) if (a.movpiece == b.movpiece && a.new1 == b.new1 &&\
+                            a.old == b.old && a.content == b.content &&\
+                            a.spe == b.spe)
+
+struct INFTYPE {
+  short   principvar;         // Principal variation search
+  MAXTYPE value;              // 静止評価値の増分
+  MAXTYPE evaluation;         // 位置の評価値
+};
+enum MOVGENTYPE { mane, specialcap, kill, norml };  //  移動の種類
+struct SEARCHTYPE {
+  LINETYPE   line;            // 次の手の最善手
+  short      capturesearch;   // 捕獲検索を示す
+  MAXTYPE    maxval;          // search が返した最大評価値
+  int        nextply;         // 次の手の読みの深さ
+  INFTYPE    next;            // 次の手の情報
+  short      zerowindow;      // α-β範囲の幅がゼロ
+  MOVGENTYPE movgentype;
+};
+
+struct PARAMTYPE {
+  MAXTYPE     alpha;
+  MAXTYPE     beta;
+  int         ply;
+  INFTYPE*    inf;
+  MOVETYPE*   bestline;
+  SEARCHTYPE* s;
+};
+
+//
+//  このモジュールのグローバル変数
+//
+MOVETYPE killingmove[MAXPLY+1][2];
+short    chcktb[MAXPLY+3];
+short*   checktab = &chcktb[1];
+
+//  ７番目の横列に来るポーンのマス
+EDGESQUARETYPE  passdpawn[MAXPLY+4];
+EDGESQUARETYPE* passedpawn = &passdpawn[2];
+BOOL            SkipSearch;
+
+
+inline void
+DisplayMove()
+{
+  if (!Depth) {
+    sprintf(buf, "%-7d%7s", MaxDepth, MoveStr(&MovTab[0]));
+    TInfo->SetDepthText(buf);
+  }
+}
+
+//
+//  killingmove、checktab、passedpawn を初期化
+//
+static void
+clearkillmove()
+{
+  const SQUARETYPE rank7[2] = {0x60, 0x10};
+  DEPTHTYPE dep;
+  COLORTYPE col;
+  SQUARETYPE sq;
+  unsigned char i;
+
+  for (dep = 0; dep <= MAXPLY; dep++)
+    for (i = 0; i < 2; i++)
+      killingmove[dep][i] = ZeroMove;
+  checktab[-1] = 0;
+  passedpawn[-2] = -1;  //  最初の手は検査しない
+  passedpawn[-1] = -1;
+
+  //  ７番目の横列に来るポーンを passedpawn に置く
+  for (col = white; col <= black; ((int)col)++)
+    for (sq = rank7[col]; sq <= rank7[col] + 7; sq++)
+      if ((Board[sq].piece == pawn) && (Board[sq].color == col))
+        if (col == Player)
+          passedpawn[-2] = sq;
+        else
+          passedpawn[-1] = sq;
+}
+
+static DEPTHTYPE searchstatedepth;
+
+//
+//  検索の保存と表示するための環境のセットアップ
+//
+static void
+getprogramstate()
+{
+  COLORTYPE oldplayer;
+
+  searchstatedepth = Depth;
+  while (Depth > 0) {
+    Depth--;
+    oldplayer = Opponent;
+    Opponent = Player;
+    Player = oldplayer;
+    Perform(&MovTab[Depth], 1);
+  }
+  Depth--;
+  if (Opan)
+    TakeBackMove(&MovTab[Depth]);
+}
+
+
+//
+//  検索の環境を復旧
+//
+static void
+getsearchstate()
+{
+  COLORTYPE oldplayer;
+
+  if (Opan) MakeMove(&MovTab[Depth+1]);
+  Depth++;
+  while (Depth < searchstatedepth) {
+    Perform(&MovTab[Depth], 0);
+    oldplayer = Player;
+    Player = Opponent;
+    Opponent = oldplayer;
+    Depth++;
+  }
+}
+
+inline bool
+UsableMessage(MSG msg)
+{
+  if (msg.hwnd != hWndMain || msg.message != WM_COMMAND)
+    return false;
+  return true;
+}
+
+static void
+MessageScan()
+{
+  MSG msg;
+  extern HACCEL hAccel;
+
+  if (!::PeekMessage(&msg, hWndMain, 0, 0, PM_REMOVE))
+    return;
+  if (::TranslateAccelerator(hWndMain, hAccel, &msg)) {
+    PostMessage(hWndMain, WM_COMMAND, MessageToPost, 0L);
+    MessageToPost = 0;
+    SkipSearch = false;
+    return;
+  }
+
+  if (Analysis) {
+    switch (msg.message) {
+      case WM_SETCURSOR:
+        DispatchMessage(&msg);
+        break;
+      case WM_COMMAND:
+        switch (msg.wParam) {
+          case CM_STOP:
+            SkipSearch = true;
+            AutoPlay = false;
+            break;
+        }
+        break;
+      default:
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+        break;
+    }
+
+  } else {
+    switch (msg.message) {
+      case WM_LBUTTONDOWN:
+        getprogramstate();
+        NoComputerMove = true;
+        GotValidMove = false;
+        DispatchMessage(&msg);
+        NoComputerMove = false;
+        if (Opan && !MultiMove && GotValidMove) {
+          IF_EQMOVE(KeyMove, MovTab[Depth + 1]) {
+            SkipSearch = false;
+            GotValidMove = false;
+            EnterKeyMove();
+            StartAnalysis();
+            PrintBestMove(&MainLine[0], MainEvalu);
+            ::SetMenu(hWndMain, ThinkMenu);
+            ::SetClassWindowCursor(hWndMain, hWaitCursor);
+
+          } else
+            SkipSearch = true;
+        }
+        getsearchstate();
+        break;
+      default:
+        if (UsableMessage(msg)) {
+          SkipSearch = true;
+          if (msg.message != WM_PAINT)
+            PostMessage(msg.hwnd, msg.message, msg.wParam, msg.lParam);
+
+        } else {
+          TranslateMessage(&msg);
+          DispatchMessage(&msg);
+        }
+        break;
+    }
+  }
+}
+
+
+static INFTYPE startinf;     //  最初の手の情報
+static MAXTYPE alphawindow;  //  α値
+static MAXTYPE repeatevalu;  //  １手の MainEvalu
+
+static MAXTYPE search(MAXTYPE alpha, MAXTYPE beta, int ply, INFTYPE* inf,
+    MOVETYPE* bestline);
+
+//
+//  最善手を使用して killingmove を更新
+//
+inline void
+updatekill(MOVETYPE* bestmove)
+{
+  if (bestmove->movpiece != empty) {
+    // 最後に移動した駒の捕獲の移動を除いて
+    // killingmove を更新
+    if (MovTab[Depth - 1].movpiece == empty || bestmove->new1 != MovTab[Depth-1].new1)
+      if (killingmove[Depth][0].movpiece == empty || EqMove(bestmove, &killingmove[Depth][1])) {
+        killingmove[Depth][1] = killingmove[Depth][0];
+        killingmove[Depth][0] = *bestmove;
+
+      } else if (!EqMove(bestmove, &killingmove[Depth][0]))
+        killingmove[Depth][1] = *bestmove;
+  }
+}
+
+//
+//  以前に移動が生成されたか検査
+//
+short
+generatedbefore(PARAMTYPE* p)
+{
+  if (p->s->movgentype != mane) {
+    IF_EQMOVE(MovTab[Depth], p->bestline[Depth])
+      return 1;
+
+    if (!p->s->capturesearch)
+      if (p->s->movgentype != kill)
+        for (char i = 0; i < 2; i++)
+          IF_EQMOVE(MovTab[Depth], killingmove[Depth][i])
+            return 1;
+  }
+  return 0;
+}
+
+//
+//  カットオフの検査。cutval は最大評価可能値
+//
+inline short
+cut(MAXTYPE cutval, PARAMTYPE* p)
+{
+  short ct = 0;
+
+  if (cutval <= p->alpha) {
+    ct = 1;
+    if (p->s->maxval < cutval)
+      p->s->maxval = cutval;
+  }
+  return ct;
+}
+
+//
+//  移動を実行、評価計算、カットオフの検査、等
+//
+static short
+update(PARAMTYPE* p)
+{
+  short selection;
+
+  IncNode(&Nodes);
+  p->s->nextply = p->ply - 1;    //  次の手を計算
+  if (Level == matesearch) {     //  詰みを読む
+    Perform(&MovTab[Depth], 0);  //  ボード上で移動を実行
+    //  移動が正しいか検査
+    if (Attacks(Opponent, PieceTab[Player][0].isquare))
+      goto TAKEBACKMOVE;
+    if (!Depth)
+      LegalMoves++;
+    checktab[Depth] = 0;
+    passedpawn[Depth] = -1;
+    p->s->next.value = p->s->next.evaluation = 0;
+    if (p->s->nextply <= 0) {    //  検査して評価を実行。カットオフする
+      if (!p->s->nextply)
+        checktab[Depth] = Attacks(Player,
+          PieceTab[Opponent][0].isquare);
+      if (!checktab[Depth])
+        if (cut(p->s->next.value, p))
+          goto TAKEBACKMOVE;
+    }
+    goto ACCEPTMOVE;
+  }
+
+  //  最初の繰り返しは制限付きの捕獲検索にする
+  //
+  if (MaxDepth <= 1)
+    if (p->s->capturesearch && Depth >= 2)
+      if (!(MovTab[Depth].content < MovTab[Depth].movpiece ||
+            p->s->movgentype == specialcap ||
+            MovTab[Depth].old == MovTab[Depth-2].new1))
+        goto CUTMOVE;
+
+  //  次の静止評価を変更分だけ計算
+  p->s->next.value = -p->inf->value + StatEvalu(&MovTab[Depth]);
+
+  //  checktab を計算（移動した駒は計算されたか検査するだけ）
+  //  思考しないで検査
+  checktab[Depth] = PieceAttacks(MovTab[Depth].movpiece, Player,
+    MovTab[Depth].new1, PieceTab[Opponent][0].isquare);
+  if (checktab[Depth])
+    p->s->nextply = p->ply;
+
+  //  passedpawn を計算。
+  //  ポーンが７番目の横列に移動する時は思考しない
+  passedpawn[Depth] = passedpawn[Depth - 2];
+  if (MovTab[Depth].movpiece == pawn)
+    if (MovTab[Depth].new1 < 0x18 || MovTab[Depth].new1 >= 0x60) {
+      passedpawn[Depth] = MovTab[Depth].new1;
+      p->s->nextply = p->ply;
+    }
+
+  //  最後の思考時の選択と、捕獲の検索
+  selection = (p->s->nextply <= 0 && !checktab[Depth] && Depth > 0);
+  if (selection)   //  評価を検査
+    if (cut(p->s->next.value + 0, p))
+      goto CUTMOVE;
+  Perform(&MovTab[Depth], 0);  //  ボード上の移動を実行する
+
+  //  移動が正しいか検査
+  if (Attacks(Opponent, PieceTab[Player][0].isquare))
+    goto TAKEBACKMOVE;
+  if (passedpawn[Depth] >= 0)  //  passedpawn を検査
+    if (Board[passedpawn[Depth]].piece != pawn ||
+        Board[passedpawn[Depth]].color != Player)
+      passedpawn[Depth] = -1;
+  if (!Depth) {
+    LegalMoves++;
+    p->s->next.value += random(4);
+  }
+  p->s->next.evaluation = p->s->next.value;
+
+ACCEPTMOVE:
+  if (Analysis)
+    DisplayMove();
+  return 0;
+
+TAKEBACKMOVE:
+  Perform(&MovTab[Depth], 1);
+
+CUTMOVE:
+  if (Analysis)
+    DisplayMove();
+  return 1;
+}
+
+//
+//  引き分けのボーナスとペナルティの計算、ゲームが引き分けなら 1 を返す
+//
+static short
+drawgame(SEARCHTYPE* s)
+{
+  int        drawcount;
+  REPEATTYPE searchrepeat;
+  FIFTYTYPE  searchfifty;
+
+  if (Depth == 1) {
+    searchfifty = FiftyMoveCnt();
+    searchrepeat = Repetition(0);
+    if (searchrepeat >= 3) {
+      s->next.evaluation = 0;
+      return 1;
+    }
+    drawcount = 0;
+    if (searchfifty >= 96)         //  ポーン移動と捕獲のない 48 回の移動
+      drawcount = 3;
+    else {
+      if (searchrepeat >= 2)       //  ２度目の繰り返し
+        drawcount = 2;
+      else if (searchfifty >= 20)  //  ポーン移動と捕獲の
+         drawcount = 1;            //  ない 10 回の移動
+    }
+    s->next.value += (repeatevalu / 4) * drawcount;
+    s->next.evaluation += (repeatevalu / 4 ) * drawcount;
+  }
+  if (Depth >= 3) {
+    searchrepeat = Repetition(1);
+    if (searchrepeat >= 2) {       //  短い繰り返しは、引き分け
+      s->next.evaluation = 0;
+      return 1;
+    }
+  }
+  return 0;
+}
+
+
+//
+//  bestline と line を使用する MainEvalu と maxval を更新
+//
+inline void
+updatebestline(PARAMTYPE *p)
+{
+  memcpy(p->bestline, &p->s->line[0], sizeof(LINETYPE));
+  // *bestline = p->s->line;
+  p->bestline[Depth] = MovTab[Depth];
+  if (!Depth) {
+    MainEvalu = p->s->maxval;
+    if (Level == matesearch)
+      p->s->maxval = alphawindow;
+    if (Analysis) PrintBestMove(&MainLine[0], MainEvalu);
+  }
+}
+
+//
+//  search 関数の内側のループ。MovTab[Depth] は移動が格納されている
+//
+static BOOL
+loopbody(PARAMTYPE* p)
+{
+  COLORTYPE oldplayer;
+  BOOL     lastanalysis;
+
+  if (generatedbefore(p))
+    return 0;
+  if (Depth < MAXPLY) {
+    p->s->line[Depth + 1] = ZeroMove;
+    if (p->s->movgentype == mane)
+      memmove(&p->s->line[0], p->bestline, sizeof(LINETYPE));
+    // p->s->line = *bestline;
+  }
+  //  Principvar indicates principal variation search
+  //  zerowindow は、α-β範囲の幅がゼロを示す
+  p->s->next.principvar = 0;
+  p->s->zerowindow = 0;
+  if (p->inf->principvar)
+    if (p->s->movgentype == mane)
+      p->s->next.principvar = p->bestline[Depth+1].movpiece != empty;
+    else
+      p->s->zerowindow = p->s->maxval >= p->alpha;
+
+REPEATSEARCH:
+  if (update(p))
+    return 0;
+  if (Level == matesearch)   //  検索を中止
+    if (p->s->nextply <= 0 && !checktab[Depth])
+      goto NOTSEARCH;
+  if (drawgame(p->s))
+    goto NOTSEARCH;
+  if (Depth >= MAXPLY)
+    goto NOTSEARCH;
+
+  //  search を再帰呼び出しして nextply を分析
+  oldplayer = Player;
+  Player = Opponent;
+  Opponent = oldplayer;
+  Depth++;
+  if (p->s->zerowindow)
+    p->s->next.evaluation = -search(-p->alpha - 1, -p->alpha, p->s->nextply,
+        &p->s->next, &p->s->line[0]);
+  else
+    p->s->next.evaluation = -search(-p->beta, -p->alpha, p->s->nextply,
+        &p->s->next, &p->s->line[0]);
+  Depth--;
+  oldplayer = Opponent;
+  Opponent = Player;
+  Player = oldplayer;
+
+NOTSEARCH:
+  Perform(&MovTab[Depth], 1);  //  移動を撤回する
+  if (SkipSearch)
+    return 1;
+  lastanalysis = Analysis;     //  メッセージをスキャンして SkipSearch を検査
+  MessageScan();
+  if (!SkipSearch)
+    if (Analysis && !SingleStep && (!Depth || !lastanalysis)) {
+      StopTime(&ChessClock);
+      if (MainEvalu > alphawindow)
+        SkipSearch = ChessClock.totaltime >= WantedTime * 1.5;
+    }
+  if (Analysis && MaxDepth <= 1)
+    SkipSearch = 0;
+  p->s->maxval = max(p->s->maxval, p->s->next.evaluation);  //  maxval を更新
+  IF_EQMOVE(p->bestline[Depth], MovTab[Depth])         //  最善手を更新
+    updatebestline(p);
+  if (p->alpha < p->s->maxval) {               //  α値を更新してαカットの検査
+    updatebestline(p);
+    if (p->s->maxval >= p->beta)
+      return 1;
+    //  maxval を調整 (許容検索)
+    if (p->ply >= 2 && p->inf->principvar && !p->s->zerowindow)
+      p->s->maxval = min(p->s->maxval + TOLERANCE, p->beta - 1);
+    p->alpha = p->s->maxval;
+    if (p->s->zerowindow && ! SkipSearch) {
+      //  全範囲で検索を繰り返す
+      p->s->zerowindow = 0;
+      goto REPEATSEARCH;
+    }
+  }
+  return SkipSearch;
+}
+
+//
+//  ポーンの昇格を生成
+//
+static short
+pawnpromotiongen(PARAMTYPE* p)
+{
+  MovTab[Depth].spe = 1;
+  for (PIECETYPE promote = queen; promote <= knight; ((int)promote)++) {
+    MovTab[Depth].movpiece = promote;
+    if (loopbody(p))
+      return 1;
+  }
+  MovTab[Depth].spe = 0;
+  return 0;
+}
+
+//
+//  newsq マス上の駒の捕獲を生成
+//
+static short
+capmovgen(SQUARETYPE newsq, PARAMTYPE* p)
+{
+  MovTab[Depth].content = Board[newsq].piece;
+  MovTab[Depth].spe = 0;
+  MovTab[Depth].new1 = newsq;
+  MovTab[Depth].movpiece = pawn;  //  ポーンが捕獲
+  EDGESQUARETYPE nxtsq = MovTab[Depth].new1 - PawnDir[Player];
+
+  for (EDGESQUARETYPE sq = nxtsq - 1; sq <= nxtsq + 1; sq++)
+    if (sq != nxtsq)
+      if (!(sq & 0x88))
+        if (Board[sq].piece == pawn && Board[sq].color == Player) {
+          MovTab[Depth].old = sq;
+          if (MovTab[Depth].new1 < 8 || MovTab[Depth].new1 >= 0x70) {
+            if (pawnpromotiongen(p))
+              return 1;
+          } else if (loopbody(p))
+            return 1;
+        }
+
+  for (INDEXTYPE i = OfficerNo[Player]; i >= 0; i--)  //  その他の捕獲
+    if (PieceTab[Player][i].ipiece != empty &&
+        PieceTab[Player][i].ipiece != pawn)
+      if (PieceAttacks(PieceTab[Player][i].ipiece, Player,
+          PieceTab[Player][i].isquare, newsq)) {
+        MovTab[Depth].old = PieceTab[Player][i].isquare;
+        MovTab[Depth].movpiece = PieceTab[Player][i].ipiece;
+        if (loopbody(p))
+          return 1;
+      }
+  return 0;
+}
+
+//
+//  oldsq マス上の駒の無捕獲移動を生成
+//
+static short
+noncapmovgen(SQUARETYPE oldsq, PARAMTYPE* p)
+{
+  DIRTYPE first, last, dir;
+  int direction;
+  EDGESQUARETYPE newsq;
+
+  MovTab[Depth].spe = 0;
+  MovTab[Depth].old = oldsq;
+  MovTab[Depth].movpiece = Board[oldsq].piece;
+  MovTab[Depth].content = empty;
+
+  switch (MovTab[Depth].movpiece) {
+    case king:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = MovTab[Depth].old + DirTab[dir];
+        if (!(newsq & 0x88))
+          if (Board[newsq].piece == empty) {
+            MovTab[Depth].new1 = newsq;
+            if (loopbody(p))
+               return 1;
+          }
+      }
+      break;
+
+    case knight:
+      for (dir = 7; dir >= 0; dir--) {
+        newsq = MovTab[Depth].old + KnightDir[dir];
+        if (!(newsq & 0x88))
+          if (Board[newsq].piece == empty) {
+            MovTab[Depth].new1 = newsq;
+            if (loopbody(p))
+              return 1;
+          }
+      }
+      break;
+
+    case queen:
+    case rook :
+    case bishop:
+      first = 7;
+      last = 0;
+      if (MovTab[Depth].movpiece == rook)
+        first = 3;
+      else if (MovTab[Depth].movpiece == bishop)
+        last = 4;
+      for (dir = first; dir >= last; dir--) {
+        direction = DirTab[dir];
+        newsq = MovTab[Depth].old + direction;
+        while (!(newsq & 0x88)) {
+          if (Board[newsq].piece != empty)
+            goto TEN;
+          MovTab[Depth].new1 = newsq;
+          if (loopbody(p))
+            return 1;
+          newsq = MovTab[Depth].new1 + direction;
+        }
+TEN:
+        continue;
+      }
+      break;
+
+    case pawn:
+      //  １マス前進
+      MovTab[Depth].new1 = MovTab[Depth].old + PawnDir[Player];
+      if (Board[MovTab[Depth].new1].piece == empty)
+        if (MovTab[Depth].new1 < 8 || MovTab[Depth].new1 >= 0x70) {
+          if (pawnpromotiongen(p))
+            return 1;
+        } else {
+          if (loopbody(p))
+            return 1;
+          if (MovTab[Depth].old < 0x18 || MovTab[Depth].old >= 0x60) {
+            //  ２マス前進
+            MovTab[Depth].new1 += MovTab[Depth].new1 - MovTab[Depth].old;
+            if (Board[MovTab[Depth].new1].piece == empty)
+              if (loopbody(p))
+                return 1;
+          }
+        }
+  }
+  return 0;
+}
+
+//
+//  キャスリング移動
+//
+static short
+castlingmovgen(PARAMTYPE* p)
+{
+  MovTab[Depth].spe = 1;
+  MovTab[Depth].movpiece = king;
+  MovTab[Depth].content = empty;
+
+  for (CASTDIRTYPE castdir = (CASTDIRTYPE)(lng-1); castdir <= shrt-1; ((int)castdir)++) {
+    MovTab[Depth].new1 = CastMove[Player][castdir].castnew;
+    MovTab[Depth].old = CastMove[Player][castdir].castold;
+    if (KillMovGen(&MovTab[Depth]))
+      if (loopbody(p))
+        return 1;
+  }
+  return 0;
+}
+
+//
+//  通過捕獲
+//
+static short
+epcapmovgen(PARAMTYPE* p)
+{
+  if (MovTab[Depth-1].movpiece == pawn)
+    if (abs(MovTab[Depth-1].new1 - MovTab[Depth-1].old) >= 0x20) {
+      MovTab[Depth].spe = 1;
+      MovTab[Depth].movpiece = pawn;
+      MovTab[Depth].content = empty;
+      MovTab[Depth].new1 = (MovTab[Depth - 1].new1 + MovTab[Depth - 1].old) / 2;
+      for (EDGESQUARETYPE sq = MovTab[Depth - 1].new1 - 1; sq <= MovTab[Depth - 1].new1 + 1; sq++)
+        if (sq != MovTab[Depth-1].new1)
+          if (!(sq & 0x88)) {
+            MovTab[Depth].old = sq;
+            if (KillMovGen(&MovTab[Depth]))
+              if (loopbody(p))
+                return 1;
+          }
+    }
+  return 0;
+}
+
+//
+//  次に解析する移動を生成
+//    移動生成の順序を制御する
+//      移動は、次の順序で生成される:
+//      メインバリエーション
+//      最後に移動した駒を捕獲
+//      移動を塞ぐ移動
+//      その他の捕獲
+//      ポーン昇格
+//      キャスリング
+//      通常移動
+//      通過捕獲
+//
+static void
+searchmovgen(PARAMTYPE* p)
+{
+  INDEXTYPE index;
+  char killno;
+
+  //  メインバリエーションから移動を生成
+  if (p->bestline[Depth].movpiece != empty) {
+    MovTab[Depth] = p->bestline[Depth];
+    p->s->movgentype = mane;
+    if (loopbody(p))
+      return;
+  }
+  if (MovTab[Depth-1].movpiece != empty)
+    if (MovTab[Depth-1].movpiece != king) {
+      p->s->movgentype = specialcap;
+      if (capmovgen(MovTab[Depth-1].new1, p))
+        return;
+    }
+  p->s->movgentype = kill;
+  if (!p->s->capturesearch)
+    for (killno = 0; killno <= 1; killno++) {
+      MovTab[Depth] = killingmove[Depth][killno];
+      if (MovTab[Depth - 1].movpiece != empty)
+        if (KillMovGen(&MovTab[Depth]))
+          if (loopbody(p))
+            return;
+    }
+  p->s->movgentype = norml;
+  for (index = 1; index <= PawnNo[Opponent]; index++)
+    if (PieceTab[Opponent][index].ipiece != empty)
+      if (MovTab[Depth-1].movpiece == empty ||
+          PieceTab[Opponent][index].isquare != MovTab[Depth-1].new1)
+        if (capmovgen(PieceTab[Opponent][index].isquare, p))
+          return;
+  if (p->s->capturesearch) {
+    if (passedpawn[Depth-2] >= 0)
+      if (Board[passedpawn[Depth-2]].piece == pawn &&
+          Board[passedpawn[Depth-2]].color == Player)
+        if (noncapmovgen(passedpawn[Depth-2], p))
+          return;
+  }
+  if (!p->s->capturesearch) {        //  無捕獲移動
+    if (castlingmovgen(p))
+      return;                        //  キャスリング
+    for (index = PawnNo[Player]; index >= 0; index--)
+      if (PieceTab[Player][index].ipiece != empty)
+        if (noncapmovgen(PieceTab[Player][index].isquare, p))
+          return;
+  }
+  if (epcapmovgen(p))
+    return;  //  捕獲移動
+}
+
+//
+//  検索の実行
+//  入力 :
+//    Player は、次に移動する色が格納されている
+//    MovTab[Depth-1] に最後に実行した移動が格納されている
+//    alpha と beta は α-β範囲が格納されている
+//    ply は検索の深さが格納されている
+//    inf には、種々の情報が格納されている
+//
+//  出力 :
+//    Bestline は、principal variation が格納される
+//    Search は、Player の評価が格納される
+//
+static MAXTYPE
+search(MAXTYPE alpha, MAXTYPE beta, int ply, INFTYPE* inf, MOVETYPE* bestline)
+{
+  SEARCHTYPE s;
+  PARAMTYPE p;
+  //  ply <= 0 で !check なら、capturesearch を実行
+  s.capturesearch = ply <= 0 && !checktab[Depth-1];
+  if (s.capturesearch) {  //  maxval を初期化
+    s.maxval = -inf->evaluation;
+    if (alpha < s.maxval) {
+      alpha = s.maxval;
+      if (s.maxval >= beta)
+        goto STOP;
+    }
+  } else
+    s.maxval = -(LOSEVALUE - Depth*DEPTHFACTOR);
+  p.alpha = alpha;
+  p.beta = beta;
+  p.ply = ply;
+  p.inf = inf;
+  p.bestline = bestline;
+  p.s = &s;
+  searchmovgen(&p);   //  検索ループ
+  if (SkipSearch)
+    goto STOP;
+  if (s.maxval == -(LOSEVALUE - Depth * DEPTHFACTOR))   //  ステイルメイトを検査
+    if (!Attacks(Opponent, PieceTab[Player][0].isquare)) {
+      s.maxval = 0;
+      goto STOP;
+    }
+  updatekill(&bestline[Depth]);
+
+STOP:
+  return s.maxval;
+}
+
+//
+//  検索を始める
+//
+static MAXTYPE
+callsearch(MAXTYPE alpha, MAXTYPE beta)
+{
+  startinf.principvar = MainLine[0].movpiece != empty;
+  LegalMoves = 0;
+  MAXTYPE maxval = search(alpha, beta, MaxDepth, &startinf, &MainLine[0]);
+  if (!LegalMoves)
+    MainEvalu = maxval;
+  return maxval;
+}
+
+//
+//  検索時間を使うかどうか検査
+//
+inline short
+timeused()
+{
+  if (Analysis && !SingleStep) {
+    StopTime(&ChessClock);
+    return ChessClock.totaltime >= WantedTime;
+  }
+  return 0;
+}
+
+//
+//  検索のセットアップ
+//
+void
+FindMove(int maxlevel)
+{
+  MAXTYPE maxval;
+  double calcpvtime;
+  InitTime(&ChessClock);
+  StartTime(&ChessClock);
+  InitNode(&Nodes);
+  SkipSearch = 0;
+  clearkillmove();
+  CalcPVTable();
+  StopTime(&ChessClock);
+  calcpvtime = ChessClock.totaltime;
+  startinf.value = startinf.evaluation = -RootValue;
+  MaxDepth = 0;
+  MainLine[0] = ZeroMove;
+  MainEvalu = RootValue;
+  alphawindow = MAXINT;
+  ComputerThinking = TRUE;
+
+  do {
+    //  種々の値を更新
+    if (MaxDepth <= 1)
+      repeatevalu = MainEvalu;
+    alphawindow = min(alphawindow, MainEvalu - 0x80);
+    if (Level == matesearch) {
+      alphawindow = 0x6000;
+      if (MaxDepth > 0) MaxDepth++;
+    }
+    MaxDepth++;
+    maxval = callsearch(alphawindow, 0x7f00);  //  検索を実行
+    if (maxval <= alphawindow && !SkipSearch && Level != matesearch &&
+        LegalMoves > 0) {
+      //  値が alphawindow の下に落ちるなら
+      //  検索を繰り返す
+      MainEvalu = alphawindow;
+      LegalMoves = 2;
+    }
+  } while (!SkipSearch && !timeused() && MaxDepth < maxlevel &&
+      LegalMoves > 1 && abs(MainEvalu) < MATEVALUE - 24 * DEPTHFACTOR);
+
+  ComputerThinking = FALSE;
+  StopTime(&ChessClock);
+
+  if (Analysis)
+    PrintNodes(&Nodes, ChessClock.totaltime - calcpvtime);
+}
+---------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/defs.h>
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+#include "wcdefs.h"
+#include "wchess.h"
+#include "externs.h"
+
+//
+//  グローバル変数
+//
+MOVETYPE  ZeroMove = { 8, 8, 0, empty, empty };
+CLOCKTYPE ChessTime[2];
+MOVETYPE  KeyMove;
+BOOL      Running;
+COLORTYPE RunColor;
+BOOL      Analysis, Opan;
+double    WantedTime;
+BOOL      GameOver = FALSE;
+char      EndGameMessage[80];
+
+extern double AverageTime;
+
+
+void EndMessage(char *);
+
+//
+//  チェス時計を初期化
+//
+void
+InitChessTime()
+{
+  InitTime(&ChessTime[white]);
+  InitTime(&ChessTime[black]);
+}
+
+void
+StopChessTime()
+{
+  if (Running) {
+    StopTime(&ChessTime[RunColor]);
+    KillTimer(hWndMain, TIMEID);
+    Running = FALSE;
+  }
+}
+
+//
+//  計測している時計を止めて、color 側の時計を計測開始
+//
+void
+StartChessTime(COLORTYPE color)
+{
+  RunColor = color;
+  Running = TRUE;
+  StartTime(&ChessTime[RunColor]);
+  SetTimer(hWndMain, TIMEID, 1000, 0);
+}
+
+//
+//  MovTab をリセット
+//
+void
+ResetMoves()
+{
+  Depth = -1;
+  MovTab[-1] = ZeroMove;
+}
+
+//
+//  HintLine をクリア
+//
+void
+ClearHint()
+{
+  HintLine[0] = ZeroMove;
+  HintEvalu = 0;
+}
+
+void
+InitNode(NODEVAL* nodes)
+{
+  nodes->nodebase = 0;
+  nodes->nodeoffset = 0;
+}
+
+//
+//  渡された位置を ProgramColor == Player として移動が正しいか検査
+//
+BOOL
+IllegalMove(MOVETYPE* move)
+{
+  Perform(move, 0);
+  BOOL illegal = Attacks(Opponent, PieceTab[Player][0].isquare);
+  Perform(move, 1);
+  return illegal;
+}
+
+//
+//  ProgramColor = Player として移動して変数を更新
+//
+void
+MakeMove(MOVETYPE* move)
+{
+  Depth++;
+  MoveNo++;
+  Perform(move, 0);
+  ProgramColor = Opponent;
+  Opponent = Player;
+  Player = ProgramColor;
+}
+
+//
+//  ゲームのコメントを表示（チェック、メイト、引き分け、放棄）
+//
+void
+PrintComment()
+{
+  short check, possiblemove, checkmate;
+  int nummoves;
+
+  Message("");
+  checkmate = 0;
+  Depth++;
+  possiblemove = 0;
+  InitMovGen();
+  do {
+    MovGen();
+    if (Next.movpiece != empty)
+      if (!IllegalMove(&Next))
+        possiblemove = 1;
+  } while (Next.movpiece != empty && !possiblemove);
+
+  Depth--;
+  check = Attacks(Opponent, PieceTab[Player][0].isquare); // チェックを計算
+  //  移動はチェックメイトでもスティルメイトでもない
+  if (!possiblemove) {
+    if (check) {
+      checkmate = 1;
+      EndMessage("ﾁｪｯｸﾒｲﾄ");
+    } else
+      EndMessage("ｽﾃｨﾙﾒｲﾄ!");
+
+  } else
+    if (HintEvalu >= MATEVALUE - DEPTHFACTOR * 16) {
+      nummoves = (MATEVALUE - HintEvalu + 0x40) / (DEPTHFACTOR * 2);
+      sprintf(buf, "%d 手!", nummoves);
+      Message(buf);
+    }
+  if (check && !checkmate)
+    Message("ﾁｪｯｸ!");
+  else { //  50 手ルールと繰り返し移動の検査
+    if (FiftyMoveCnt() >= 100) {
+      EndMessage("50 手ﾙｰﾙ");
+    } else
+     if (Repetition(0) >= 3) {
+       EndMessage("3 回の繰り返し");
+     } else        //  見込のない試合は放棄
+      if (-25500 < HintEvalu && HintEvalu < -0x880) {
+        switch (Opponent) {
+          case white:
+            EndMessage(" 白の放棄");
+            break;
+          case black:
+            EndMessage(" 黒の放棄");
+        }
+      }
+  }
+}
+
+void
+EnterMove(MOVETYPE* move)
+{
+   StopChessTime();
+   PrintMove(MoveNo, ProgramColor, move, ChessTime[RunColor].totaltime);
+   MakeMove(move);
+   UpdateBoard();
+   PrintComment();
+   StartChessTime(ProgramColor);
+}
+
+void
+RemoveMove(MOVETYPE* move)
+{
+   StopChessTime();
+   PrintMove(MoveNo, ProgramColor, move, ChessTime[RunColor].totaltime);
+   TakeBackMove(move);
+   UpdateBoard();
+   PrintComment();
+   StartChessTime(ProgramColor);
+}
+
+//
+//  ユーザから入力された移動を実行
+//
+void
+EnterKeyMove()
+{
+  MovTab[Depth+1] = KeyMove;
+  PlayerMove = KeyMove;
+  ClearHint();
+  DragEnd(TRUE);
+  EnterMove(&MovTab[Depth+1]);
+}
+
+//
+//  MovTab を Depth = -1 まで移動
+//
+void
+AdjustMoves()
+{
+  for (int i = Depth; i >= BACK; i--)
+    MovTab[i-(Depth+1)] = MovTab[i];
+  Depth = -1;
+}
+
+//
+//  MovTab の移動を１つ戻す
+//
+void
+StoreMoves()
+{
+  Depth--;
+  for (int i = BACK; i <= Depth; i++)
+    MovTab[i] = MovTab[i+1];
+  MovTab[BACK] = ZeroMove;
+}
+  
+//
+//  入力された移動は正しいか検査
+//
+BOOL
+MoveCheck(SQUARETYPE startsq, SQUARETYPE endsq)
+{
+  Depth++;
+  KeyMove = ZeroMove;
+  InitMovGen();
+  do {
+    MovGen();
+    if (Next.new1 == endsq && Next.old == startsq) {
+      KeyMove = Next;
+      break;
+    }
+  } while (Next.movpiece != empty);
+
+  if (KeyMove.movpiece == empty) {
+    Warning("不正な移動です");
+    Depth--;
+    return FALSE;
+  }
+  if (IllegalMove(&KeyMove)) {
+    Warning("不正な移動です. ﾁｪｯｸ!");
+    Depth--;
+    return FALSE;
+  }
+  Depth--;
+  if (!ComputerThinking) {
+    AdjustMoves();
+    EnterKeyMove();
+    StoreMoves();
+  }
+  return TRUE;
+}
+
+//
+//  要求された応答時間を計算
+//
+void
+StartAnalysis()
+{
+  int            timecontrol;
+  extern HWND    hWndMain;
+  extern HCURSOR hWaitCursor;
+
+  Analysis = 1;
+  Opan = 0;
+  SetClassWindowCursor(hWndMain, hWaitCursor);
+
+  switch (Level) {
+    case easygame:
+    case normal:
+      //  残り時間を残りの移動の間の時間制御で配分。
+      //  ４手分のマージンを付けて、プログラムが確実に
+      //  タイムロスしないようにする
+      timecontrol = (((MoveNo >> 1) + 20) / 20) * 20;
+      if (timecontrol <= 40)
+        timecontrol = 40;
+      WantedTime = (AverageTime * timecontrol - ChessTime[ProgramColor].totaltime) /
+            (timecontrol + 4 - (MoveNo >> 1));
+
+      //  ゲームの始めは２倍の時間をかけて考え、通常、
+      //  中盤の始めからがゲームの最も決定的な部分
+      if ((MoveNo >> 1) <= 40)
+        WantedTime = 5.0 + (WantedTime - 5.0) * ((80 - (MoveNo >> 1)) / 40);
+      break;
+
+    case fullgametime:
+      //  ゲームが最後 40 手づつと考え、残り時間を配分
+      WantedTime = (AverageTime * 60.0 - ChessTime[ProgramColor].totaltime) / 44;
+
+      //  ゲームの始めは２倍の時間をかけて考え、通常、
+      //  中盤の始めからがゲームの最も決定的な部分
+      if ((MoveNo >> 1) <= 40)
+        WantedTime = 5.0 + (WantedTime - 5.0) * ((80 - (MoveNo >> 1)) /40);
+      break;
+
+    case matching:
+      //  相手と同じぐらいの時間をかける
+      if (MoveNo >= 2)
+        WantedTime = ChessTime[Opponent].totaltime / (MoveNo >> 1);
+      else
+        WantedTime = 5.0;
+      WantedTime += (ChessTime[Opponent].totaltime - 
+                     ChessTime[ProgramColor].totaltime) * 0.25;
+
+      //break; //wasn't here???
+
+    default:
+      WantedTime = 1000000.0;
+  }
+}
+
+//
+//  移動を元に戻し、変数を更新する
+//
+void
+TakeBackMove(MOVETYPE* move)
+{
+  ProgramColor = Opponent;
+  Opponent = Player;
+  Player = ProgramColor;
+  Perform(move, 1);
+  MoveNo--;
+  Depth--;
+}
+
+void
+IncNode(NODEVAL *nodes)
+{
+  if (nodes->nodeoffset >= MAXINT) {
+    nodes->nodebase++;
+    nodes->nodeoffset = 0;
+
+  } else
+    nodes->nodeoffset++;
+}
+
+
+void
+Wait(int tenths)
+{
+  clock_t NumTicksToWait;
+
+  // 1000ティックが１秒なので, 100ティック == 1/10秒
+  NumTicksToWait = tenths*100 + clock();
+  while (NumTicksToWait > clock())
+    ;
+}
+
+//
+//  画面上を明滅して移動する
+//
+void
+FlashMove(MOVETYPE* move)
+{
+  MakeMove(move);
+  UpdateBoard();
+  Wait(4);
+  TakeBackMove(move);
+  UpdateBoard();
+  Wait(4);
+}
+
+void
+DoSlideMove(MOVETYPE& move)
+{
+  SQUARETYPE castsquare, cornersquare;
+  SlidePiece(move.new1, move.old);
+  if (move.spe) {
+    if (move.movpiece == king) {
+      GenCastSquare(move.new1, &castsquare, &cornersquare);
+      SlidePiece(castsquare, cornersquare);
+    }
+  }
+}
+
+void
+EndMessage(char* message)
+{
+  strcpy(EndGameMessage, message);
+  GameOver = TRUE;
+}
+
+void
+ShowHint()
+{
+  DEPTHTYPE dep = 0;
+  *buf = 0;
+  Message(buf);
+  while (HintLine[dep].movpiece != empty) {
+    strcat(buf, MoveStr(&HintLine[dep]));
+    strcat(buf, " ");
+    Message(buf);
+    MakeMove(&HintLine[dep]);
+    UpdateBoard();
+    Wait(6);
+    dep++;
+  }
+  while (dep > 0) {
+    dep--;
+    TakeBackMove(&HintLine[dep]);
+  }
+  UpdateBoard();
+}
+------------------------------
+//----------------------------------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//   examples\owl\chess\wchess.cpp
+//
+//   OWL Chess は、 TURBO PASCAL GameWorks でリリースされたオリジナルを
+//   ベースにしたチェスプログラムです。チェスエンジンはＣに移植されただ
+//   けで、本質的な変更はありません。このサンプルプログラムは、DOS コード
+//   周辺をウィンドウズ用にした時の OWL の使われ方を示し、それらの部分は、
+//   C または C++ で記述されています。
+//----------------------------------------------------------------------------
+#include <owl/pch.h>
+#include <owl/applicat.h>
+#include <owl/framewin.h>
+#include <owl/static.h>
+#include <owl/opensave.h>
+#include <owl/inputdia.h>
+#include <owl/dc.h>
+#include <string.h>
+#include <stdio.h>
+
+#include "wcdefs.h"
+#include "info.h"
+#include "wchess.h"
+#include "edit.h"
+#include "colors.h"
+#include "pvalue.h"
+#include "externs.h"
+
+#undef MAXPATH
+#define MAXPATH  160
+
+//
+//  グローバル変数
+//
+TColor WhiteSquareColor = TColor::White;
+TColor BlackSquareColor(0, 128, 0);      // 緑
+
+BOOL         ShowBestLine = true;
+TInfoWindow* TInfo;
+HBRUSH       hBlackBrush;
+HBRUSH       hWhiteBrush;
+HWND         hWndMain;
+HBITMAP      PieceBmpArray[6][2];
+HBITMAP      MaskArray[6];
+HCURSOR      hArrowCursor;
+HCURSOR      hWaitCursor;
+HMENU        ThinkMenu;
+HMENU        MainMenu;
+HANDLE       hAccel;
+COLORTYPE    ComputerColor;
+short        LINESIZE;
+short        CHARSIZE;
+int          CAPTIONY;
+BOOL         Editing;
+int          BORDERSIZE;
+const        BORDERYEXTRA = 4; // ４ピクセルの隙間
+short        INFOXSIZE, INFOYSIZE;
+BOOL         SoundOn;
+
+
+// --------------- TMessageDialog ----------------------
+
+//
+// BWCC スタイルのメッセージボックスを RC ファイルからの静的テンプレート
+// から作成します。他に、各メッセージのサイズに丁度いいメッセージボック
+// スを動的に作成したり、表示するボタンのタイプをユーザが指定したり、
+// ウィンドウズの MessageBox のようにしてもいいでしょう。
+//
+class TMessageDialog : public TDialog {
+  public:
+    TMessageDialog(TWindow* parent, int resourceId, const char far* message,
+                   const char far* title);
+
+  protected:
+    void SetupWindow();
+
+  private:
+    const char far* NewMessage;
+    const char far* NewTitle;
+};
+
+TMessageDialog::TMessageDialog(TWindow* parent, int resourceId,
+                               const char far* message, const char far* title)
+:
+  TDialog(parent, resourceId)
+{
+   NewMessage = message;
+   NewTitle = title;
+}
+
+void
+TMessageDialog::SetupWindow()
+{
+  // 祖先の SetupWindow を最後に呼び出して失敗すると、結果が不定になる。
+  // 常に、派生した SetupWindow を最初に呼ぶべき。
+  //
+  TDialog::SetupWindow();
+  SetDlgItemText(ID_INPUT, NewMessage);
+  SetWindowText(NewTitle);
+}
+
+// --------------- TEndDialog ----------------------
+
+class TEndDialog : public TDialog {
+  public:
+    TEndDialog(TWindow* parent, int resourceId, const char far* message);
+
+  protected:
+    void SetupWindow();
+    void CmYes() {CloseWindow(IDYES);}
+    void CmNo() {CloseWindow(IDNO);}
+
+  private:
+    const char far* EndMessage;
+
+  DECLARE_RESPONSE_TABLE(TEndDialog);
+};
+
+DEFINE_RESPONSE_TABLE1(TEndDialog, TDialog)
+  EV_COMMAND(IDYES, CmYes),
+  EV_COMMAND(IDNO, CmNo),
+END_RESPONSE_TABLE;
+
+TEndDialog::TEndDialog(TWindow* parent, int resourceId, const char far* message)
+:
+  TDialog(parent, resourceId)
+{
+  EndMessage = message;
+}
+
+void
+TEndDialog::SetupWindow()
+{
+  TDialog::SetupWindow();
+  SetDlgItemText(ID_INPUT, EndMessage);
+}
+
+// --------------- TChessWindow ----------------------
+
+class TChessWindow : public TWindow {
+  public:
+    TChessWindow();
+   ~TChessWindow();
+    void SetupWindow();
+    void GetWindowClass(WNDCLASS& wndClass);
+    char far* GetClassName() {return "ChessWindow";}
+
+    void Paint(TDC& dc, bool erase, TRect& rect);
+
+    void EvLButtonDown(uint, TPoint&);
+    void EvMouseMove(uint, TPoint&);
+
+    void CmNewGame();
+    void CmRestoreGame();
+    void CmSaveGame();
+    void CmSaveGameAs();
+    void CmUndoMove();
+    void CmRedoUndo();
+    void CmMovePieces();
+    void CmMoveTime();
+    void CmTotalTime();
+    void CmDemo();
+    void CmInfiniteSearch();
+    void CmPlySearch();
+    void CmMateSearch();
+    void CmSinglePlayer();
+    void CmTwoPlayer();
+    void CmAutoPlay();
+    void CmReverseBoard();
+    void CmEasy();
+    void CmHint();
+    void CmPass();
+    void CmDone();
+    void CmClear();
+    void CmCancel();
+    void CmError();
+    void CmMatching();
+    void CmWhiteTurn();
+    void CmBlackTurn();
+    void CmColors();
+    void CmPieceValues();
+    void CmBestLine();
+    void CmMouseDrag();
+    void CmMouseSelect();
+    void CmSound();
+    void EvTimer(uint);
+
+    void EndGame();
+    void DoEdit(TPoint& point);
+    void ComputersTurn();
+    void UnCheckLevelMenu(LEVELTYPE);
+    void NormalSetup();
+    void CheckLevelMenu(LEVELTYPE);
+    bool CanClose() {
+      if (ComputerThinking || AutoPlay) {
+        PostMessage(WM_COMMAND, CM_STOP);
+        PostMessage(WM_COMMAND, IDM_EXIT);
+        return false;
+      }
+      QuitProgram();
+      return true;
+    }
+
+  private:
+    enum TURNTYPE { player, computer };
+    TInfoWindow*    TInfo;    // 情報ウィンドウ
+    TEditBarWindow* TEditBar; // エディットバー
+    bool       NewGame;       // 新しいゲームがセットアップされているか?
+    char*      FileName;      // 最後に保存したゲーム
+    TRect      MainWndRect;   // メインウィンドウの座標
+    TRect      InfoAreaRect;  // 情報ウィンドウの座標
+    HMENU      hMenu;         // メインメニューのハンドル
+    HMENU      hThinkMenu;    // 小メニュー（「停止」）のハンドル
+    HMENU      hEditMenu;     // 編集（「アレンジ」）メニューのハンドル
+    TURNTYPE   WhoseTurn;     // プレイヤーかコンピュータの順番か？
+    SQUARETYPE MoveStartSquare; // 移動の最初のマス
+    SQUARETYPE MoveEndSquare; // 移動の終りのマス
+    COLORTYPE  CurPlayer;     // 現在のプレイヤー
+    bool       GotStartSquare; // ユーザは移動するために正しい駒を選択したか?
+    HBRUSH     hBKBrush;      // メインウィンドウの背景を塗るブラシのハンドル
+    HBITMAP    hBKBrushBmp;   // メインウィンドウの背景を塗る小さいビットマップ
+    bool       Modified;      // 編集モードでボードが変更されたかどうか?
+    bool       EditingBoard;  // ユーザがボードを編集しているかどうか
+    bool       Dragging;      // ドラッグモード?
+    BOARDTYPE* SaveBoard;     // ユーザが編集をキャンセルした場合のボードの保存
+
+  DECLARE_RESPONSE_TABLE(TChessWindow);
+};
+
+// ------------- TChessWindow 応答テーブル関数 -----------------------
+
+DEFINE_RESPONSE_TABLE1(TChessWindow, TWindow)
+  EV_WM_LBUTTONDOWN,
+  EV_WM_MOUSEMOVE,
+  EV_COMMAND(CM_FILENEW, CmNewGame),
+  EV_COMMAND(CM_FILEOPEN, CmRestoreGame),
+  EV_COMMAND(CM_FILESAVE, CmSaveGame),
+  EV_COMMAND(CM_FILESAVEAS, CmSaveGameAs),
+  EV_COMMAND(CM_UNDO, CmUndoMove),
+  EV_COMMAND(CM_REDO, CmRedoUndo),
+  EV_COMMAND(IDM_MOVEPIECE, CmMovePieces),
+  EV_COMMAND(IDM_MOVETIME, CmMoveTime),
+  EV_COMMAND(IDM_TOTALTIME, CmTotalTime),
+  EV_COMMAND(IDM_DEMO, CmDemo),
+  EV_COMMAND(IDM_INFINITE, CmInfiniteSearch),
+  EV_COMMAND(IDM_PLY, CmPlySearch),
+  EV_COMMAND(IDM_MATE, CmMateSearch),
+  EV_COMMAND(IDM_SINGLE, CmSinglePlayer),
+  EV_COMMAND(IDM_TWOPLAYER, CmTwoPlayer),
+  EV_COMMAND(IDM_AUTO, CmAutoPlay),
+  EV_COMMAND(IDM_REVERSE, CmReverseBoard),
+  EV_COMMAND(IDM_EASY, CmEasy),
+  EV_COMMAND(IDM_HINT, CmHint),
+  EV_COMMAND(IDM_PASS, CmPass),
+  EV_COMMAND(EM_DONE, CmDone),
+  EV_COMMAND(EM_CLEAR, CmClear),
+  EV_COMMAND(EM_CANCEL, CmCancel),
+  EV_COMMAND(EM_ERROR, CmError),
+  EV_COMMAND(IDM_MATCHING, CmMatching),
+  EV_COMMAND(IDM_WHITETURN, CmWhiteTurn),
+  EV_COMMAND(IDM_BLACKTURN, CmBlackTurn),
+  EV_COMMAND(IDM_COLORS, CmColors),
+  EV_COMMAND(IDM_PIECEVALUES, CmPieceValues),
+  EV_COMMAND(IDM_BESTLINE, CmBestLine),
+  EV_COMMAND(IDM_MOUSEDRAG, CmMouseDrag),
+  EV_COMMAND(IDM_MOUSESELECT, CmMouseSelect),
+  EV_COMMAND(IDM_SOUND, CmSound),
+
+  EV_WM_TIMER,
+END_RESPONSE_TABLE;
+
+// ------------- TChessWindow メンバ関数 -----------------
+
+TChessWindow::TChessWindow()
+:
+  TWindow(0, 0, 0)
+{
+  TScreenDC dc;
+  TEXTMETRIC tm;
+  dc.GetTextMetrics(tm);
+  CHARSIZE = short(tm.tmAveCharWidth);
+  LINESIZE = short(tm.tmHeight + tm.tmExternalLeading);
+
+  CAPTIONY = ::GetSystemMetrics(SM_CYCAPTION) + ::GetSystemMetrics(SM_CYMENU);
+  BORDERSIZE = LINESIZE + MYFRAMESIZE;
+  TInfo = new TInfoWindow(this, "InfoWindow");
+  TEditBar = new TEditBarWindow(this, "EditBar");
+  SoundOn = true;
+  ::TInfo = TInfo;
+
+  Attr.Style = WS_CHILD | WS_VISIBLE;
+  Attr.X = 5;
+  Attr.Y = 5;
+  Attr.H = CAPTIONY + BORDERSIZE*2 + INFOYSIZE + BORDERYEXTRA +
+    2*GetSystemMetrics(SM_CYBORDER);
+
+  Attr.W = BORDERSIZE*4 + MAXBDSIZE*SQUARE_SIZE + INFOXSIZE +
+    2*GetSystemMetrics(SM_CXBORDER) + 2*MYFRAMESIZE;
+
+  SetBkgndColor(TColor::Sys3dFace);
+
+  FileName = new char[MAXPATH];
+  WhoseTurn = player;
+  CurPlayer = white;
+  ::ComputerColor = black;
+  ::Editing = EditingBoard = GotStartSquare = FALSE;
+  NewGame = TRUE;
+}
+
+TChessWindow::~TChessWindow()
+{
+  delete FileName;
+  delete TInfo;
+  ::DeleteObject(hWhiteBrush);
+  ::DeleteObject(hBlackBrush);
+  ::DeleteObject(hBKBrushBmp);
+  ::DestroyMenu(hThinkMenu);
+  ::DestroyMenu(hEditMenu);
+  for (int i = 0; i < 6; i++) {
+    ::DeleteObject(MaskArray[i]);
+    for (int j = 0; j < 2; j++)
+      ::DeleteObject(PieceBmpArray[i][j]);
+  }
+  KillTimer(TIMEID);
+}
+
+void
+TChessWindow::GetWindowClass(WNDCLASS& wndClass)
+{
+  // これも、SetupWindow と InitInstance のように、
+  // 最初に祖先を呼ぶ
+  //
+  TWindow::GetWindowClass(wndClass);
+
+  //  OWL に登録するウィンドウクラスに固有の値を設定
+  //
+  ::hArrowCursor = wndClass.hCursor = ::LoadCursor(0, IDC_ARROW);
+  hBKBrushBmp = GetApplication()->LoadBitmap("BKBrush");
+  hBKBrush = ::CreatePatternBrush(hBKBrushBmp);
+
+  wndClass.hbrBackground = hBKBrush;
+  wndClass.lpszMenuName = 0;
+  wndClass.hIcon = LoadIcon(*GetApplication(), "ChessIcon");
+}
+
+void
+TChessWindow::SetupWindow()
+{
+  TWindow::SetupWindow();
+
+  ::hWndMain = GetHandle();
+  ::hWaitCursor = ::LoadCursor(0, IDC_WAIT);
+
+  ::PieceBmpArray[pawn-1][white] = GetApplication()->LoadBitmap("WPawn");
+  ::PieceBmpArray[pawn-1][black] = GetApplication()->LoadBitmap("BPawn");
+  ::PieceBmpArray[rook-1][white] = GetApplication()->LoadBitmap("WRook");
+  ::PieceBmpArray[rook-1][black] = GetApplication()->LoadBitmap("BRook");
+  ::PieceBmpArray[knight-1][black] = GetApplication()->LoadBitmap("BKnight");
+  ::PieceBmpArray[bishop-1][black] = GetApplication()->LoadBitmap("BBishop");
+  ::PieceBmpArray[queen-1][black] = GetApplication()->LoadBitmap("BQueen");
+
+  ::PieceBmpArray[knight-1][white] = GetApplication()->LoadBitmap("WKnight");
+  ::PieceBmpArray[bishop-1][white] = GetApplication()->LoadBitmap("WBishop");
+  ::PieceBmpArray[queen-1][white] = GetApplication()->LoadBitmap("WQueen");
+
+  ::PieceBmpArray[king-1][white] =  GetApplication()->LoadBitmap("WKing");
+  ::PieceBmpArray[king-1][black] =  GetApplication()->LoadBitmap("BKing");
+
+  ::MaskArray[pawn-1] =   GetApplication()->LoadBitmap("PMask");
+  ::MaskArray[rook-1] =   GetApplication()->LoadBitmap("RMask");
+  ::MaskArray[knight-1] = GetApplication()->LoadBitmap("KTMask");
+  ::MaskArray[bishop-1] = GetApplication()->LoadBitmap("BMask");
+  ::MaskArray[queen-1] =  GetApplication()->LoadBitmap("QMask");
+  ::MaskArray[king-1] =   GetApplication()->LoadBitmap("KMask");
+
+  InfoAreaRect = MainWndRect = GetClientRect();
+  InfoAreaRect.left = MainWndRect.right -= BORDERSIZE*2 + INFOXSIZE;
+
+  MainMenu = hMenu = GetApplication()->LoadMenu("TChessMenu");
+  ::ThinkMenu = hThinkMenu = GetApplication()->LoadMenu("TChessThinkMenu");
+  hEditMenu = GetApplication()->LoadMenu("TChessEditMenu");
+  GetParentO()->SetMenu(hMenu);
+
+  ::Talk();
+  CheckLevelMenu(Level);
+  ::hWhiteBrush = ::CreateSolidBrush(WhiteSquareColor);
+  ::hBlackBrush = ::CreateSolidBrush(BlackSquareColor);
+
+  Dragging = true;
+}
+
+void
+TChessWindow::Paint(TDC& dc, bool, TRect&)
+{
+  DrawFrame(dc, MainWndRect);
+  DrawFrame(dc, InfoAreaRect);
+  PrintBoard();
+}
+
+void
+TChessWindow::EvLButtonDown(uint, TPoint& point)
+{
+  if (EditingBoard) {
+    DoEdit(point);
+    return;
+  }
+
+  if (WhoseTurn == computer && !NoComputerMove)
+    return;
+
+  if (!GotStartSquare) {
+    MoveStartSquare = GetValidSquare(point, CurPlayer, true);
+    if (MoveStartSquare == -1)
+      return;
+    GotStartSquare = true;
+    if (!Dragging)
+      DrawInvertedBitmap(MoveStartSquare);
+    else
+      DragStart(MoveStartSquare, point);
+
+  }
+  else {
+    MoveEndSquare = GetValidSquare(point, CurPlayer, false);
+    GotStartSquare = false;
+    if (MoveEndSquare == -1) {
+      if (Dragging)
+        DragEnd(FALSE);
+      Warning("不正な移動です");
+      DrawNormalBitmap(MoveStartSquare);
+      return;
+    }
+    if (!MoveCheck(MoveStartSquare, MoveEndSquare)) {
+      if (Dragging)
+        DragEnd(FALSE);
+      DrawNormalBitmap(MoveStartSquare);
+      return;
+    }
+
+    ::GotValidMove = true;
+    ::EnableMenuItem(hMenu, CM_UNDO, MF_BYCOMMAND | MF_ENABLED);
+    if (GameOver)
+      EndGame();
+    else if (NoComputerMove == false)
+      ComputersTurn();
+    else if (::MultiMove)
+      CurPlayer = (CurPlayer == white) ? black : white;
+  }
+}
+
+void
+TChessWindow::ComputersTurn()
+{
+  WhoseTurn = computer;
+  SetClassWindowCursor(GetHandle(), ::hWaitCursor);
+  GetParentO()->SetMenu(hThinkMenu);
+  ProgramMove();
+  GetParentO()->SetMenu(hMenu);
+
+  WhoseTurn = player;
+  SetClassWindowCursor(GetHandle(), hArrowCursor);
+  if (GameOver)
+    EndGame();
+}
+
+void
+TChessWindow::CmNewGame()
+{
+  KillTimer(TIMEID);
+  TInfo->SetTimerText("");
+  ::EnableMenuItem(hMenu, CM_UNDO, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+  ::EnableMenuItem(hMenu, CM_REDO, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+  NewGame = TRUE;
+  ::NewGame();
+  ::PrintBoard();
+  CurPlayer = Player;
+  ComputerColor = Opponent;
+}
+
+void
+TChessWindow::CmRestoreGame()
+{
+  TOpenSaveDialog::TData data (
+    OFN_HIDEREADONLY|OFN_FILEMUSTEXIST|OFN_NOREADONLYRETURN,
+    "ﾁｪｽｹﾞｰﾑﾌｧｲﾙ (*.CHS)\0*.chs\0",
+    0,
+    0,
+    "CHS"
+  );
+
+  if (TFileOpenDialog(this, data).Execute() == IDOK) {
+    NewGame = FALSE;
+    strcpy(FileName, data.FileName);
+    ::RestoreGame(FileName);
+    CurPlayer = Player;
+    ComputerColor = Opponent;
+    ::EnableMenuItem(hMenu, CM_REDO, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+    ::EnableMenuItem(hMenu, CM_UNDO, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+  }
+}
+
+void
+TChessWindow::CmSaveGameAs()
+{
+  TOpenSaveDialog::TData data (
+    OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT,
+    "ﾁｪｽｹﾞｰﾑﾌｧｲﾙ (*.CHS)|*.chs|",
+    0,
+    0,
+    "CHS"
+  );
+  if (TFileSaveDialog(this, data).Execute() == IDOK) {
+    NewGame = FALSE;
+    strcpy(FileName, data.FileName);
+    ::SaveGame(FileName);
+  }
+}
+
+void
+TChessWindow::CmSaveGame()
+{
+  if (NewGame)
+    CmSaveGameAs();
+  else
+    ::SaveGame(FileName);
+}
+
+void
+TChessWindow::CmError()
+{
+  TMessageDialog(this, DR_CHESSERROR, buf, "OWL Chess ｴﾗｰ").Execute();
+}
+
+void
+TChessWindow::DoEdit(TPoint& point)
+{
+  Modified = TRUE;
+
+  SQUARETYPE square = GetValidSquare(point, black, FALSE);
+  if (Board[square].piece != empty) {
+    Board[square].piece = empty;
+    ::UpdateBoard();
+    return;
+  }
+  int selectedItem = TEditBar->GetSelectedItem();
+
+  Board[square].piece = (PIECETYPE)(selectedItem % 6 + 1);
+  Board[square].color = (selectedItem < 6) ? white : black;
+  ::UpdateBoard();
+}
+
+void
+TChessWindow::CmMovePieces()
+{
+  SaveBoard = new BOARDTYPE[0x78];
+  if (!SaveBoard) {
+    Error("ﾒﾓﾘ不足です");
+    return;
+  }
+  memcpy(SaveBoard, Board, sizeof(BOARDTYPE) * 0x78);
+  Editing = EditingBoard = TRUE;
+  TInfo->Show(SW_HIDE);
+  GetParentO()->SetMenu(hEditMenu);
+  Modified = FALSE;
+  if (CurPlayer == white) {
+    CheckMenuItem(hEditMenu, IDM_BLACKTURN, MF_UNCHECKED);
+    CheckMenuItem(hEditMenu, IDM_WHITETURN, MF_CHECKED);
+  } else {
+    CheckMenuItem(hEditMenu, IDM_BLACKTURN, MF_CHECKED);
+    CheckMenuItem(hEditMenu, IDM_WHITETURN, MF_UNCHECKED);
+  }
+  TEditBar->Show(SW_NORMAL);
+}
+
+void
+TChessWindow::CmDone()
+{
+  SQUARETYPE sq;
+  int        kingCount[2] = { 0, 0 };
+  int        totalCount[2] = { 0, 0 };
+  bool       done = false;
+
+  if (Modified) {
+    for (sq = 0; sq < 0x78; sq++)
+      if (!(sq & 0x88)) {
+        if (Board[sq].piece != empty) {
+          totalCount[Board[sq].color]++;
+          if (Board[sq].piece == king)
+            kingCount[Board[sq].color]++;
+        }
+      }
+    if (totalCount[white] <= 16 && kingCount[white] == 1 &&
+        totalCount[black] <= 16 && kingCount[black] == 1) {
+      ResetNewPos();
+      if (!Attacks(Player, PieceTab[Opponent][0].isquare))
+        done = TRUE;
+      else
+        Error("ｷﾝｸﾞの位置が不正です");
+    } else
+       Error("駒の個数が不正です");
+  } else
+    NormalSetup();
+
+  if (done)
+    NormalSetup();
+}
+
+void
+TChessWindow::CmClear()
+{
+  Modified = TRUE;
+  for (SQUARETYPE sq = 0; sq <= 0x77; sq++)
+    Board[sq].piece = empty;
+  ::UpdateBoard();
+}
+
+void
+TChessWindow::CmCancel()
+{
+  memcpy(Board, SaveBoard, sizeof(BOARDTYPE) * 0x78);
+  ResetNewPos();
+  NormalSetup();
+}
+
+void
+TChessWindow::NormalSetup()
+{
+  TEditBar->Show(SW_HIDE);
+  TInfo->Show(SW_NORMAL);
+  GetParentO()->SetMenu(hMenu);
+  delete [] SaveBoard;
+  Editing = EditingBoard = FALSE;
+  ::UpdateBoard();
+}
+
+void
+TChessWindow::CmMoveTime()
+{
+  char* secsPerMove = new char[40];
+  sprintf(secsPerMove, "%.2lf", ::AverageTime);
+
+  if (TInputDialog(this, "１手の時間設定",
+      "１手の時間(秒):", secsPerMove, 19).Execute() == IDOK) {
+    double newMoveTime = atof(secsPerMove);
+    if (newMoveTime > 0.0) {
+      if (::Level != normal) {
+        UnCheckLevelMenu(Level);
+        ::CheckMenuItem(hMenu, IDM_MOVETIME, MF_CHECKED);
+      }
+      ::Level = normal;
+      ::AverageTime = newMoveTime;
+      PrintCurLevel();
+      for (COLORTYPE color = white; color <= black; ((int)color)++)
+        ::ChessTime[color].totaltime = (::MoveNo / 2) * ::AverageTime;
+      ::MaxLevel = MAXPLY;
+
+    } else
+      Error("入力が不正です. 変更は行われません.");
+  }
+  delete secsPerMove;
+}
+
+void
+TChessWindow::CmTotalTime()
+{
+  char* totalMoveTime = new char[40];
+  sprintf(totalMoveTime, "%.2lf", ::AverageTime);
+
+  if (TInputDialog(this, "試合の時間設定", "試合の時間(分):",
+      totalMoveTime, 19).Execute() == IDOK) {
+    double newMoveTime = atof(totalMoveTime);
+    if (newMoveTime > 0.0) {
+      if (::Level != fullgametime) {
+        UnCheckLevelMenu(Level);
+        ::CheckMenuItem(hMenu, IDM_TOTALTIME, MF_CHECKED);
+      }
+      ::Level = fullgametime;
+      ::AverageTime = newMoveTime;
+      ::PrintCurLevel();
+      for (COLORTYPE color = white; color <= black; ((int)color)++)
+        ::ChessTime[color].totaltime = (::MoveNo / 2) * ::AverageTime;
+      ::MaxLevel = MAXPLY;
+
+    } else
+      Error("入力が不正です. 変更は行われません.");
+  }
+  delete totalMoveTime;
+}
+
+void
+TChessWindow::CmDemo()
+{
+  bool isEasy = false;
+  if (::Level == easygame) {
+    isEasy = true;
+    ::Level = normal;
+    HideAttacks();
+  }
+  AutoPlay = true;
+  ComputersTurn();
+  if (isEasy) {
+    ::Level = easygame;
+    ::UpdateBoard();
+  }
+  CurPlayer = Player;
+  ComputerColor = Opponent;
+  ::PrintCurLevel();
+}
+
+void
+TChessWindow::CmMatching()
+{
+  if (::Level != matching) {
+    UnCheckLevelMenu(Level);
+    ::CheckMenuItem(hMenu, IDM_MATCHING, MF_CHECKED);
+  }
+  ::Level = matching;
+  ::PrintCurLevel();
+}
+
+void
+TChessWindow::CmInfiniteSearch()
+{
+  if (::Level != infinite) {
+    UnCheckLevelMenu(Level);
+    ::CheckMenuItem(hMenu, IDM_INFINITE, MF_CHECKED);
+  }
+  ::Level = infinite;
+  ::MaxLevel = MAXPLY;
+  ::PrintCurLevel();
+}
+
+void
+TChessWindow::CmPlySearch()
+{
+  char* plySearchDepth = new char[40];
+  sprintf(plySearchDepth, "%d", ::MaxLevel);
+
+  if (TInputDialog(this, "先読み深さ設定", "先読みの深さ:",
+      plySearchDepth, 19).Execute() == IDOK) {
+    int newPlyDepth = atoi(plySearchDepth);
+    if (newPlyDepth > 0) {
+      if (::Level != plysearch) {
+        UnCheckLevelMenu(Level);
+        ::CheckMenuItem(hMenu, IDM_PLY, MF_CHECKED);
+      }
+      ::MaxLevel = (BYTE)((newPlyDepth > MAXPLY) ? MAXPLY : newPlyDepth);
+      ::Level = plysearch;
+      ::PrintCurLevel();
+    } else
+      ::Error("入力が不正です. 変更は行われません.");
+  }
+  delete[] plySearchDepth;
+}
+
+void
+TChessWindow::CmMateSearch()
+{
+  if (::Level != matesearch) {
+    UnCheckLevelMenu(Level);
+    ::CheckMenuItem(hMenu, IDM_MATE, MF_CHECKED);
+  }
+  ::Level = matesearch;
+  ::PrintCurLevel();
+  ComputersTurn();
+}
+
+void
+TChessWindow::CmSinglePlayer()
+{
+}
+
+void TChessWindow::CmTwoPlayer()
+{
+  static LEVELTYPE OldLevel = normal;
+  ::MultiMove = !::MultiMove;
+
+  if (::MultiMove) {
+    OldLevel = ::Level;
+    ::ModifyMenu(hMenu, IDM_TWOPLAYER, MF_BYCOMMAND | MF_STRING,
+      IDM_TWOPLAYER, "１人用(&S)");
+    ::EnableMenuItem(hMenu, 2, MF_GRAYED | MF_BYPOSITION);
+    GetParentO()->DrawMenuBar();
+    ::Level = normal;
+    ::PrintCurLevel();
+
+  } else {
+    ::ModifyMenu(hMenu, IDM_TWOPLAYER, MF_BYCOMMAND | MF_STRING,
+      IDM_TWOPLAYER, "２人用(&T)");
+    ::EnableMenuItem(hMenu, 2, MF_ENABLED | MF_BYPOSITION);
+    GetParentO()->DrawMenuBar();
+    ::Level = OldLevel;
+    ::PrintCurLevel();
+  }
+}
+
+void TChessWindow::CmAutoPlay()
+{
+}
+
+void
+TChessWindow::CmReverseBoard()
+{
+  ::Turned = !::Turned;
+  ::PrintBoard();
+}
+
+void
+TChessWindow::CmUndoMove()
+{
+  if (ComputerThinking) {
+    MessageToPost = CM_UNDO;
+    return;
+  }
+  if (!Undo())
+    ::EnableMenuItem(hMenu, CM_UNDO, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+  ::EnableMenuItem(hMenu, CM_REDO, MF_BYCOMMAND | MF_ENABLED);
+  CurPlayer = Player;
+  ComputerColor = Opponent;
+}
+
+void
+TChessWindow::CmRedoUndo()
+{
+  if (ComputerThinking) {
+    MessageToPost = CM_REDO;
+    return;
+  }
+  if (!Redo())
+    ::EnableMenuItem(hMenu, CM_REDO, MF_BYCOMMAND | MF_DISABLED | MF_GRAYED);
+  ::EnableMenuItem(hMenu, CM_UNDO, MF_BYCOMMAND | MF_ENABLED);
+  CurPlayer = Player;
+  ComputerColor = Opponent;
+}
+
+void
+TChessWindow::UnCheckLevelMenu(LEVELTYPE level)
+{
+  WORD checkItem = IDM_EASY;
+  switch (level) {
+    case normal:
+      checkItem = IDM_MOVETIME;
+      break;
+    case fullgametime:
+      checkItem = IDM_TOTALTIME;
+      break;
+    case plysearch:
+      checkItem = IDM_PLY;
+      break;
+    case easygame:
+      checkItem = IDM_EASY;
+      break;
+    case infinite:
+      checkItem = IDM_INFINITE;
+      break;
+    case matesearch:
+      checkItem = IDM_MATE;
+      break;
+    case matching:
+      checkItem = IDM_MATCHING;
+      break;
+  }
+  ::CheckMenuItem(hMenu, checkItem, MF_UNCHECKED);
+}
+
+void
+TChessWindow::CheckLevelMenu(LEVELTYPE level)
+{
+  WORD checkItem = IDM_EASY;
+  switch (level) {
+    case normal:
+      checkItem = IDM_MOVETIME;
+      break;
+    case fullgametime:
+      checkItem = IDM_TOTALTIME;
+      break;
+    case plysearch:
+      checkItem = IDM_PLY;
+      break;
+    case easygame:
+      checkItem = IDM_EASY;
+      break;
+    case infinite:
+      checkItem = IDM_INFINITE;
+      break;
+    case matesearch:
+      checkItem = IDM_MATE;
+      break;
+    case matching:
+      checkItem = IDM_MATCHING;
+      break;
+  }
+  ::CheckMenuItem(hMenu, checkItem, MF_CHECKED);
+}
+
+void
+TChessWindow::CmEasy()
+{
+  if (::Level != easygame) {
+    UnCheckLevelMenu(Level);
+    ::CheckMenuItem(hMenu, IDM_EASY, MF_CHECKED);
+  }
+  ::Level = easygame;
+  ::AverageTime = 5.;
+  ::MaxLevel = MAXPLY;
+  ::PrintCurLevel();
+}
+
+void
+TChessWindow::EndGame()
+{
+  if (TEndDialog(this, DR_ENDGAMEDLG, EndGameMessage).Execute() != IDYES) {
+    PostMessage(WM_COMMAND, CM_EXIT);
+    return;
+  }
+  GameOver = false;
+  PostMessage(WM_COMMAND, CM_FILENEW);
+}
+
+void
+TChessWindow::CmHint()
+{
+  FindHintMove();
+  ShowHint();
+}
+
+void
+TChessWindow::CmPass()
+{
+  if (::Level == easygame)
+    HideAttacks();
+  CurPlayer = Opponent;
+  ComputerColor = Player;
+  ComputersTurn();
+}
+
+void
+TChessWindow::CmWhiteTurn()
+{
+  CheckMenuItem(hEditMenu, IDM_BLACKTURN, MF_UNCHECKED);
+  CheckMenuItem(hEditMenu, IDM_WHITETURN, MF_CHECKED);
+  CurPlayer = white;
+  ComputerColor = black;
+  if (CurPlayer != Player) {
+    Opponent = ComputerColor;
+    Player = ProgramColor = CurPlayer;
+  }
+}
+
+void
+TChessWindow::CmBlackTurn()
+{
+  CheckMenuItem(hEditMenu, IDM_BLACKTURN, MF_CHECKED);
+  CheckMenuItem(hEditMenu, IDM_WHITETURN, MF_UNCHECKED);
+  CurPlayer = black;
+  ComputerColor = white;
+  if (CurPlayer != Player) {
+    Opponent = ComputerColor;
+    Player = ProgramColor = CurPlayer;
+  }
+}
+
+void
+TChessWindow::CmColors()
+{
+  TColorsDialog(this, "ColorsDialog").Execute();
+  DeleteObject(hWhiteBrush);
+  DeleteObject(hBlackBrush);
+  ::hWhiteBrush = CreateSolidBrush(WhiteSquareColor);
+  ::hBlackBrush = CreateSolidBrush(BlackSquareColor);
+}
+
+void
+TChessWindow::CmPieceValues()
+{
+  TPieceValueDialog(this, "PieceValueDlg").Execute();
+}
+
+void
+TChessWindow::CmBestLine()
+{
+  ShowBestLine = !ShowBestLine;
+
+  if (ShowBestLine)
+    ::CheckMenuItem(hMenu, IDM_BESTLINE, MF_CHECKED);
+  else {
+    ::CheckMenuItem(hMenu, IDM_BESTLINE, MF_UNCHECKED);
+    TInfo->SetBestLineText("");
+  }
+}
+
+void
+TChessWindow::CmMouseDrag()
+{
+  TPoint point;
+
+  if (!Dragging && GotStartSquare) {
+    DrawNormalBitmap(MoveStartSquare);
+    GetCursorPos(point);
+    DragStart(MoveStartSquare, point);
+  }
+  Dragging = true;
+  ::CheckMenuItem(hMenu, IDM_MOUSEDRAG, MF_CHECKED);
+  ::CheckMenuItem(hMenu, IDM_MOUSESELECT, MF_UNCHECKED);
+}
+
+void
+TChessWindow::CmMouseSelect()
+{
+  DragEnd(true);
+  Dragging = false;
+  ::CheckMenuItem(hMenu, IDM_MOUSEDRAG, MF_UNCHECKED);
+  ::CheckMenuItem(hMenu, IDM_MOUSESELECT, MF_CHECKED);
+  if (GotStartSquare)
+    DrawInvertedBitmap(MoveStartSquare);
+}
+
+void
+TChessWindow::CmSound()
+{
+  SoundOn = !SoundOn;
+  if (SoundOn)
+    ::CheckMenuItem(hMenu, IDM_SOUND, MF_CHECKED);
+  else
+    ::CheckMenuItem(hMenu, IDM_SOUND, MF_UNCHECKED);
+}
+
+void
+TChessWindow::EvMouseMove(uint, TPoint& point)
+{
+  if (!GotStartSquare || !Dragging)
+    return;
+  Drag(point);
+}
+
+void
+TChessWindow::EvTimer(uint)
+{
+  DisplayTime();
+}
+
+
+// --------------- TChess ----------------------
+
+class TChessApp : public TApplication {
+  public:
+   TChessApp() : TApplication() {}
+   void InitMainWindow();
+};
+
+void
+TChessApp::InitMainWindow()
+{
+  TFrameWindow* frame = new TFrameWindow(0, "OWL Chess", new TChessWindow, true);
+  frame->Attr.AccelTable = "ChessCommands";
+  frame->Attr.Style &= ~WS_THICKFRAME;
+
+  SetMainWindow(frame);
+  EnableCtl3d();
+}
+
+int OwlMain(int,char**)
+{
+  return TChessApp().Run();
+}
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
