@@ -11,7 +11,7 @@ const MAXLEN         = 64;
 const SQUARE_SIZE = 36;
 const MAXBDSIZE = 8;
 const MYFRAMESIZE = 3;
-enum SPE {normal1,kingsidecas,qeensidecas,empassant,queening};
+enum SPE {normal1,kingsidecas,queensidecas,empassant,queening};
 const BACK  =  -104;
 const MAXPLY  =  23;
 const LOSEVALUE  = 0x7D00;
@@ -31,7 +31,7 @@ typedef short DEPTHTYPE;
 enum PIECETYPE {empty, king, queen, rook, bishop, knight, pawn};
 enum COLORTYPE {white, black};
 typedef struct {int z,t,showx,showy,type;char rank;} xPIECE;
-typedef struct {int newz,oldz,spe; xPIECE *p,*cap;}MOVE;
+typedef struct {int newz,oldz; SPE spe; xPIECE *p,*cap;}MOVE;
  struct BOARDIDTYPE {
   PIECETYPE piece;
   COLORTYPE color;

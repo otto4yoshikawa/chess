@@ -31,12 +31,14 @@ void chessrule::castling(xPIECE *p) {
 	if (moved(p, &record)) 		return;   //“®‚©‚µ‚½‚±‚Æ‚ ‚è
 	xPIECE *rook;
 	int t = p->t;
-
+	if(step>24)
+	 t=t;
 	// king side castling
 	int rookz = (t == 1) ? 0x07 : 0x77;
 	rook = board[rookz];
 	if (moved(rook, &record)) 	goto aa;
 	if (!safespot(p, rook))		goto aa;
+	DoPrintf("$$$$$$$$$$$");
 	generate(rookz, p, rook, kingsidecas);
 
 	// qeen side  castling
@@ -45,7 +47,8 @@ aa:
 	rook = board[rookz];
 	if (moved(rook, &record))		return;
 	if (!safespot(p, rook)) 		return;
-	generate(rookz, p, rook, qeensidecas);
+		DoPrintf("$$$$$$");
+	generate(rookz, p, rook, queensidecas);
 }
 
 // --------------------------
@@ -76,18 +79,19 @@ void chessrule::Play(MOVE m) {
 	xPIECE *cap = m.cap;
 	int z3;
 	int kingy,rookxold,rookxnew,kingnewx,oldking;
-	kingy=-1;
+	rookxnew=-1;
 	if (m.spe == kingsidecas) {
-	rookxold=7,rookxnew=5;kingnewx=6;
+		rookxold=7,rookxnew=5;kingnewx=6;
      }
-	if( m.spe==qeensidecas) {
+	if( m.spe==queensidecas) {
 		 rookxold=0,rookxnew=3; kingnewx=2;
 	}
-	if(kingy>=0){  // castling
+	if(rookxnew>0){  // castling
 			kingy=p->z&0xf0;
 			oldking=p->z;
 		temp = board[kingy+rookxold];
 		p->z= kingy+kingnewx;
+
 		board[oldking] = 0;
 		board[kingy+rookxold] = 0;
 		board[p->z]=p;
@@ -353,7 +357,7 @@ bool chessrule::genmove(int t) {
 			break;
 		case 'k':
 			gensearch2(0, 8, 1, p->z);
-		  //	castling(p);
+		  	castling(p);
 			break;
 
 		}
@@ -438,7 +442,7 @@ void chessrule::pawnsearch(int oldz, int t) {
 	if(step<3) return;
 	MOVE *mm = &record[step - 2];
 	q = mm->p;
-	DoPrintf("mm %02x %02x rank=%c",mm->newz,mm->oldz,mm->p->rank);
+   //	DoPrintf("mm %02x %02x rank=%c",mm->newz,mm->oldz,mm->p->rank);
 
 	if (!(q->rank == 'p' || q->rank =='P'))return;  //pawn ‚ÉŒÀ‚é
 	if (abs(mm->oldz/16 - mm->newz / 16) != 2)	return;

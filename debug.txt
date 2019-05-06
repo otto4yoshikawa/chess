@@ -1,375 +1,1152 @@
 load
-i=0 ii=0  n=0 d4 
 istr=d4
+$$$$$$$$$$$
+$$$$$$
 to=33
-oldz1=71 newz1=52 oldz=ffffffff newz=43 
-oldz1=71 newz1=50 oldz=ffffffff newz=43 
-oldz1=76 newz1=57 oldz=ffffffff newz=43 
-oldz1=76 newz1=55 oldz=ffffffff newz=43 
-oldz1=60 newz1=50 oldz=ffffffff newz=43 
-oldz1=60 newz1=40 oldz=ffffffff newz=43 
-oldz1=61 newz1=51 oldz=ffffffff newz=43 
-oldz1=61 newz1=41 oldz=ffffffff newz=43 
-oldz1=62 newz1=52 oldz=ffffffff newz=43 
-oldz1=62 newz1=42 oldz=ffffffff newz=43 
-oldz1=63 newz1=53 oldz=ffffffff newz=43 
-oldz1=63 newz1=43 oldz=ffffffff newz=43 
-oldz1=64 newz1=54 oldz=ffffffff newz=43 
-oldz1=64 newz1=44 oldz=ffffffff newz=43 
-oldz1=65 newz1=55 oldz=ffffffff newz=43 
-oldz1=65 newz1=45 oldz=ffffffff newz=43 
-oldz1=66 newz1=56 oldz=ffffffff newz=43 
-oldz1=66 newz1=46 oldz=ffffffff newz=43 
-oldz1=67 newz1=57 oldz=ffffffff newz=43 
-oldz1=67 newz1=47 oldz=ffffffff newz=43 
-k=11 from=63 to=43
+oldz1=(74 77 ÿ 1) INput=(ffffffff 43 K) 
+oldz1=(74 70 ÿ 2) INput=(ffffffff 43 K) 
+oldz1=(71 52 ÿ 0) INput=(ffffffff 43 N) 
+oldz1=(71 50 ÿ 0) INput=(ffffffff 43 N) 
+oldz1=(76 57 ÿ 0) INput=(ffffffff 43 N) 
+oldz1=(76 55 ÿ 0) INput=(ffffffff 43 N) 
+oldz1=(60 50 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(60 40 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(61 51 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(61 41 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(62 52 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(62 42 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(63 53 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(63 43 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(64 54 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(64 44 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(65 55 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(65 45 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(66 56 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(66 46 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(67 57 ÿ 0) INput=(ffffffff 43 P) 
+oldz1=(67 47 ÿ 0) INput=(ffffffff 43 P) 
+k=13 from=63 to=43
 from 63 ==> 43
-i=0 ii=1  n=1 Nf6 
 istr=Nf6
+$$$$$$$$$$$
+$$$$$$
 bz =13 P 33
-oldz1=01 newz1=20 oldz=ffffffff newz=25 
-oldz1=01 newz1=22 oldz=ffffffff newz=25 
-oldz1=06 newz1=25 oldz=ffffffff newz=25 
-oldz1=06 newz1=27 oldz=ffffffff newz=25 
-oldz1=10 newz1=20 oldz=ffffffff newz=25 
-oldz1=10 newz1=30 oldz=ffffffff newz=25 
-oldz1=11 newz1=21 oldz=ffffffff newz=25 
-oldz1=11 newz1=31 oldz=ffffffff newz=25 
-oldz1=12 newz1=22 oldz=ffffffff newz=25 
-oldz1=12 newz1=32 oldz=ffffffff newz=25 
-oldz1=13 newz1=23 oldz=ffffffff newz=25 
-oldz1=13 newz1=33 oldz=ffffffff newz=25 
-oldz1=14 newz1=24 oldz=ffffffff newz=25 
-oldz1=14 newz1=34 oldz=ffffffff newz=25 
-oldz1=15 newz1=25 oldz=ffffffff newz=25 
-oldz1=15 newz1=35 oldz=ffffffff newz=25 
-oldz1=16 newz1=26 oldz=ffffffff newz=25 
-oldz1=16 newz1=36 oldz=ffffffff newz=25 
-oldz1=17 newz1=27 oldz=ffffffff newz=25 
-oldz1=17 newz1=37 oldz=ffffffff newz=25 
-k=2 from=06 to=25
+oldz1=(04 07 N 1) INput=(ffffffff 25 K) 
+oldz1=(04 00 N 2) INput=(ffffffff 25 K) 
+oldz1=(01 20 N 0) INput=(ffffffff 25 N) 
+oldz1=(01 22 N 0) INput=(ffffffff 25 N) 
+oldz1=(06 25 N 0) INput=(ffffffff 25 N) 
+oldz1=(06 27 N 0) INput=(ffffffff 25 N) 
+oldz1=(10 20 N 0) INput=(ffffffff 25 P) 
+oldz1=(10 30 N 0) INput=(ffffffff 25 P) 
+oldz1=(11 21 N 0) INput=(ffffffff 25 P) 
+oldz1=(11 31 N 0) INput=(ffffffff 25 P) 
+oldz1=(12 22 N 0) INput=(ffffffff 25 P) 
+oldz1=(12 32 N 0) INput=(ffffffff 25 P) 
+oldz1=(13 23 N 0) INput=(ffffffff 25 P) 
+oldz1=(13 33 N 0) INput=(ffffffff 25 P) 
+oldz1=(14 24 N 0) INput=(ffffffff 25 P) 
+oldz1=(14 34 N 0) INput=(ffffffff 25 P) 
+oldz1=(15 25 N 0) INput=(ffffffff 25 P) 
+oldz1=(15 35 N 0) INput=(ffffffff 25 P) 
+oldz1=(16 26 N 0) INput=(ffffffff 25 P) 
+oldz1=(16 36 N 0) INput=(ffffffff 25 P) 
+oldz1=(17 27 N 0) INput=(ffffffff 25 P) 
+oldz1=(17 37 N 0) INput=(ffffffff 25 P) 
+k=4 from=06 to=25
 from 06 ==> 25
-i=1 ii=0  n=2 Bg5 
 istr=Bg5
+$$$$$$$$$$$
+$$$$$$
 bz =43 p 33
-oldz1=74 newz1=63 oldz=ffffffff newz=36 
-oldz1=71 newz1=63 oldz=ffffffff newz=36 
-oldz1=71 newz1=52 oldz=ffffffff newz=36 
-oldz1=71 newz1=50 oldz=ffffffff newz=36 
-oldz1=72 newz1=63 oldz=ffffffff newz=36 
-oldz1=72 newz1=54 oldz=ffffffff newz=36 
-oldz1=72 newz1=45 oldz=ffffffff newz=36 
-oldz1=72 newz1=36 oldz=ffffffff newz=36 
-oldz1=72 newz1=27 oldz=ffffffff newz=36 
-oldz1=73 newz1=63 oldz=ffffffff newz=36 
-oldz1=73 newz1=53 oldz=ffffffff newz=36 
-oldz1=76 newz1=57 oldz=ffffffff newz=36 
-oldz1=76 newz1=55 oldz=ffffffff newz=36 
-oldz1=60 newz1=50 oldz=ffffffff newz=36 
-oldz1=60 newz1=40 oldz=ffffffff newz=36 
-oldz1=61 newz1=51 oldz=ffffffff newz=36 
-oldz1=61 newz1=41 oldz=ffffffff newz=36 
-oldz1=62 newz1=52 oldz=ffffffff newz=36 
-oldz1=62 newz1=42 oldz=ffffffff newz=36 
-oldz1=43 newz1=33 oldz=ffffffff newz=36 
-oldz1=64 newz1=54 oldz=ffffffff newz=36 
-oldz1=64 newz1=44 oldz=ffffffff newz=36 
-oldz1=65 newz1=55 oldz=ffffffff newz=36 
-oldz1=65 newz1=45 oldz=ffffffff newz=36 
-oldz1=66 newz1=56 oldz=ffffffff newz=36 
-oldz1=66 newz1=46 oldz=ffffffff newz=36 
-oldz1=67 newz1=57 oldz=ffffffff newz=36 
-oldz1=67 newz1=47 oldz=ffffffff newz=36 
-k=7 from=72 to=36
+oldz1=(74 63 B 0) INput=(ffffffff 36 K) 
+oldz1=(74 77 B 1) INput=(ffffffff 36 K) 
+oldz1=(74 70 B 2) INput=(ffffffff 36 K) 
+oldz1=(71 63 B 0) INput=(ffffffff 36 N) 
+oldz1=(71 52 B 0) INput=(ffffffff 36 N) 
+oldz1=(71 50 B 0) INput=(ffffffff 36 N) 
+oldz1=(72 63 B 0) INput=(ffffffff 36 B) 
+oldz1=(72 54 B 0) INput=(ffffffff 36 B) 
+oldz1=(72 45 B 0) INput=(ffffffff 36 B) 
+oldz1=(72 36 B 0) INput=(ffffffff 36 B) 
+oldz1=(72 27 B 0) INput=(ffffffff 36 B) 
+oldz1=(73 63 B 0) INput=(ffffffff 36 Q) 
+oldz1=(73 53 B 0) INput=(ffffffff 36 Q) 
+oldz1=(76 57 B 0) INput=(ffffffff 36 N) 
+oldz1=(76 55 B 0) INput=(ffffffff 36 N) 
+oldz1=(60 50 B 0) INput=(ffffffff 36 P) 
+oldz1=(60 40 B 0) INput=(ffffffff 36 P) 
+oldz1=(61 51 B 0) INput=(ffffffff 36 P) 
+oldz1=(61 41 B 0) INput=(ffffffff 36 P) 
+oldz1=(62 52 B 0) INput=(ffffffff 36 P) 
+oldz1=(62 42 B 0) INput=(ffffffff 36 P) 
+oldz1=(43 33 B 0) INput=(ffffffff 36 P) 
+oldz1=(64 54 B 0) INput=(ffffffff 36 P) 
+oldz1=(64 44 B 0) INput=(ffffffff 36 P) 
+oldz1=(65 55 B 0) INput=(ffffffff 36 P) 
+oldz1=(65 45 B 0) INput=(ffffffff 36 P) 
+oldz1=(66 56 B 0) INput=(ffffffff 36 P) 
+oldz1=(66 46 B 0) INput=(ffffffff 36 P) 
+oldz1=(67 57 B 0) INput=(ffffffff 36 P) 
+oldz1=(67 47 B 0) INput=(ffffffff 36 P) 
+k=9 from=72 to=36
 from 72 ==> 36
-i=1 ii=1  n=3 e6 
 istr=e6
+$$$$$$$$$$$
+$$$$$$
+bz =25 N 33
+bz =13 P 33
 to=54
-bz =25 N 33
-bz =13 P 33
-oldz1=01 newz1=20 oldz=ffffffff newz=24 
-oldz1=01 newz1=22 oldz=ffffffff newz=24 
-oldz1=25 newz1=33 oldz=ffffffff newz=24 
-oldz1=25 newz1=37 oldz=ffffffff newz=24 
-oldz1=25 newz1=44 oldz=ffffffff newz=24 
-oldz1=25 newz1=06 oldz=ffffffff newz=24 
-oldz1=25 newz1=46 oldz=ffffffff newz=24 
-oldz1=07 newz1=06 oldz=ffffffff newz=24 
-oldz1=10 newz1=20 oldz=ffffffff newz=24 
-oldz1=10 newz1=30 oldz=ffffffff newz=24 
-oldz1=11 newz1=21 oldz=ffffffff newz=24 
-oldz1=11 newz1=31 oldz=ffffffff newz=24 
-oldz1=12 newz1=22 oldz=ffffffff newz=24 
-oldz1=12 newz1=32 oldz=ffffffff newz=24 
-oldz1=13 newz1=23 oldz=ffffffff newz=24 
-oldz1=13 newz1=33 oldz=ffffffff newz=24 
-oldz1=14 newz1=24 oldz=ffffffff newz=24 
-oldz1=14 newz1=34 oldz=ffffffff newz=24 
-oldz1=16 newz1=26 oldz=ffffffff newz=24 
-oldz1=17 newz1=27 oldz=ffffffff newz=24 
-oldz1=17 newz1=37 oldz=ffffffff newz=24 
-k=16 from=14 to=24
+oldz1=(04 07 ÿ 1) INput=(ffffffff 24 K) 
+oldz1=(04 00 ÿ 2) INput=(ffffffff 24 K) 
+oldz1=(01 20 ÿ 0) INput=(ffffffff 24 N) 
+oldz1=(01 22 ÿ 0) INput=(ffffffff 24 N) 
+oldz1=(25 33 ÿ 0) INput=(ffffffff 24 N) 
+oldz1=(25 37 ÿ 0) INput=(ffffffff 24 N) 
+oldz1=(25 44 ÿ 0) INput=(ffffffff 24 N) 
+oldz1=(25 06 ÿ 0) INput=(ffffffff 24 N) 
+oldz1=(25 46 ÿ 0) INput=(ffffffff 24 N) 
+oldz1=(07 06 ÿ 0) INput=(ffffffff 24 R) 
+oldz1=(10 20 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(10 30 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(11 21 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(11 31 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(12 22 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(12 32 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(13 23 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(13 33 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(14 24 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(14 34 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(16 26 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(17 27 ÿ 0) INput=(ffffffff 24 P) 
+oldz1=(17 37 ÿ 0) INput=(ffffffff 24 P) 
+k=18 from=14 to=24
 from 14 ==> 24
-i=2 ii=0  n=4 e4 
 istr=e4
+$$$$$$$$$$$
+$$$$$$
+bz =43 p 33
 to=34
-bz =43 p 33
-oldz1=74 newz1=63 oldz=ffffffff newz=44 
-oldz1=71 newz1=63 oldz=ffffffff newz=44 
-oldz1=71 newz1=52 oldz=ffffffff newz=44 
-oldz1=71 newz1=50 oldz=ffffffff newz=44 
-oldz1=36 newz1=47 oldz=ffffffff newz=44 
-oldz1=36 newz1=25 oldz=ffffffff newz=44 
-oldz1=36 newz1=45 oldz=ffffffff newz=44 
-oldz1=36 newz1=54 oldz=ffffffff newz=44 
-oldz1=36 newz1=63 oldz=ffffffff newz=44 
-oldz1=36 newz1=72 oldz=ffffffff newz=44 
-oldz1=36 newz1=27 oldz=ffffffff newz=44 
-oldz1=73 newz1=72 oldz=ffffffff newz=44 
-oldz1=73 newz1=63 oldz=ffffffff newz=44 
-oldz1=73 newz1=53 oldz=ffffffff newz=44 
-oldz1=76 newz1=57 oldz=ffffffff newz=44 
-oldz1=76 newz1=55 oldz=ffffffff newz=44 
-oldz1=60 newz1=50 oldz=ffffffff newz=44 
-oldz1=60 newz1=40 oldz=ffffffff newz=44 
-oldz1=61 newz1=51 oldz=ffffffff newz=44 
-oldz1=61 newz1=41 oldz=ffffffff newz=44 
-oldz1=62 newz1=52 oldz=ffffffff newz=44 
-oldz1=62 newz1=42 oldz=ffffffff newz=44 
-oldz1=43 newz1=33 oldz=ffffffff newz=44 
-oldz1=64 newz1=54 oldz=ffffffff newz=44 
-oldz1=64 newz1=44 oldz=ffffffff newz=44 
-oldz1=65 newz1=55 oldz=ffffffff newz=44 
-oldz1=65 newz1=45 oldz=ffffffff newz=44 
-oldz1=66 newz1=56 oldz=ffffffff newz=44 
-oldz1=66 newz1=46 oldz=ffffffff newz=44 
-oldz1=67 newz1=57 oldz=ffffffff newz=44 
-oldz1=67 newz1=47 oldz=ffffffff newz=44 
-k=24 from=64 to=44
+oldz1=(74 63 ÿ 0) INput=(ffffffff 44 K) 
+oldz1=(74 77 ÿ 1) INput=(ffffffff 44 K) 
+oldz1=(74 70 ÿ 2) INput=(ffffffff 44 K) 
+oldz1=(71 63 ÿ 0) INput=(ffffffff 44 N) 
+oldz1=(71 52 ÿ 0) INput=(ffffffff 44 N) 
+oldz1=(71 50 ÿ 0) INput=(ffffffff 44 N) 
+oldz1=(36 47 ÿ 0) INput=(ffffffff 44 B) 
+oldz1=(36 25 ÿ 0) INput=(ffffffff 44 B) 
+oldz1=(36 45 ÿ 0) INput=(ffffffff 44 B) 
+oldz1=(36 54 ÿ 0) INput=(ffffffff 44 B) 
+oldz1=(36 63 ÿ 0) INput=(ffffffff 44 B) 
+oldz1=(36 72 ÿ 0) INput=(ffffffff 44 B) 
+oldz1=(36 27 ÿ 0) INput=(ffffffff 44 B) 
+oldz1=(73 72 ÿ 0) INput=(ffffffff 44 Q) 
+oldz1=(73 63 ÿ 0) INput=(ffffffff 44 Q) 
+oldz1=(73 53 ÿ 0) INput=(ffffffff 44 Q) 
+oldz1=(76 57 ÿ 0) INput=(ffffffff 44 N) 
+oldz1=(76 55 ÿ 0) INput=(ffffffff 44 N) 
+oldz1=(60 50 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(60 40 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(61 51 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(61 41 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(62 52 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(62 42 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(43 33 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(64 54 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(64 44 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(65 55 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(65 45 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(66 56 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(66 46 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(67 57 ÿ 0) INput=(ffffffff 44 P) 
+oldz1=(67 47 ÿ 0) INput=(ffffffff 44 P) 
+k=26 from=64 to=44
 from 64 ==> 44
-i=2 ii=1  n=5 Be7 
 istr=Be7
+$$$$$$$$$$$
+$$$$$$
 bz =25 N 33
 bz =13 P 33
-oldz1=04 newz1=14 oldz=ffffffff newz=14 
-oldz1=01 newz1=20 oldz=ffffffff newz=14 
-oldz1=01 newz1=22 oldz=ffffffff newz=14 
-oldz1=03 newz1=14 oldz=ffffffff newz=14 
-oldz1=05 newz1=14 oldz=ffffffff newz=14 
-oldz1=05 newz1=23 oldz=ffffffff newz=14 
-oldz1=05 newz1=32 oldz=ffffffff newz=14 
-oldz1=05 newz1=41 oldz=ffffffff newz=14 
-oldz1=05 newz1=50 oldz=ffffffff newz=14 
-oldz1=25 newz1=33 oldz=ffffffff newz=14 
-oldz1=25 newz1=37 oldz=ffffffff newz=14 
-oldz1=25 newz1=44 oldz=ffffffff newz=14 
-oldz1=25 newz1=06 oldz=ffffffff newz=14 
-oldz1=25 newz1=46 oldz=ffffffff newz=14 
-oldz1=07 newz1=06 oldz=ffffffff newz=14 
-oldz1=10 newz1=20 oldz=ffffffff newz=14 
-oldz1=10 newz1=30 oldz=ffffffff newz=14 
-oldz1=11 newz1=21 oldz=ffffffff newz=14 
-oldz1=11 newz1=31 oldz=ffffffff newz=14 
-oldz1=12 newz1=22 oldz=ffffffff newz=14 
-oldz1=12 newz1=32 oldz=ffffffff newz=14 
-oldz1=13 newz1=23 oldz=ffffffff newz=14 
-oldz1=13 newz1=33 oldz=ffffffff newz=14 
-oldz1=24 newz1=34 oldz=ffffffff newz=14 
-oldz1=16 newz1=26 oldz=ffffffff newz=14 
-oldz1=17 newz1=27 oldz=ffffffff newz=14 
-oldz1=17 newz1=37 oldz=ffffffff newz=14 
-k=4 from=05 to=14
+oldz1=(04 14 B 0) INput=(ffffffff 14 K) 
+oldz1=(04 07 B 1) INput=(ffffffff 14 K) 
+oldz1=(04 00 B 2) INput=(ffffffff 14 K) 
+oldz1=(01 20 B 0) INput=(ffffffff 14 N) 
+oldz1=(01 22 B 0) INput=(ffffffff 14 N) 
+oldz1=(03 14 B 0) INput=(ffffffff 14 Q) 
+oldz1=(05 14 B 0) INput=(ffffffff 14 B) 
+oldz1=(05 23 B 0) INput=(ffffffff 14 B) 
+oldz1=(05 32 B 0) INput=(ffffffff 14 B) 
+oldz1=(05 41 B 0) INput=(ffffffff 14 B) 
+oldz1=(05 50 B 0) INput=(ffffffff 14 B) 
+oldz1=(25 33 B 0) INput=(ffffffff 14 N) 
+oldz1=(25 37 B 0) INput=(ffffffff 14 N) 
+oldz1=(25 44 B 0) INput=(ffffffff 14 N) 
+oldz1=(25 06 B 0) INput=(ffffffff 14 N) 
+oldz1=(25 46 B 0) INput=(ffffffff 14 N) 
+oldz1=(07 06 B 0) INput=(ffffffff 14 R) 
+oldz1=(10 20 B 0) INput=(ffffffff 14 P) 
+oldz1=(10 30 B 0) INput=(ffffffff 14 P) 
+oldz1=(11 21 B 0) INput=(ffffffff 14 P) 
+oldz1=(11 31 B 0) INput=(ffffffff 14 P) 
+oldz1=(12 22 B 0) INput=(ffffffff 14 P) 
+oldz1=(12 32 B 0) INput=(ffffffff 14 P) 
+oldz1=(13 23 B 0) INput=(ffffffff 14 P) 
+oldz1=(13 33 B 0) INput=(ffffffff 14 P) 
+oldz1=(24 34 B 0) INput=(ffffffff 14 P) 
+oldz1=(16 26 B 0) INput=(ffffffff 14 P) 
+oldz1=(17 27 B 0) INput=(ffffffff 14 P) 
+oldz1=(17 37 B 0) INput=(ffffffff 14 P) 
+k=6 from=05 to=14
 from 05 ==> 14
-i=3 ii=0  n=6 Nd2 
 istr=Nd2
+$$$$$$$$$$$
+$$$$$$
 bz =43 p 33
-oldz1=74 newz1=64 oldz=ffffffff newz=63 
-oldz1=74 newz1=63 oldz=ffffffff newz=63 
-oldz1=71 newz1=63 oldz=ffffffff newz=63 
-oldz1=71 newz1=52 oldz=ffffffff newz=63 
-oldz1=71 newz1=50 oldz=ffffffff newz=63 
-oldz1=36 newz1=47 oldz=ffffffff newz=63 
-oldz1=36 newz1=25 oldz=ffffffff newz=63 
-oldz1=36 newz1=45 oldz=ffffffff newz=63 
-oldz1=36 newz1=54 oldz=ffffffff newz=63 
-oldz1=36 newz1=63 oldz=ffffffff newz=63 
-oldz1=36 newz1=72 oldz=ffffffff newz=63 
-oldz1=36 newz1=27 oldz=ffffffff newz=63 
-oldz1=73 newz1=72 oldz=ffffffff newz=63 
-oldz1=73 newz1=63 oldz=ffffffff newz=63 
-oldz1=73 newz1=53 oldz=ffffffff newz=63 
-oldz1=73 newz1=64 oldz=ffffffff newz=63 
-oldz1=73 newz1=55 oldz=ffffffff newz=63 
-oldz1=73 newz1=46 oldz=ffffffff newz=63 
-oldz1=73 newz1=37 oldz=ffffffff newz=63 
-oldz1=75 newz1=64 oldz=ffffffff newz=63 
-oldz1=75 newz1=53 oldz=ffffffff newz=63 
-oldz1=75 newz1=42 oldz=ffffffff newz=63 
-oldz1=75 newz1=31 oldz=ffffffff newz=63 
-oldz1=75 newz1=20 oldz=ffffffff newz=63 
-oldz1=76 newz1=64 oldz=ffffffff newz=63 
-oldz1=76 newz1=57 oldz=ffffffff newz=63 
-oldz1=76 newz1=55 oldz=ffffffff newz=63 
-oldz1=60 newz1=50 oldz=ffffffff newz=63 
-oldz1=60 newz1=40 oldz=ffffffff newz=63 
-oldz1=61 newz1=51 oldz=ffffffff newz=63 
-oldz1=61 newz1=41 oldz=ffffffff newz=63 
-oldz1=62 newz1=52 oldz=ffffffff newz=63 
-oldz1=62 newz1=42 oldz=ffffffff newz=63 
-oldz1=43 newz1=33 oldz=ffffffff newz=63 
-oldz1=44 newz1=34 oldz=ffffffff newz=63 
-oldz1=65 newz1=55 oldz=ffffffff newz=63 
-oldz1=65 newz1=45 oldz=ffffffff newz=63 
-oldz1=66 newz1=56 oldz=ffffffff newz=63 
-oldz1=66 newz1=46 oldz=ffffffff newz=63 
-oldz1=67 newz1=57 oldz=ffffffff newz=63 
-oldz1=67 newz1=47 oldz=ffffffff newz=63 
-k=2 from=71 to=63
+oldz1=(74 64 N 0) INput=(ffffffff 63 K) 
+oldz1=(74 63 N 0) INput=(ffffffff 63 K) 
+oldz1=(74 77 N 1) INput=(ffffffff 63 K) 
+oldz1=(74 70 N 2) INput=(ffffffff 63 K) 
+oldz1=(71 63 N 0) INput=(ffffffff 63 N) 
+oldz1=(71 52 N 0) INput=(ffffffff 63 N) 
+oldz1=(71 50 N 0) INput=(ffffffff 63 N) 
+oldz1=(36 47 N 0) INput=(ffffffff 63 B) 
+oldz1=(36 25 N 0) INput=(ffffffff 63 B) 
+oldz1=(36 45 N 0) INput=(ffffffff 63 B) 
+oldz1=(36 54 N 0) INput=(ffffffff 63 B) 
+oldz1=(36 63 N 0) INput=(ffffffff 63 B) 
+oldz1=(36 72 N 0) INput=(ffffffff 63 B) 
+oldz1=(36 27 N 0) INput=(ffffffff 63 B) 
+oldz1=(73 72 N 0) INput=(ffffffff 63 Q) 
+oldz1=(73 63 N 0) INput=(ffffffff 63 Q) 
+oldz1=(73 53 N 0) INput=(ffffffff 63 Q) 
+oldz1=(73 64 N 0) INput=(ffffffff 63 Q) 
+oldz1=(73 55 N 0) INput=(ffffffff 63 Q) 
+oldz1=(73 46 N 0) INput=(ffffffff 63 Q) 
+oldz1=(73 37 N 0) INput=(ffffffff 63 Q) 
+oldz1=(75 64 N 0) INput=(ffffffff 63 B) 
+oldz1=(75 53 N 0) INput=(ffffffff 63 B) 
+oldz1=(75 42 N 0) INput=(ffffffff 63 B) 
+oldz1=(75 31 N 0) INput=(ffffffff 63 B) 
+oldz1=(75 20 N 0) INput=(ffffffff 63 B) 
+oldz1=(76 64 N 0) INput=(ffffffff 63 N) 
+oldz1=(76 57 N 0) INput=(ffffffff 63 N) 
+oldz1=(76 55 N 0) INput=(ffffffff 63 N) 
+oldz1=(60 50 N 0) INput=(ffffffff 63 P) 
+oldz1=(60 40 N 0) INput=(ffffffff 63 P) 
+oldz1=(61 51 N 0) INput=(ffffffff 63 P) 
+oldz1=(61 41 N 0) INput=(ffffffff 63 P) 
+oldz1=(62 52 N 0) INput=(ffffffff 63 P) 
+oldz1=(62 42 N 0) INput=(ffffffff 63 P) 
+oldz1=(43 33 N 0) INput=(ffffffff 63 P) 
+oldz1=(44 34 N 0) INput=(ffffffff 63 P) 
+oldz1=(65 55 N 0) INput=(ffffffff 63 P) 
+oldz1=(65 45 N 0) INput=(ffffffff 63 P) 
+oldz1=(66 56 N 0) INput=(ffffffff 63 P) 
+oldz1=(66 46 N 0) INput=(ffffffff 63 P) 
+oldz1=(67 57 N 0) INput=(ffffffff 63 P) 
+oldz1=(67 47 N 0) INput=(ffffffff 63 P) 
+k=4 from=71 to=63
 from 71 ==> 63
-i=3 ii=1  n=7 Nd5 
-istr=Nd5
+istr=Pd5
+$$$$$$$$$$$
+$$$$$$
 bz =25 N 33
 bz =13 P 33
-oldz1=04 newz1=05 oldz=ffffffff newz=33 
-oldz1=01 newz1=20 oldz=ffffffff newz=33 
-oldz1=01 newz1=22 oldz=ffffffff newz=33 
-oldz1=14 newz1=23 oldz=ffffffff newz=33 
-oldz1=14 newz1=32 oldz=ffffffff newz=33 
-oldz1=14 newz1=41 oldz=ffffffff newz=33 
-oldz1=14 newz1=50 oldz=ffffffff newz=33 
-oldz1=14 newz1=05 oldz=ffffffff newz=33 
-oldz1=25 newz1=33 oldz=ffffffff newz=33 
-oldz1=25 newz1=37 oldz=ffffffff newz=33 
-oldz1=25 newz1=44 oldz=ffffffff newz=33 
-oldz1=25 newz1=06 oldz=ffffffff newz=33 
-oldz1=25 newz1=46 oldz=ffffffff newz=33 
-oldz1=07 newz1=06 oldz=ffffffff newz=33 
-oldz1=07 newz1=05 oldz=ffffffff newz=33 
-oldz1=10 newz1=20 oldz=ffffffff newz=33 
-oldz1=10 newz1=30 oldz=ffffffff newz=33 
-oldz1=11 newz1=21 oldz=ffffffff newz=33 
-oldz1=11 newz1=31 oldz=ffffffff newz=33 
-oldz1=12 newz1=22 oldz=ffffffff newz=33 
-oldz1=12 newz1=32 oldz=ffffffff newz=33 
-oldz1=13 newz1=23 oldz=ffffffff newz=33 
-oldz1=13 newz1=33 oldz=ffffffff newz=33 
-oldz1=24 newz1=34 oldz=ffffffff newz=33 
-oldz1=16 newz1=26 oldz=ffffffff newz=33 
-oldz1=17 newz1=27 oldz=ffffffff newz=33 
-oldz1=17 newz1=37 oldz=ffffffff newz=33 
-k=8 from=25 to=33
-from 25 ==> 33
-i=4 ii=0  n=8 e5 
+oldz1=(04 05 P 0) INput=(ffffffff 33 K) 
+oldz1=(04 07 P 1) INput=(ffffffff 33 K) 
+oldz1=(04 00 P 2) INput=(ffffffff 33 K) 
+oldz1=(01 20 P 0) INput=(ffffffff 33 N) 
+oldz1=(01 22 P 0) INput=(ffffffff 33 N) 
+oldz1=(14 23 P 0) INput=(ffffffff 33 B) 
+oldz1=(14 32 P 0) INput=(ffffffff 33 B) 
+oldz1=(14 41 P 0) INput=(ffffffff 33 B) 
+oldz1=(14 50 P 0) INput=(ffffffff 33 B) 
+oldz1=(14 05 P 0) INput=(ffffffff 33 B) 
+oldz1=(25 33 P 0) INput=(ffffffff 33 N) 
+oldz1=(25 37 P 0) INput=(ffffffff 33 N) 
+oldz1=(25 44 P 0) INput=(ffffffff 33 N) 
+oldz1=(25 06 P 0) INput=(ffffffff 33 N) 
+oldz1=(25 46 P 0) INput=(ffffffff 33 N) 
+oldz1=(07 06 P 0) INput=(ffffffff 33 R) 
+oldz1=(07 05 P 0) INput=(ffffffff 33 R) 
+oldz1=(10 20 P 0) INput=(ffffffff 33 P) 
+oldz1=(10 30 P 0) INput=(ffffffff 33 P) 
+oldz1=(11 21 P 0) INput=(ffffffff 33 P) 
+oldz1=(11 31 P 0) INput=(ffffffff 33 P) 
+oldz1=(12 22 P 0) INput=(ffffffff 33 P) 
+oldz1=(12 32 P 0) INput=(ffffffff 33 P) 
+oldz1=(13 23 P 0) INput=(ffffffff 33 P) 
+oldz1=(13 33 P 0) INput=(ffffffff 33 P) 
+oldz1=(24 34 P 0) INput=(ffffffff 33 P) 
+oldz1=(16 26 P 0) INput=(ffffffff 33 P) 
+oldz1=(17 27 P 0) INput=(ffffffff 33 P) 
+oldz1=(17 37 P 0) INput=(ffffffff 33 P) 
+k=24 from=13 to=33
+from 13 ==> 33
 istr=e5
-to=44
+$$$$$$$$$$$
+$$$$$$
 Pawn tkw33 44 q=33 
 bz =44 p 33
-oldz1=74 newz1=64 oldz=ffffffff newz=34 
-oldz1=70 newz1=71 oldz=ffffffff newz=34 
-oldz1=70 newz1=72 oldz=ffffffff newz=34 
-oldz1=63 newz1=71 oldz=ffffffff newz=34 
-oldz1=63 newz1=55 oldz=ffffffff newz=34 
-oldz1=63 newz1=51 oldz=ffffffff newz=34 
-oldz1=63 newz1=42 oldz=ffffffff newz=34 
-oldz1=36 newz1=47 oldz=ffffffff newz=34 
-oldz1=36 newz1=25 oldz=ffffffff newz=34 
-oldz1=36 newz1=14 oldz=ffffffff newz=34 
-oldz1=36 newz1=45 oldz=ffffffff newz=34 
-oldz1=36 newz1=54 oldz=ffffffff newz=34 
-oldz1=36 newz1=27 oldz=ffffffff newz=34 
-oldz1=73 newz1=72 oldz=ffffffff newz=34 
-oldz1=73 newz1=71 oldz=ffffffff newz=34 
-oldz1=73 newz1=64 oldz=ffffffff newz=34 
-oldz1=73 newz1=55 oldz=ffffffff newz=34 
-oldz1=73 newz1=46 oldz=ffffffff newz=34 
-oldz1=73 newz1=37 oldz=ffffffff newz=34 
-oldz1=75 newz1=64 oldz=ffffffff newz=34 
-oldz1=75 newz1=53 oldz=ffffffff newz=34 
-oldz1=75 newz1=42 oldz=ffffffff newz=34 
-oldz1=75 newz1=31 oldz=ffffffff newz=34 
-oldz1=75 newz1=20 oldz=ffffffff newz=34 
-oldz1=76 newz1=64 oldz=ffffffff newz=34 
-oldz1=76 newz1=57 oldz=ffffffff newz=34 
-oldz1=76 newz1=55 oldz=ffffffff newz=34 
-oldz1=60 newz1=50 oldz=ffffffff newz=34 
-oldz1=60 newz1=40 oldz=ffffffff newz=34 
-oldz1=61 newz1=51 oldz=ffffffff newz=34 
-oldz1=61 newz1=41 oldz=ffffffff newz=34 
-oldz1=62 newz1=52 oldz=ffffffff newz=34 
-oldz1=62 newz1=42 oldz=ffffffff newz=34 
-oldz1=44 newz1=34 oldz=ffffffff newz=34 
-oldz1=44 newz1=33 oldz=ffffffff newz=34 
-oldz1=65 newz1=55 oldz=ffffffff newz=34 
-oldz1=65 newz1=45 oldz=ffffffff newz=34 
-oldz1=66 newz1=56 oldz=ffffffff newz=34 
-oldz1=66 newz1=46 oldz=ffffffff newz=34 
-oldz1=67 newz1=57 oldz=ffffffff newz=34 
-oldz1=67 newz1=47 oldz=ffffffff newz=34 
-k=33 from=44 to=34
+to=44
+oldz1=(74 64 ÿ 0) INput=(ffffffff 34 K) 
+oldz1=(74 77 ÿ 1) INput=(ffffffff 34 K) 
+oldz1=(74 70 ÿ 2) INput=(ffffffff 34 K) 
+oldz1=(70 71 ÿ 0) INput=(ffffffff 34 R) 
+oldz1=(70 72 ÿ 0) INput=(ffffffff 34 R) 
+oldz1=(63 71 ÿ 0) INput=(ffffffff 34 N) 
+oldz1=(63 55 ÿ 0) INput=(ffffffff 34 N) 
+oldz1=(63 51 ÿ 0) INput=(ffffffff 34 N) 
+oldz1=(63 42 ÿ 0) INput=(ffffffff 34 N) 
+oldz1=(36 47 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(36 25 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(36 45 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(36 54 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(36 27 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(73 72 ÿ 0) INput=(ffffffff 34 Q) 
+oldz1=(73 71 ÿ 0) INput=(ffffffff 34 Q) 
+oldz1=(73 64 ÿ 0) INput=(ffffffff 34 Q) 
+oldz1=(73 55 ÿ 0) INput=(ffffffff 34 Q) 
+oldz1=(73 46 ÿ 0) INput=(ffffffff 34 Q) 
+oldz1=(73 37 ÿ 0) INput=(ffffffff 34 Q) 
+oldz1=(75 64 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(75 53 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(75 42 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(75 31 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(75 20 ÿ 0) INput=(ffffffff 34 B) 
+oldz1=(76 64 ÿ 0) INput=(ffffffff 34 N) 
+oldz1=(76 57 ÿ 0) INput=(ffffffff 34 N) 
+oldz1=(76 55 ÿ 0) INput=(ffffffff 34 N) 
+oldz1=(60 50 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(60 40 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(61 51 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(61 41 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(62 52 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(62 42 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(44 34 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(44 33 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(65 55 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(65 45 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(66 56 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(66 46 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(67 57 ÿ 0) INput=(ffffffff 34 P) 
+oldz1=(67 47 ÿ 0) INput=(ffffffff 34 P) 
+k=34 from=44 to=34
 from 44 ==> 34
-i=4 ii=1  n=9 Nfd7 
 istr=Nfd7
+$$$$$$$$$$$
+$$$$$$
 cxsave =05 z=63 
-oldz1=04 newz1=05 oldz=05 newz=13 
-oldz1=01 newz1=20 oldz=05 newz=13 
-oldz1=01 newz1=22 oldz=05 newz=13 
-oldz1=14 newz1=25 oldz=05 newz=13 
-oldz1=14 newz1=36 oldz=05 newz=13 
-oldz1=14 newz1=23 oldz=05 newz=13 
-oldz1=14 newz1=32 oldz=05 newz=13 
-oldz1=14 newz1=41 oldz=05 newz=13 
-oldz1=14 newz1=50 oldz=05 newz=13 
-oldz1=14 newz1=05 oldz=05 newz=13 
-oldz1=33 newz1=41 oldz=05 newz=13 
-oldz1=33 newz1=25 oldz=05 newz=13 
-oldz1=33 newz1=45 oldz=05 newz=13 
-oldz1=33 newz1=21 oldz=05 newz=13 
-oldz1=33 newz1=52 oldz=05 newz=13 
-oldz1=33 newz1=54 oldz=05 newz=13 
-oldz1=07 newz1=06 oldz=05 newz=13 
-oldz1=07 newz1=05 oldz=05 newz=13 
-oldz1=10 newz1=20 oldz=05 newz=13 
-oldz1=10 newz1=30 oldz=05 newz=13 
-oldz1=11 newz1=21 oldz=05 newz=13 
-oldz1=11 newz1=31 oldz=05 newz=13 
-oldz1=12 newz1=22 oldz=05 newz=13 
-oldz1=12 newz1=32 oldz=05 newz=13 
-oldz1=13 newz1=23 oldz=05 newz=13 
-oldz1=15 newz1=25 oldz=05 newz=13 
-$$$$$$$$$$$i=25
-oldz1=15 newz1=35 oldz=05 newz=13 
-$$$$$$$$$$$i=26
-oldz1=16 newz1=26 oldz=05 newz=13 
-oldz1=17 newz1=27 oldz=05 newz=13 
-oldz1=17 newz1=37 oldz=05 newz=13 
-oldz1=04 newz1=05 oldz=10 newz=13 
-oldz1=01 newz1=20 oldz=10 newz=13 
-oldz1=01 newz1=22 oldz=10 newz=13 
-oldz1=14 newz1=25 oldz=10 newz=13 
-oldz1=14 newz1=36 oldz=10 newz=13 
-oldz1=14 newz1=23 oldz=10 newz=13 
-oldz1=14 newz1=32 oldz=10 newz=13 
-oldz1=14 newz1=41 oldz=10 newz=13 
-oldz1=14 newz1=50 oldz=10 newz=13 
-oldz1=14 newz1=05 oldz=10 newz=13 
-oldz1=33 newz1=41 oldz=10 newz=13 
-oldz1=33 newz1=25 oldz=10 newz=13 
-oldz1=33 newz1=45 oldz=10 newz=13 
-oldz1=33 newz1=21 oldz=10 newz=13 
-oldz1=33 newz1=52 oldz=10 newz=13 
-oldz1=33 newz1=54 oldz=10 newz=13 
-oldz1=07 newz1=06 oldz=10 newz=13 
-oldz1=07 newz1=05 oldz=10 newz=13 
-oldz1=10 newz1=20 oldz=10 newz=13 
-oldz1=10 newz1=30 oldz=10 newz=13 
-oldz1=11 newz1=21 oldz=10 newz=13 
-oldz1=11 newz1=31 oldz=10 newz=13 
-oldz1=12 newz1=22 oldz=10 newz=13 
-oldz1=12 newz1=32 oldz=10 newz=13 
-oldz1=13 newz1=23 oldz=10 newz=13 
-oldz1=15 newz1=25 oldz=10 newz=13 
-oldz1=15 newz1=35 oldz=10 newz=13 
-oldz1=16 newz1=26 oldz=10 newz=13 
-oldz1=17 newz1=27 oldz=10 newz=13 
-oldz1=17 newz1=37 oldz=10 newz=13 
-B–†‚Å‚·
+oldz1=(04 05 N 0) INput=(05 13 K) 
+oldz1=(04 13 N 0) INput=(05 13 K) 
+oldz1=(04 07 N 1) INput=(05 13 K) 
+oldz1=(04 00 N 2) INput=(05 13 K) 
+oldz1=(01 13 N 0) INput=(05 13 N) 
+oldz1=(01 20 N 0) INput=(05 13 N) 
+oldz1=(01 22 N 0) INput=(05 13 N) 
+oldz1=(02 13 N 0) INput=(05 13 B) 
+oldz1=(03 13 N 0) INput=(05 13 Q) 
+oldz1=(03 23 N 0) INput=(05 13 Q) 
+oldz1=(14 23 N 0) INput=(05 13 B) 
+oldz1=(14 32 N 0) INput=(05 13 B) 
+oldz1=(14 41 N 0) INput=(05 13 B) 
+oldz1=(14 50 N 0) INput=(05 13 B) 
+oldz1=(14 05 N 0) INput=(05 13 B) 
+oldz1=(25 37 N 0) INput=(05 13 N) 
+oldz1=(25 13 N 0) INput=(05 13 N) 
+oldz1=(25 44 N 0) INput=(05 13 N) 
+oldz1=(25 06 N 0) INput=(05 13 N) 
+oldz1=(25 46 N 0) INput=(05 13 N) 
+oldz1=(07 06 N 0) INput=(05 13 R) 
+oldz1=(07 05 N 0) INput=(05 13 R) 
+oldz1=(10 20 N 0) INput=(05 13 P) 
+oldz1=(10 30 N 0) INput=(05 13 P) 
+oldz1=(11 21 N 0) INput=(05 13 P) 
+oldz1=(11 31 N 0) INput=(05 13 P) 
+oldz1=(12 22 N 0) INput=(05 13 P) 
+oldz1=(12 32 N 0) INput=(05 13 P) 
+oldz1=(16 26 N 0) INput=(05 13 P) 
+oldz1=(17 27 N 0) INput=(05 13 P) 
+oldz1=(17 37 N 0) INput=(05 13 P) 
+cxsaveend
+oldz1=(04 05 N 0) INput=(10 13 K) 
+oldz1=(04 13 N 0) INput=(10 13 K) 
+oldz1=(04 07 N 1) INput=(10 13 K) 
+oldz1=(04 00 N 2) INput=(10 13 K) 
+oldz1=(01 13 N 0) INput=(10 13 N) 
+oldz1=(01 20 N 0) INput=(10 13 N) 
+oldz1=(01 22 N 0) INput=(10 13 N) 
+oldz1=(02 13 N 0) INput=(10 13 B) 
+oldz1=(03 13 N 0) INput=(10 13 Q) 
+oldz1=(03 23 N 0) INput=(10 13 Q) 
+oldz1=(14 23 N 0) INput=(10 13 B) 
+oldz1=(14 32 N 0) INput=(10 13 B) 
+oldz1=(14 41 N 0) INput=(10 13 B) 
+oldz1=(14 50 N 0) INput=(10 13 B) 
+oldz1=(14 05 N 0) INput=(10 13 B) 
+oldz1=(25 37 N 0) INput=(10 13 N) 
+oldz1=(25 13 N 0) INput=(10 13 N) 
+oldz1=(25 44 N 0) INput=(10 13 N) 
+oldz1=(25 06 N 0) INput=(10 13 N) 
+oldz1=(25 46 N 0) INput=(10 13 N) 
+oldz1=(07 06 N 0) INput=(10 13 R) 
+oldz1=(07 05 N 0) INput=(10 13 R) 
+oldz1=(10 20 N 0) INput=(10 13 P) 
+oldz1=(10 30 N 0) INput=(10 13 P) 
+oldz1=(11 21 N 0) INput=(10 13 P) 
+oldz1=(11 31 N 0) INput=(10 13 P) 
+oldz1=(12 22 N 0) INput=(10 13 P) 
+oldz1=(12 32 N 0) INput=(10 13 P) 
+oldz1=(16 26 N 0) INput=(10 13 P) 
+oldz1=(17 27 N 0) INput=(10 13 P) 
+oldz1=(17 37 N 0) INput=(10 13 P) 
+k=16 from=25 to=13
+from 25 ==> 13
+istr=Be3
+$$$$$$$$$$$
+$$$$$$
+oldz1=(74 64 B 0) INput=(ffffffff 54 K) 
+oldz1=(74 77 B 1) INput=(ffffffff 54 K) 
+oldz1=(74 70 B 2) INput=(ffffffff 54 K) 
+oldz1=(70 71 B 0) INput=(ffffffff 54 R) 
+oldz1=(70 72 B 0) INput=(ffffffff 54 R) 
+oldz1=(63 71 B 0) INput=(ffffffff 54 N) 
+oldz1=(63 55 B 0) INput=(ffffffff 54 N) 
+oldz1=(63 51 B 0) INput=(ffffffff 54 N) 
+oldz1=(63 44 B 0) INput=(ffffffff 54 N) 
+oldz1=(63 42 B 0) INput=(ffffffff 54 N) 
+oldz1=(36 47 B 0) INput=(ffffffff 54 B) 
+oldz1=(36 25 B 0) INput=(ffffffff 54 B) 
+oldz1=(36 14 B 0) INput=(ffffffff 54 B) 
+oldz1=(36 45 B 0) INput=(ffffffff 54 B) 
+oldz1=(36 54 B 0) INput=(ffffffff 54 B) 
+oldz1=(36 27 B 0) INput=(ffffffff 54 B) 
+oldz1=(73 72 B 0) INput=(ffffffff 54 Q) 
+oldz1=(73 71 B 0) INput=(ffffffff 54 Q) 
+oldz1=(73 64 B 0) INput=(ffffffff 54 Q) 
+oldz1=(73 55 B 0) INput=(ffffffff 54 Q) 
+oldz1=(73 46 B 0) INput=(ffffffff 54 Q) 
+oldz1=(73 37 B 0) INput=(ffffffff 54 Q) 
+oldz1=(75 64 B 0) INput=(ffffffff 54 B) 
+oldz1=(75 53 B 0) INput=(ffffffff 54 B) 
+oldz1=(75 42 B 0) INput=(ffffffff 54 B) 
+oldz1=(75 31 B 0) INput=(ffffffff 54 B) 
+oldz1=(75 20 B 0) INput=(ffffffff 54 B) 
+oldz1=(76 64 B 0) INput=(ffffffff 54 N) 
+oldz1=(76 57 B 0) INput=(ffffffff 54 N) 
+oldz1=(76 55 B 0) INput=(ffffffff 54 N) 
+oldz1=(60 50 B 0) INput=(ffffffff 54 P) 
+oldz1=(60 40 B 0) INput=(ffffffff 54 P) 
+oldz1=(61 51 B 0) INput=(ffffffff 54 P) 
+oldz1=(61 41 B 0) INput=(ffffffff 54 P) 
+oldz1=(62 52 B 0) INput=(ffffffff 54 P) 
+oldz1=(62 42 B 0) INput=(ffffffff 54 P) 
+oldz1=(65 55 B 0) INput=(ffffffff 54 P) 
+oldz1=(65 45 B 0) INput=(ffffffff 54 P) 
+oldz1=(66 56 B 0) INput=(ffffffff 54 P) 
+oldz1=(66 46 B 0) INput=(ffffffff 54 P) 
+oldz1=(67 57 B 0) INput=(ffffffff 54 P) 
+oldz1=(67 47 B 0) INput=(ffffffff 54 P) 
+k=14 from=36 to=54
+from 36 ==> 54
+istr=Pb6
+$$$$$$$$$$$
+$$$$$$
+oldz1=(04 05 P 0) INput=(ffffffff 21 K) 
+oldz1=(04 07 P 1) INput=(ffffffff 21 K) 
+oldz1=(04 00 P 2) INput=(ffffffff 21 K) 
+oldz1=(01 20 P 0) INput=(ffffffff 21 N) 
+oldz1=(01 22 P 0) INput=(ffffffff 21 N) 
+oldz1=(14 25 P 0) INput=(ffffffff 21 B) 
+oldz1=(14 36 P 0) INput=(ffffffff 21 B) 
+oldz1=(14 47 P 0) INput=(ffffffff 21 B) 
+oldz1=(14 23 P 0) INput=(ffffffff 21 B) 
+oldz1=(14 32 P 0) INput=(ffffffff 21 B) 
+oldz1=(14 41 P 0) INput=(ffffffff 21 B) 
+oldz1=(14 50 P 0) INput=(ffffffff 21 B) 
+oldz1=(14 05 P 0) INput=(ffffffff 21 B) 
+oldz1=(13 21 P 0) INput=(ffffffff 21 N) 
+oldz1=(13 05 P 0) INput=(ffffffff 21 N) 
+oldz1=(13 25 P 0) INput=(ffffffff 21 N) 
+oldz1=(13 32 P 0) INput=(ffffffff 21 N) 
+oldz1=(13 34 P 0) INput=(ffffffff 21 N) 
+oldz1=(07 06 P 0) INput=(ffffffff 21 R) 
+oldz1=(07 05 P 0) INput=(ffffffff 21 R) 
+oldz1=(10 20 P 0) INput=(ffffffff 21 P) 
+oldz1=(10 30 P 0) INput=(ffffffff 21 P) 
+oldz1=(11 21 P 0) INput=(ffffffff 21 P) 
+oldz1=(11 31 P 0) INput=(ffffffff 21 P) 
+oldz1=(12 22 P 0) INput=(ffffffff 21 P) 
+oldz1=(12 32 P 0) INput=(ffffffff 21 P) 
+oldz1=(15 25 P 0) INput=(ffffffff 21 P) 
+oldz1=(15 35 P 0) INput=(ffffffff 21 P) 
+oldz1=(16 26 P 0) INput=(ffffffff 21 P) 
+oldz1=(16 36 P 0) INput=(ffffffff 21 P) 
+oldz1=(17 27 P 0) INput=(ffffffff 21 P) 
+oldz1=(17 37 P 0) INput=(ffffffff 21 P) 
+k=22 from=11 to=21
+from 11 ==> 21
+istr=Nh3
+$$$$$$$$$$$
+$$$$$$
+oldz1=(74 64 N 0) INput=(ffffffff 57 K) 
+oldz1=(74 77 N 1) INput=(ffffffff 57 K) 
+oldz1=(74 70 N 2) INput=(ffffffff 57 K) 
+oldz1=(70 71 N 0) INput=(ffffffff 57 R) 
+oldz1=(70 72 N 0) INput=(ffffffff 57 R) 
+oldz1=(63 71 N 0) INput=(ffffffff 57 N) 
+oldz1=(63 55 N 0) INput=(ffffffff 57 N) 
+oldz1=(63 51 N 0) INput=(ffffffff 57 N) 
+oldz1=(63 44 N 0) INput=(ffffffff 57 N) 
+oldz1=(63 42 N 0) INput=(ffffffff 57 N) 
+oldz1=(54 45 N 0) INput=(ffffffff 57 B) 
+oldz1=(54 36 N 0) INput=(ffffffff 57 B) 
+oldz1=(54 27 N 0) INput=(ffffffff 57 B) 
+oldz1=(73 72 N 0) INput=(ffffffff 57 Q) 
+oldz1=(73 71 N 0) INput=(ffffffff 57 Q) 
+oldz1=(73 64 N 0) INput=(ffffffff 57 Q) 
+oldz1=(73 55 N 0) INput=(ffffffff 57 Q) 
+oldz1=(73 46 N 0) INput=(ffffffff 57 Q) 
+oldz1=(73 37 N 0) INput=(ffffffff 57 Q) 
+oldz1=(75 64 N 0) INput=(ffffffff 57 B) 
+oldz1=(75 53 N 0) INput=(ffffffff 57 B) 
+oldz1=(75 42 N 0) INput=(ffffffff 57 B) 
+oldz1=(75 31 N 0) INput=(ffffffff 57 B) 
+oldz1=(75 20 N 0) INput=(ffffffff 57 B) 
+oldz1=(76 64 N 0) INput=(ffffffff 57 N) 
+oldz1=(76 57 N 0) INput=(ffffffff 57 N) 
+oldz1=(76 55 N 0) INput=(ffffffff 57 N) 
+oldz1=(60 50 N 0) INput=(ffffffff 57 P) 
+oldz1=(60 40 N 0) INput=(ffffffff 57 P) 
+oldz1=(61 51 N 0) INput=(ffffffff 57 P) 
+oldz1=(61 41 N 0) INput=(ffffffff 57 P) 
+oldz1=(62 52 N 0) INput=(ffffffff 57 P) 
+oldz1=(62 42 N 0) INput=(ffffffff 57 P) 
+oldz1=(65 55 N 0) INput=(ffffffff 57 P) 
+oldz1=(65 45 N 0) INput=(ffffffff 57 P) 
+oldz1=(66 56 N 0) INput=(ffffffff 57 P) 
+oldz1=(66 46 N 0) INput=(ffffffff 57 P) 
+oldz1=(67 57 N 0) INput=(ffffffff 57 P) 
+oldz1=(67 47 N 0) INput=(ffffffff 57 P) 
+k=25 from=76 to=57
+from 76 ==> 57
+istr=Bb7
+$$$$$$$$$$$
+$$$$$$
+oldz1=(04 05 B 0) INput=(ffffffff 11 K) 
+oldz1=(04 07 B 1) INput=(ffffffff 11 K) 
+oldz1=(04 00 B 2) INput=(ffffffff 11 K) 
+oldz1=(01 20 B 0) INput=(ffffffff 11 N) 
+oldz1=(01 22 B 0) INput=(ffffffff 11 N) 
+oldz1=(02 11 B 0) INput=(ffffffff 11 B) 
+oldz1=(02 20 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 25 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 36 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 47 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 23 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 32 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 41 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 50 B 0) INput=(ffffffff 11 B) 
+oldz1=(14 05 B 0) INput=(ffffffff 11 B) 
+oldz1=(13 05 B 0) INput=(ffffffff 11 N) 
+oldz1=(13 25 B 0) INput=(ffffffff 11 N) 
+oldz1=(13 32 B 0) INput=(ffffffff 11 N) 
+oldz1=(13 34 B 0) INput=(ffffffff 11 N) 
+oldz1=(07 06 B 0) INput=(ffffffff 11 R) 
+oldz1=(07 05 B 0) INput=(ffffffff 11 R) 
+oldz1=(10 20 B 0) INput=(ffffffff 11 P) 
+oldz1=(10 30 B 0) INput=(ffffffff 11 P) 
+oldz1=(21 31 B 0) INput=(ffffffff 11 P) 
+oldz1=(12 22 B 0) INput=(ffffffff 11 P) 
+oldz1=(12 32 B 0) INput=(ffffffff 11 P) 
+oldz1=(15 25 B 0) INput=(ffffffff 11 P) 
+oldz1=(15 35 B 0) INput=(ffffffff 11 P) 
+oldz1=(16 26 B 0) INput=(ffffffff 11 P) 
+oldz1=(16 36 B 0) INput=(ffffffff 11 P) 
+oldz1=(17 27 B 0) INput=(ffffffff 11 P) 
+oldz1=(17 37 B 0) INput=(ffffffff 11 P) 
+k=5 from=02 to=11
+from 02 ==> 11
+istr=Qg4
+$$$$$$$$$$$
+$$$$$$
+oldz1=(74 64 Q 0) INput=(ffffffff 46 K) 
+oldz1=(74 77 Q 1) INput=(ffffffff 46 K) 
+oldz1=(74 70 Q 2) INput=(ffffffff 46 K) 
+oldz1=(70 71 Q 0) INput=(ffffffff 46 R) 
+oldz1=(70 72 Q 0) INput=(ffffffff 46 R) 
+oldz1=(63 71 Q 0) INput=(ffffffff 46 N) 
+oldz1=(63 55 Q 0) INput=(ffffffff 46 N) 
+oldz1=(63 51 Q 0) INput=(ffffffff 46 N) 
+oldz1=(63 44 Q 0) INput=(ffffffff 46 N) 
+oldz1=(63 42 Q 0) INput=(ffffffff 46 N) 
+oldz1=(54 45 Q 0) INput=(ffffffff 46 B) 
+oldz1=(54 36 Q 0) INput=(ffffffff 46 B) 
+oldz1=(54 27 Q 0) INput=(ffffffff 46 B) 
+oldz1=(73 72 Q 0) INput=(ffffffff 46 Q) 
+oldz1=(73 71 Q 0) INput=(ffffffff 46 Q) 
+oldz1=(73 64 Q 0) INput=(ffffffff 46 Q) 
+oldz1=(73 55 Q 0) INput=(ffffffff 46 Q) 
+oldz1=(73 46 Q 0) INput=(ffffffff 46 Q) 
+oldz1=(73 37 Q 0) INput=(ffffffff 46 Q) 
+oldz1=(75 64 Q 0) INput=(ffffffff 46 B) 
+oldz1=(75 53 Q 0) INput=(ffffffff 46 B) 
+oldz1=(75 42 Q 0) INput=(ffffffff 46 B) 
+oldz1=(75 31 Q 0) INput=(ffffffff 46 B) 
+oldz1=(75 20 Q 0) INput=(ffffffff 46 B) 
+oldz1=(57 45 Q 0) INput=(ffffffff 46 N) 
+oldz1=(57 76 Q 0) INput=(ffffffff 46 N) 
+oldz1=(57 36 Q 0) INput=(ffffffff 46 N) 
+oldz1=(77 76 Q 0) INput=(ffffffff 46 R) 
+oldz1=(60 50 Q 0) INput=(ffffffff 46 P) 
+oldz1=(60 40 Q 0) INput=(ffffffff 46 P) 
+oldz1=(61 51 Q 0) INput=(ffffffff 46 P) 
+oldz1=(61 41 Q 0) INput=(ffffffff 46 P) 
+oldz1=(62 52 Q 0) INput=(ffffffff 46 P) 
+oldz1=(62 42 Q 0) INput=(ffffffff 46 P) 
+oldz1=(65 55 Q 0) INput=(ffffffff 46 P) 
+oldz1=(65 45 Q 0) INput=(ffffffff 46 P) 
+oldz1=(66 56 Q 0) INput=(ffffffff 46 P) 
+oldz1=(66 46 Q 0) INput=(ffffffff 46 P) 
+k=17 from=73 to=46
+from 73 ==> 46
+istr=g6
+$$$$$$$$$$$
+$$$$$$
+to=56
+oldz1=(04 05 ÿ 0) INput=(ffffffff 26 K) 
+oldz1=(04 07 ÿ 1) INput=(ffffffff 26 K) 
+oldz1=(04 00 ÿ 2) INput=(ffffffff 26 K) 
+oldz1=(01 20 ÿ 0) INput=(ffffffff 26 N) 
+oldz1=(01 22 ÿ 0) INput=(ffffffff 26 N) 
+oldz1=(11 22 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(11 20 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(11 02 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(03 02 ÿ 0) INput=(ffffffff 26 Q) 
+oldz1=(14 25 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(14 36 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(14 47 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(14 23 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(14 32 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(14 41 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(14 50 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(14 05 ÿ 0) INput=(ffffffff 26 B) 
+oldz1=(13 05 ÿ 0) INput=(ffffffff 26 N) 
+oldz1=(13 25 ÿ 0) INput=(ffffffff 26 N) 
+oldz1=(13 32 ÿ 0) INput=(ffffffff 26 N) 
+oldz1=(13 34 ÿ 0) INput=(ffffffff 26 N) 
+oldz1=(07 06 ÿ 0) INput=(ffffffff 26 R) 
+oldz1=(07 05 ÿ 0) INput=(ffffffff 26 R) 
+oldz1=(10 20 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(10 30 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(21 31 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(12 22 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(12 32 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(15 25 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(15 35 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(16 26 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(16 36 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(17 27 ÿ 0) INput=(ffffffff 26 P) 
+oldz1=(17 37 ÿ 0) INput=(ffffffff 26 P) 
+k=30 from=16 to=26
+from 16 ==> 26
+istr=Ng5
+$$$$$$$$$$$
+$$$$$$
+oldz1=(74 73 N 0) INput=(ffffffff 36 K) 
+oldz1=(74 64 N 0) INput=(ffffffff 36 K) 
+oldz1=(74 77 N 1) INput=(ffffffff 36 K) 
+oldz1=(74 70 N 2) INput=(ffffffff 36 K) 
+oldz1=(70 71 N 0) INput=(ffffffff 36 R) 
+oldz1=(70 72 N 0) INput=(ffffffff 36 R) 
+oldz1=(70 73 N 0) INput=(ffffffff 36 R) 
+oldz1=(63 71 N 0) INput=(ffffffff 36 N) 
+oldz1=(63 55 N 0) INput=(ffffffff 36 N) 
+oldz1=(63 51 N 0) INput=(ffffffff 36 N) 
+oldz1=(63 44 N 0) INput=(ffffffff 36 N) 
+oldz1=(63 42 N 0) INput=(ffffffff 36 N) 
+oldz1=(54 45 N 0) INput=(ffffffff 36 B) 
+oldz1=(54 36 N 0) INput=(ffffffff 36 B) 
+oldz1=(54 27 N 0) INput=(ffffffff 36 B) 
+oldz1=(46 47 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 45 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 44 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 56 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 36 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 26 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 35 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 24 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 55 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 64 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 73 N 0) INput=(ffffffff 36 Q) 
+oldz1=(46 37 N 0) INput=(ffffffff 36 Q) 
+oldz1=(75 64 N 0) INput=(ffffffff 36 B) 
+oldz1=(75 53 N 0) INput=(ffffffff 36 B) 
+oldz1=(75 42 N 0) INput=(ffffffff 36 B) 
+oldz1=(75 31 N 0) INput=(ffffffff 36 B) 
+oldz1=(75 20 N 0) INput=(ffffffff 36 B) 
+oldz1=(57 45 N 0) INput=(ffffffff 36 N) 
+oldz1=(57 76 N 0) INput=(ffffffff 36 N) 
+oldz1=(57 36 N 0) INput=(ffffffff 36 N) 
+oldz1=(77 76 N 0) INput=(ffffffff 36 R) 
+oldz1=(60 50 N 0) INput=(ffffffff 36 P) 
+oldz1=(60 40 N 0) INput=(ffffffff 36 P) 
+oldz1=(61 51 N 0) INput=(ffffffff 36 P) 
+oldz1=(61 41 N 0) INput=(ffffffff 36 P) 
+oldz1=(62 52 N 0) INput=(ffffffff 36 P) 
+oldz1=(62 42 N 0) INput=(ffffffff 36 P) 
+oldz1=(65 55 N 0) INput=(ffffffff 36 P) 
+oldz1=(65 45 N 0) INput=(ffffffff 36 P) 
+oldz1=(66 56 N 0) INput=(ffffffff 36 P) 
+k=34 from=57 to=36
+from 57 ==> 36
+istr=Nf8
+$$$$$$$$$$$
+$$$$$$
+oldz1=(04 05 N 0) INput=(ffffffff 05 K) 
+oldz1=(04 07 N 1) INput=(ffffffff 05 K) 
+oldz1=(04 00 N 2) INput=(ffffffff 05 K) 
+oldz1=(01 20 N 0) INput=(ffffffff 05 N) 
+oldz1=(01 22 N 0) INput=(ffffffff 05 N) 
+oldz1=(11 22 N 0) INput=(ffffffff 05 B) 
+oldz1=(11 20 N 0) INput=(ffffffff 05 B) 
+oldz1=(11 02 N 0) INput=(ffffffff 05 B) 
+oldz1=(03 02 N 0) INput=(ffffffff 05 Q) 
+oldz1=(14 25 N 0) INput=(ffffffff 05 B) 
+oldz1=(14 36 N 0) INput=(ffffffff 05 B) 
+oldz1=(14 23 N 0) INput=(ffffffff 05 B) 
+oldz1=(14 32 N 0) INput=(ffffffff 05 B) 
+oldz1=(14 41 N 0) INput=(ffffffff 05 B) 
+oldz1=(14 50 N 0) INput=(ffffffff 05 B) 
+oldz1=(14 05 N 0) INput=(ffffffff 05 B) 
+oldz1=(13 05 N 0) INput=(ffffffff 05 N) 
+oldz1=(13 25 N 0) INput=(ffffffff 05 N) 
+oldz1=(13 32 N 0) INput=(ffffffff 05 N) 
+oldz1=(13 34 N 0) INput=(ffffffff 05 N) 
+oldz1=(07 06 N 0) INput=(ffffffff 05 R) 
+oldz1=(07 05 N 0) INput=(ffffffff 05 R) 
+oldz1=(10 20 N 0) INput=(ffffffff 05 P) 
+oldz1=(10 30 N 0) INput=(ffffffff 05 P) 
+oldz1=(21 31 N 0) INput=(ffffffff 05 P) 
+oldz1=(12 22 N 0) INput=(ffffffff 05 P) 
+oldz1=(12 32 N 0) INput=(ffffffff 05 P) 
+oldz1=(15 25 N 0) INput=(ffffffff 05 P) 
+oldz1=(15 35 N 0) INput=(ffffffff 05 P) 
+oldz1=(17 27 N 0) INput=(ffffffff 05 P) 
+oldz1=(17 37 N 0) INput=(ffffffff 05 P) 
+k=16 from=13 to=05
+from 13 ==> 05
+istr=Ph4
+$$$$$$$$$$$
+$$$$$$
+oldz1=(74 73 P 0) INput=(ffffffff 47 K) 
+oldz1=(74 64 P 0) INput=(ffffffff 47 K) 
+oldz1=(74 77 P 1) INput=(ffffffff 47 K) 
+oldz1=(74 70 P 2) INput=(ffffffff 47 K) 
+oldz1=(70 71 P 0) INput=(ffffffff 47 R) 
+oldz1=(70 72 P 0) INput=(ffffffff 47 R) 
+oldz1=(70 73 P 0) INput=(ffffffff 47 R) 
+oldz1=(63 71 P 0) INput=(ffffffff 47 N) 
+oldz1=(63 55 P 0) INput=(ffffffff 47 N) 
+oldz1=(63 51 P 0) INput=(ffffffff 47 N) 
+oldz1=(63 44 P 0) INput=(ffffffff 47 N) 
+oldz1=(63 42 P 0) INput=(ffffffff 47 N) 
+oldz1=(54 45 P 0) INput=(ffffffff 47 B) 
+oldz1=(46 47 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 45 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 44 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 56 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 57 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 35 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 24 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 55 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 64 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 73 P 0) INput=(ffffffff 47 Q) 
+oldz1=(46 37 P 0) INput=(ffffffff 47 Q) 
+oldz1=(75 64 P 0) INput=(ffffffff 47 B) 
+oldz1=(75 53 P 0) INput=(ffffffff 47 B) 
+oldz1=(75 42 P 0) INput=(ffffffff 47 B) 
+oldz1=(75 31 P 0) INput=(ffffffff 47 B) 
+oldz1=(75 20 P 0) INput=(ffffffff 47 B) 
+oldz1=(36 44 P 0) INput=(ffffffff 47 N) 
+oldz1=(36 24 P 0) INput=(ffffffff 47 N) 
+oldz1=(36 55 P 0) INput=(ffffffff 47 N) 
+oldz1=(36 17 P 0) INput=(ffffffff 47 N) 
+oldz1=(36 57 P 0) INput=(ffffffff 47 N) 
+oldz1=(36 15 P 0) INput=(ffffffff 47 N) 
+oldz1=(77 76 P 0) INput=(ffffffff 47 R) 
+oldz1=(60 50 P 0) INput=(ffffffff 47 P) 
+oldz1=(60 40 P 0) INput=(ffffffff 47 P) 
+oldz1=(61 51 P 0) INput=(ffffffff 47 P) 
+oldz1=(61 41 P 0) INput=(ffffffff 47 P) 
+oldz1=(62 52 P 0) INput=(ffffffff 47 P) 
+oldz1=(62 42 P 0) INput=(ffffffff 47 P) 
+oldz1=(65 55 P 0) INput=(ffffffff 47 P) 
+oldz1=(65 45 P 0) INput=(ffffffff 47 P) 
+oldz1=(66 56 P 0) INput=(ffffffff 47 P) 
+oldz1=(67 57 P 0) INput=(ffffffff 47 P) 
+oldz1=(67 47 P 0) INput=(ffffffff 47 P) 
+k=46 from=67 to=47
+from 67 ==> 47
+istr=h6
+$$$$$$$$$$$
+$$$$$$
+to=57
+oldz1=(04 13 ÿ 0) INput=(ffffffff 27 K) 
+oldz1=(04 07 ÿ 1) INput=(ffffffff 27 K) 
+oldz1=(04 00 ÿ 2) INput=(ffffffff 27 K) 
+oldz1=(01 13 ÿ 0) INput=(ffffffff 27 N) 
+oldz1=(01 20 ÿ 0) INput=(ffffffff 27 N) 
+oldz1=(01 22 ÿ 0) INput=(ffffffff 27 N) 
+oldz1=(11 22 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(11 20 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(11 02 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(03 02 ÿ 0) INput=(ffffffff 27 Q) 
+oldz1=(03 13 ÿ 0) INput=(ffffffff 27 Q) 
+oldz1=(03 23 ÿ 0) INput=(ffffffff 27 Q) 
+oldz1=(14 25 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(14 36 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(14 23 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(14 32 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(14 41 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(14 50 ÿ 0) INput=(ffffffff 27 B) 
+oldz1=(05 13 ÿ 0) INput=(ffffffff 27 N) 
+oldz1=(07 06 ÿ 0) INput=(ffffffff 27 R) 
+oldz1=(10 20 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(10 30 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(21 31 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(12 22 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(12 32 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(15 25 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(15 35 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(17 27 ÿ 0) INput=(ffffffff 27 P) 
+oldz1=(17 37 ÿ 0) INput=(ffffffff 27 P) 
+k=27 from=17 to=27
+from 17 ==> 27
+istr=Ngf3
+$$$$$$$$$$$
+$$$$$$
+cxsave =06 z=25 
+oldz1=(74 73 N 0) INput=(06 55 K) 
+oldz1=(74 64 N 0) INput=(06 55 K) 
+oldz1=(74 77 N 1) INput=(06 55 K) 
+oldz1=(74 70 N 2) INput=(06 55 K) 
+oldz1=(70 71 N 0) INput=(06 55 R) 
+oldz1=(70 72 N 0) INput=(06 55 R) 
+oldz1=(70 73 N 0) INput=(06 55 R) 
+oldz1=(63 71 N 0) INput=(06 55 N) 
+oldz1=(63 55 N 0) INput=(06 55 N) 
+oldz1=(63 51 N 0) INput=(06 55 N) 
+oldz1=(63 44 N 0) INput=(06 55 N) 
+oldz1=(63 42 N 0) INput=(06 55 N) 
+oldz1=(54 45 N 0) INput=(06 55 B) 
+oldz1=(46 45 N 0) INput=(06 55 Q) 
+oldz1=(46 44 N 0) INput=(06 55 Q) 
+oldz1=(46 56 N 0) INput=(06 55 Q) 
+oldz1=(46 57 N 0) INput=(06 55 Q) 
+oldz1=(46 35 N 0) INput=(06 55 Q) 
+oldz1=(46 24 N 0) INput=(06 55 Q) 
+oldz1=(46 55 N 0) INput=(06 55 Q) 
+oldz1=(46 64 N 0) INput=(06 55 Q) 
+oldz1=(46 73 N 0) INput=(06 55 Q) 
+oldz1=(46 37 N 0) INput=(06 55 Q) 
+oldz1=(75 64 N 0) INput=(06 55 B) 
+oldz1=(75 53 N 0) INput=(06 55 B) 
+oldz1=(75 42 N 0) INput=(06 55 B) 
+oldz1=(75 31 N 0) INput=(06 55 B) 
+oldz1=(75 20 N 0) INput=(06 55 B) 
+oldz1=(36 44 N 0) INput=(06 55 N) 
+oldz1=(36 24 N 0) INput=(06 55 N) 
+oldz1=(36 55 N 0) INput=(06 55 N) 
+oldz1=(36 17 N 0) INput=(06 55 N) 
+oldz1=(36 57 N 0) INput=(06 55 N) 
+oldz1=(36 15 N 0) INput=(06 55 N) 
+oldz1=(77 76 N 0) INput=(06 55 R) 
+oldz1=(77 67 N 0) INput=(06 55 R) 
+oldz1=(77 57 N 0) INput=(06 55 R) 
+oldz1=(60 50 N 0) INput=(06 55 P) 
+oldz1=(60 40 N 0) INput=(06 55 P) 
+oldz1=(61 51 N 0) INput=(06 55 P) 
+oldz1=(61 41 N 0) INput=(06 55 P) 
+oldz1=(62 52 N 0) INput=(06 55 P) 
+oldz1=(62 42 N 0) INput=(06 55 P) 
+oldz1=(65 55 N 0) INput=(06 55 P) 
+oldz1=(65 45 N 0) INput=(06 55 P) 
+oldz1=(66 56 N 0) INput=(06 55 P) 
+oldz1=(47 37 N 0) INput=(06 55 P) 
+cxsaveend
+oldz1=(74 73 N 0) INput=(50 55 K) 
+oldz1=(74 64 N 0) INput=(50 55 K) 
+oldz1=(74 77 N 1) INput=(50 55 K) 
+oldz1=(74 70 N 2) INput=(50 55 K) 
+oldz1=(70 71 N 0) INput=(50 55 R) 
+oldz1=(70 72 N 0) INput=(50 55 R) 
+oldz1=(70 73 N 0) INput=(50 55 R) 
+oldz1=(63 71 N 0) INput=(50 55 N) 
+oldz1=(63 55 N 0) INput=(50 55 N) 
+oldz1=(63 51 N 0) INput=(50 55 N) 
+oldz1=(63 44 N 0) INput=(50 55 N) 
+oldz1=(63 42 N 0) INput=(50 55 N) 
+oldz1=(54 45 N 0) INput=(50 55 B) 
+oldz1=(46 45 N 0) INput=(50 55 Q) 
+oldz1=(46 44 N 0) INput=(50 55 Q) 
+oldz1=(46 56 N 0) INput=(50 55 Q) 
+oldz1=(46 57 N 0) INput=(50 55 Q) 
+oldz1=(46 35 N 0) INput=(50 55 Q) 
+oldz1=(46 24 N 0) INput=(50 55 Q) 
+oldz1=(46 55 N 0) INput=(50 55 Q) 
+oldz1=(46 64 N 0) INput=(50 55 Q) 
+oldz1=(46 73 N 0) INput=(50 55 Q) 
+oldz1=(46 37 N 0) INput=(50 55 Q) 
+oldz1=(75 64 N 0) INput=(50 55 B) 
+oldz1=(75 53 N 0) INput=(50 55 B) 
+oldz1=(75 42 N 0) INput=(50 55 B) 
+oldz1=(75 31 N 0) INput=(50 55 B) 
+oldz1=(75 20 N 0) INput=(50 55 B) 
+oldz1=(36 44 N 0) INput=(50 55 N) 
+oldz1=(36 24 N 0) INput=(50 55 N) 
+oldz1=(36 55 N 0) INput=(50 55 N) 
+oldz1=(36 17 N 0) INput=(50 55 N) 
+oldz1=(36 57 N 0) INput=(50 55 N) 
+oldz1=(36 15 N 0) INput=(50 55 N) 
+oldz1=(77 76 N 0) INput=(50 55 R) 
+oldz1=(77 67 N 0) INput=(50 55 R) 
+oldz1=(77 57 N 0) INput=(50 55 R) 
+oldz1=(60 50 N 0) INput=(50 55 P) 
+oldz1=(60 40 N 0) INput=(50 55 P) 
+oldz1=(61 51 N 0) INput=(50 55 P) 
+oldz1=(61 41 N 0) INput=(50 55 P) 
+oldz1=(62 52 N 0) INput=(50 55 P) 
+oldz1=(62 42 N 0) INput=(50 55 P) 
+oldz1=(65 55 N 0) INput=(50 55 P) 
+oldz1=(65 45 N 0) INput=(50 55 P) 
+oldz1=(66 56 N 0) INput=(50 55 P) 
+oldz1=(47 37 N 0) INput=(50 55 P) 
+k=30 from=36 to=55
+from 36 ==> 55
+istr=Na6
+$$$$$$$$$$$
+$$$$$$
+oldz1=(04 13 N 0) INput=(ffffffff 20 K) 
+oldz1=(04 07 N 1) INput=(ffffffff 20 K) 
+oldz1=(04 00 N 2) INput=(ffffffff 20 K) 
+oldz1=(01 13 N 0) INput=(ffffffff 20 N) 
+oldz1=(01 20 N 0) INput=(ffffffff 20 N) 
+oldz1=(01 22 N 0) INput=(ffffffff 20 N) 
+oldz1=(11 22 N 0) INput=(ffffffff 20 B) 
+oldz1=(11 20 N 0) INput=(ffffffff 20 B) 
+oldz1=(11 02 N 0) INput=(ffffffff 20 B) 
+oldz1=(03 02 N 0) INput=(ffffffff 20 Q) 
+oldz1=(03 13 N 0) INput=(ffffffff 20 Q) 
+oldz1=(03 23 N 0) INput=(ffffffff 20 Q) 
+oldz1=(14 25 N 0) INput=(ffffffff 20 B) 
+oldz1=(14 36 N 0) INput=(ffffffff 20 B) 
+oldz1=(14 47 N 0) INput=(ffffffff 20 B) 
+oldz1=(14 23 N 0) INput=(ffffffff 20 B) 
+oldz1=(14 32 N 0) INput=(ffffffff 20 B) 
+oldz1=(14 41 N 0) INput=(ffffffff 20 B) 
+oldz1=(14 50 N 0) INput=(ffffffff 20 B) 
+oldz1=(05 13 N 0) INput=(ffffffff 20 N) 
+oldz1=(05 17 N 0) INput=(ffffffff 20 N) 
+oldz1=(07 06 N 0) INput=(ffffffff 20 R) 
+oldz1=(07 17 N 0) INput=(ffffffff 20 R) 
+oldz1=(10 20 N 0) INput=(ffffffff 20 P) 
+oldz1=(10 30 N 0) INput=(ffffffff 20 P) 
+oldz1=(21 31 N 0) INput=(ffffffff 20 P) 
+oldz1=(12 22 N 0) INput=(ffffffff 20 P) 
+oldz1=(12 32 N 0) INput=(ffffffff 20 P) 
+oldz1=(15 25 N 0) INput=(ffffffff 20 P) 
+oldz1=(15 35 N 0) INput=(ffffffff 20 P) 
+oldz1=(26 36 N 0) INput=(ffffffff 20 P) 
+oldz1=(27 37 N 0) INput=(ffffffff 20 P) 
+k=4 from=01 to=20
+from 01 ==> 20
+istr=c3
+$$$$$$$$$$$
+$$$$$$
+to=22
+oldz1=(74 73 ÿ 0) INput=(ffffffff 52 K) 
+oldz1=(74 64 ÿ 0) INput=(ffffffff 52 K) 
+oldz1=(74 77 ÿ 1) INput=(ffffffff 52 K) 
+oldz1=(74 70 ÿ 2) INput=(ffffffff 52 K) 
+oldz1=(70 71 ÿ 0) INput=(ffffffff 52 R) 
+oldz1=(70 72 ÿ 0) INput=(ffffffff 52 R) 
+oldz1=(70 73 ÿ 0) INput=(ffffffff 52 R) 
+oldz1=(63 71 ÿ 0) INput=(ffffffff 52 N) 
+oldz1=(63 51 ÿ 0) INput=(ffffffff 52 N) 
+oldz1=(63 44 ÿ 0) INput=(ffffffff 52 N) 
+oldz1=(63 42 ÿ 0) INput=(ffffffff 52 N) 
+oldz1=(54 45 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(54 36 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(54 27 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(46 45 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 44 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 56 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 36 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 26 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 57 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 35 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 24 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(46 37 ÿ 0) INput=(ffffffff 52 Q) 
+oldz1=(75 64 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(75 53 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(75 42 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(75 31 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(75 20 ÿ 0) INput=(ffffffff 52 B) 
+oldz1=(55 67 ÿ 0) INput=(ffffffff 52 N) 
+oldz1=(55 36 ÿ 0) INput=(ffffffff 52 N) 
+oldz1=(55 76 ÿ 0) INput=(ffffffff 52 N) 
+oldz1=(77 76 ÿ 0) INput=(ffffffff 52 R) 
+oldz1=(77 67 ÿ 0) INput=(ffffffff 52 R) 
+oldz1=(77 57 ÿ 0) INput=(ffffffff 52 R) 
+oldz1=(60 50 ÿ 0) INput=(ffffffff 52 P) 
+oldz1=(60 40 ÿ 0) INput=(ffffffff 52 P) 
+oldz1=(61 51 ÿ 0) INput=(ffffffff 52 P) 
+oldz1=(61 41 ÿ 0) INput=(ffffffff 52 P) 
+oldz1=(62 52 ÿ 0) INput=(ffffffff 52 P) 
+oldz1=(62 42 ÿ 0) INput=(ffffffff 52 P) 
+oldz1=(66 56 ÿ 0) INput=(ffffffff 52 P) 
+oldz1=(47 37 ÿ 0) INput=(ffffffff 52 P) 
+k=38 from=62 to=52
+from 62 ==> 52
+istr=Qd7
+$$$$$$$$$$$
+$$$$$$
+oldz1=(04 13 Q 0) INput=(ffffffff 13 K) 
+oldz1=(04 07 Q 1) INput=(ffffffff 13 K) 
+oldz1=(04 00 Q 2) INput=(ffffffff 13 K) 
+oldz1=(00 01 Q 0) INput=(ffffffff 13 R) 
+oldz1=(00 02 Q 0) INput=(ffffffff 13 R) 
+oldz1=(20 32 Q 0) INput=(ffffffff 13 N) 
+oldz1=(20 01 Q 0) INput=(ffffffff 13 N) 
+oldz1=(20 41 Q 0) INput=(ffffffff 13 N) 
+oldz1=(11 22 Q 0) INput=(ffffffff 13 B) 
+oldz1=(11 02 Q 0) INput=(ffffffff 13 B) 
+oldz1=(03 02 Q 0) INput=(ffffffff 13 Q) 
+oldz1=(03 01 Q 0) INput=(ffffffff 13 Q) 
+oldz1=(03 13 Q 0) INput=(ffffffff 13 Q) 
+oldz1=(03 23 Q 0) INput=(ffffffff 13 Q) 
+oldz1=(14 25 Q 0) INput=(ffffffff 13 B) 
+oldz1=(14 36 Q 0) INput=(ffffffff 13 B) 
+oldz1=(14 47 Q 0) INput=(ffffffff 13 B) 
+oldz1=(14 23 Q 0) INput=(ffffffff 13 B) 
+oldz1=(14 32 Q 0) INput=(ffffffff 13 B) 
+oldz1=(14 41 Q 0) INput=(ffffffff 13 B) 
+oldz1=(14 50 Q 0) INput=(ffffffff 13 B) 
+oldz1=(05 13 Q 0) INput=(ffffffff 13 N) 
+oldz1=(05 17 Q 0) INput=(ffffffff 13 N) 
+oldz1=(07 06 Q 0) INput=(ffffffff 13 R) 
+oldz1=(07 17 Q 0) INput=(ffffffff 13 R) 
+oldz1=(21 31 Q 0) INput=(ffffffff 13 P) 
+oldz1=(12 22 Q 0) INput=(ffffffff 13 P) 
+oldz1=(12 32 Q 0) INput=(ffffffff 13 P) 
+oldz1=(15 25 Q 0) INput=(ffffffff 13 P) 
+oldz1=(15 35 Q 0) INput=(ffffffff 13 P) 
+oldz1=(26 36 Q 0) INput=(ffffffff 13 P) 
+oldz1=(27 37 Q 0) INput=(ffffffff 13 P) 
+k=12 from=03 to=13
+from 03 ==> 13
+istr=a4
+$$$$$$$$$$$
+$$$$$$
+to=30
+oldz1=(74 73 ÿ 0) INput=(ffffffff 40 K) 
+oldz1=(74 64 ÿ 0) INput=(ffffffff 40 K) 
+oldz1=(74 77 ÿ 1) INput=(ffffffff 40 K) 
+oldz1=(74 70 ÿ 2) INput=(ffffffff 40 K) 
+oldz1=(70 71 ÿ 0) INput=(ffffffff 40 R) 
+oldz1=(70 72 ÿ 0) INput=(ffffffff 40 R) 
+oldz1=(70 73 ÿ 0) INput=(ffffffff 40 R) 
+oldz1=(63 71 ÿ 0) INput=(ffffffff 40 N) 
+oldz1=(63 51 ÿ 0) INput=(ffffffff 40 N) 
+oldz1=(63 44 ÿ 0) INput=(ffffffff 40 N) 
+oldz1=(63 42 ÿ 0) INput=(ffffffff 40 N) 
+oldz1=(54 45 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(54 36 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(54 27 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(46 45 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 44 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 56 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 36 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 26 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 57 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 35 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 24 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(46 37 ÿ 0) INput=(ffffffff 40 Q) 
+oldz1=(75 64 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(75 53 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(75 42 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(75 31 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(75 20 ÿ 0) INput=(ffffffff 40 B) 
+oldz1=(55 67 ÿ 0) INput=(ffffffff 40 N) 
+oldz1=(55 36 ÿ 0) INput=(ffffffff 40 N) 
+oldz1=(55 76 ÿ 0) INput=(ffffffff 40 N) 
+oldz1=(77 76 ÿ 0) INput=(ffffffff 40 R) 
+oldz1=(77 67 ÿ 0) INput=(ffffffff 40 R) 
+oldz1=(77 57 ÿ 0) INput=(ffffffff 40 R) 
+oldz1=(60 50 ÿ 0) INput=(ffffffff 40 P) 
+oldz1=(60 40 ÿ 0) INput=(ffffffff 40 P) 
+oldz1=(61 51 ÿ 0) INput=(ffffffff 40 P) 
+oldz1=(61 41 ÿ 0) INput=(ffffffff 40 P) 
+oldz1=(52 42 ÿ 0) INput=(ffffffff 40 P) 
+oldz1=(66 56 ÿ 0) INput=(ffffffff 40 P) 
+oldz1=(47 37 ÿ 0) INput=(ffffffff 40 P) 
+k=35 from=60 to=40
+from 60 ==> 40
+istr=O-O-O
+$$$$$$$$$$$
+$$$$$$
+esp=2 
+oldz1=(04 03 ÿ 0) INput=(ffffffff 73 K) 
+oldz1=(04 07 ÿ 1) INput=(ffffffff 73 K) 
+oldz1=(04 00 ÿ 2) INput=(ffffffff 73 K) 
+k=2 from=04 to=00
+istr=b4
+$$$$$$$$$$$
+$$$$$$
+to=31
+oldz1=(74 73 ÿ 0) INput=(ffffffff 41 K) 
+oldz1=(74 64 ÿ 0) INput=(ffffffff 41 K) 
+oldz1=(74 77 ÿ 1) INput=(ffffffff 41 K) 
+oldz1=(74 70 ÿ 2) INput=(ffffffff 41 K) 
+oldz1=(70 71 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(70 72 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(70 73 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(70 60 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(70 50 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(63 71 ÿ 0) INput=(ffffffff 41 N) 
+oldz1=(63 51 ÿ 0) INput=(ffffffff 41 N) 
+oldz1=(63 44 ÿ 0) INput=(ffffffff 41 N) 
+oldz1=(63 42 ÿ 0) INput=(ffffffff 41 N) 
+oldz1=(54 45 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(54 36 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(54 27 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(46 45 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 44 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 56 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 36 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 26 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 57 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 35 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 24 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(46 37 ÿ 0) INput=(ffffffff 41 Q) 
+oldz1=(75 64 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(75 53 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(75 42 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(75 31 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(75 20 ÿ 0) INput=(ffffffff 41 B) 
+oldz1=(55 67 ÿ 0) INput=(ffffffff 41 N) 
+oldz1=(55 36 ÿ 0) INput=(ffffffff 41 N) 
+oldz1=(55 76 ÿ 0) INput=(ffffffff 41 N) 
+oldz1=(77 76 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(77 67 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(77 57 ÿ 0) INput=(ffffffff 41 R) 
+oldz1=(40 30 ÿ 0) INput=(ffffffff 41 P) 
+oldz1=(61 51 ÿ 0) INput=(ffffffff 41 P) 
+oldz1=(61 41 ÿ 0) INput=(ffffffff 41 P) 
+oldz1=(52 42 ÿ 0) INput=(ffffffff 41 P) 
+oldz1=(66 56 ÿ 0) INput=(ffffffff 41 P) 
+oldz1=(47 37 ÿ 0) INput=(ffffffff 41 P) 
+k=38 from=61 to=41
+from 61 ==> 41
+istr=c5

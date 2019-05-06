@@ -1,13 +1,13 @@
 1.d4 Nf6
 2.Bg5 e6
 3.e4 Be7
-4.Nd2 Nd5
+4.Nd2 Pd5
 5.e5 Nfd7
-6.Be3 b6
+6.Be3 Pb6
 7.Nh3 Bb7
 8.Qg4 g6
 9.Ng5 Nf8
-10.h4 h6
+10.Ph4 h6
 11.Ngf3 Na6
 12.c3 Qd7
 13.a4 O-O-O
