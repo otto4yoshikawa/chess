@@ -106,7 +106,8 @@ extern MOVETYPE Next;
 
 // ---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner) {
-	SetCurrentDir("../");
+
+	if(!FileExists("BPawn.bmp") )	SetCurrentDir("../");
 	BPawn->LoadFromFile("BPawn.bmp");
 	bitmaphd[0][0] = BPawn;
 	WPawn->LoadFromFile("WPawn.bmp");
