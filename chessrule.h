@@ -3,6 +3,7 @@
 #include<vector>
 #include<iostream>
 using namespace std;
+#define VERSION "2.1"
 
 const MATEVALUE  = 0x7C80;
 const DEPTHFACTOR  = 0x80;
@@ -11,7 +12,8 @@ const MAXLEN         = 64;
 const SQUARE_SIZE = 36;
 const MAXBDSIZE = 8;
 const MYFRAMESIZE = 3;
-enum SPE {normal1,kingsidecas,queensidecas,empassant,queening};
+enum SPE {normal,kingsidecas,queensidecas,
+empassant,queening,take,check};
 const BACK  =  -104;
 const MAXPLY  =  23;
 const LOSEVALUE  = 0x7D00;
@@ -102,7 +104,7 @@ struct NODEVAL {
 
 typedef char COMMANDSTRING[COMMANDLENGTH];
 
-enum LEVELTYPE { normal, fullgametime, easygame, infinite, plysearch,
+enum LEVELTYPE { normalz, fullgametime, easygame, infinite, plysearch,
 				matesearch, matching };
 
 

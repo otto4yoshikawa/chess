@@ -85,6 +85,7 @@ object Form1: TForm1
       '3'
       '3'
       '3')
+    MultiSelect = True
     ScrollWidth = 4
     TabOrder = 3
     OnClick = listbox1click

@@ -38,7 +38,7 @@ void chessrule::castling(xPIECE *p) {
 	rook = board[rookz];
 	if (moved(rook, &record)) 	goto aa;
 	if (!safespot(p, rook))		goto aa;
-	DoPrintf("$$$$$$$$$$$");
+
 	generate(rookz, p, rook, kingsidecas);
 
 	// qeen side  castling
@@ -47,7 +47,7 @@ aa:
 	rook = board[rookz];
 	if (moved(rook, &record))		return;
 	if (!safespot(p, rook)) 		return;
-		DoPrintf("$$$$$$");
+
 	generate(rookz, p, rook, queensidecas);
 }
 
@@ -78,24 +78,33 @@ void chessrule::Play(MOVE m) {
 	xPIECE *temp, *p = m.p;     //from
 	xPIECE *cap = m.cap;
 	int z3;
-	int kingy,rookxold,rookxnew,kingnewx,oldking;
+	int rookz,rooknew,kingy,rookxold,rookxnew,kingnewx,oldking;
 	rookxnew=-1;
 	if (m.spe == kingsidecas) {
 		rookxold=7,rookxnew=5;kingnewx=6;
-     }
+	 }
 	if( m.spe==queensidecas) {
 		 rookxold=0,rookxnew=3; kingnewx=2;
 	}
 	if(rookxnew>0){  // castling
-			kingy=p->z&0xf0;
-			oldking=p->z;
-		temp = board[kingy+rookxold];
-		p->z= kingy+kingnewx;
+		  oldking =(teban==1)?0x04:0x74;
+	 p=board[oldking];
+			kingy=oldking&0x70;
 
+			oldking=p->z;
+			rookz=kingy+rookxold;
+			temp= board[rookz];
+		temp = board[rookz];
+		rooknew=kingy+rookxnew;
+		p->z= kingy+kingnewx;
+		temp->z=rooknew;
 		board[oldking] = 0;
-		board[kingy+rookxold] = 0;
+		board[rookz] = 0;
 		board[p->z]=p;
-		board[kingy+rookxnew]=temp;
+		board[rooknew]=temp;
+		DoPrintf("cas rookz=%02x rooknew=%02x ",rookz,rooknew);
+	   temp->showx = basex + (sz * (temp->z & 7));
+	   temp->showy = basey + (temp->z) / 16 * sz;
 	}
 
 	else {
@@ -117,13 +126,43 @@ void chessrule::Play(MOVE m) {
 }
 
 void chessrule::Back() {
-	MOVE m = record[1];
+
+	int rookz,rooknew,kingy,rookxold,rookxnew,kingnewx,oldking;
+	int newking;
+	rookxnew=-1;
+	step--;
+	teban = 3 - teban;
+	MOVE m = record[step-1];
+
+	if (m.spe == kingsidecas) {
+		rookxold=7,rookxnew=5;kingnewx=6;
+	 }
+	if( m.spe==queensidecas) {
+		 rookxold=0,rookxnew=3;kingnewx=2;
+	}
 	record.pop_back();
-	xPIECE *p = m.p;
+	xPIECE *temp,*p = m.p;
 	xPIECE *cap = m.cap;
-	if (m.spe == 1) {
-		board[m.newz] = board[m.oldz];
-		board[m.oldz] = p;
+
+	if(rookxnew>0){
+	  //castling
+		oldking =(teban==1)?0x04:0x74;  //depend on  vwesion
+		kingy=oldking&0x70;
+		newking= p->z;
+		rookz=kingy+rookxnew;
+		temp= board[rookz];
+		rooknew=kingy+rookxnew;
+		p->z= oldking;
+		temp->z=kingy+rookxold;
+		board[newking] = 0;
+		board[rookz] = 0;
+		board[oldking]=p;
+		rooknew= rookxold+kingy;
+		board[rooknew]= temp;
+		DoPrintf("back cas %02x %02x %02x",rookz,rooknew,newking);
+		temp->showx = basex + (sz * (temp->z & 7));
+		temp->showy = basey + (temp->z) / 16 * sz;
+
 	}
 
 	else {
@@ -139,8 +178,9 @@ void chessrule::Back() {
 			p->rank -= ('Q' - 'P');
 	}
 	p->z = m.oldz;
-	step--;
-	teban = 3 - teban;
+	p->showx = basex + (sz * (p->z & 7));
+	p->showy = basey + (p->z) / 16 * sz;
+
 }
 
 bool chessrule::CheckAndPlay(int to) {
@@ -320,7 +360,7 @@ bool chessrule::Stealmate() {
 void chessrule::generate(int z, xPIECE *p, xPIECE *cap, SPE spe) {
 	MOVE m;
 
- if(z==0x33) DoPrintf("bz =%02x %c %02x",p->z,p->rank,z);
+ //if(z==0x33) DoPrintf("bz =%02x %c %02x",p->z,p->rank,z);
 	m.newz = z;
 	m.oldz = p->z;
 	m.p = p;
@@ -336,9 +376,9 @@ bool chessrule::genmove(int t) {
 	movelist.clear();
 	for (i = ia; i < 32; i++, i++) {
 		p = piece + i;
+		if(p->t==0) continue;        //$2019-5-7
 		char rank = p->rank;
 		rank |= 0x20;
-		// cout<<"movegen i="<<dec<<i<<" rank="<<p->rank<<" z="<<hex<<p->z<<endl;
 		switch(rank) {
 		case 'p':
 			pawnsearch(p->z, p->t); // empassant();
@@ -431,7 +471,7 @@ void chessrule::pawnsearch(int oldz, int t) {
 		q = board[newz];
 	  //	DoPrintf("newz=%02x",newz);
 		if (q  && ( q->t) == (3 - teban)) {
-			DoPrintf ("Pawn tkw%02x %02x q=%02x ", newz,p->z, q->z);
+  //			DoPrintf ("Pawn tkw%02x %02x q=%02x ", newz,p->z, q->z);
 
 			generate(newz, p, q, 0);   }
 	}
@@ -448,7 +488,7 @@ void chessrule::pawnsearch(int oldz, int t) {
 	if (abs(mm->oldz/16 - mm->newz / 16) != 2)	return;
 	if (abs((mm->oldz & 0x07)-(oldz&0x0f)) != 1) return;
 	newz=(mm->newz+mm->oldz)/2;//’†“_
-	DoPrintf ("emp %02x %02x q=%02x ", newz,p->z, q->z);
+  //	DoPrintf ("emp %02x %02x q=%02x ", newz,p->z, q->z);
 
 
 	generate(newz, p, q, empassant);

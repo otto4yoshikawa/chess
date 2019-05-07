@@ -162,6 +162,10 @@ __fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner) {
 	ListBox1->Items->Add("1 d4 e5");
 	ListBox1->Items->Add("2 d4 e5");
 	ListBox1->Items->Add("3 d4 e5");
+	 char w[30];
+	 strcpy( w,"VERSION ");
+	 strcat(w,VERSION);
+	Caption=w;
 
 }
 
@@ -199,7 +203,7 @@ void __fastcall TForm1::paint(TObject *Sender) {
 			basex + sz * 8 + GRAYSIZE, basey + sz * 8 + GRAYSIZE);
 	}
 	// Form1->Canvas->Brush->Color = clWhite;
-
+	Canvas->Font->Color = clBlack;
 	for (x = 0; x < 8; x++)
 		for (y = 0; y < 8; y++) {
 
@@ -215,11 +219,11 @@ void __fastcall TForm1::paint(TObject *Sender) {
 			// if(x==0 && y==0) continue;
 			if (!newkernel->getxyrt(x, y, &showx, &showy, &col, &type))
 				continue;
-			// if(col==0) continue;
+			 if(col==0) continue;
 			// DoPrintf("%d %d &d %d",showx,showy,type,col);
 			drawPiece(showx, showy, type, col);
 		}
-	Canvas->Font->Color = clBlack; // clNavy;
+	Canvas->Font->Color = clYellow;//clBlack; // clNavy;
 	Canvas->Font->Size = 12;
 	Canvas->Brush->Color = clGray;
 
@@ -377,41 +381,50 @@ static void cxyp(char c, int *cx, int *cy, char *cp) {
 		}
 }
 
-static void xypsearch(int newz, int oldz, char cp, SPE esp) {
+static void xypsearch(int newza, int oldz, char cp, SPE esp) {
 
-	int newz1, oldz1;
+
+	char newz ,newz1, oldz1;
+	newz=newza;
+	bool capture=false;
 	char pp;
-	newz = (newz & 7) + 16 * (7 - newz / 16); // chessruuke invert
+	newz = (newz & 7) + 16 * (7 - newz / 16); // depend on version
 	if (oldz >= 16)
-		oldz = 16 * (7 - oldz / 16);
-		if(esp>0)
-		 DoPrintf("esp=%d ", esp);
+		oldz = 16 * (7 - oldz / 16);   // depend on version
+	
 	for (int i = 0; i < newkernel->movelist.size(); i++) {
 		newz1 = newkernel->movelist[i].newz;
 		oldz1 = newkernel->movelist[i].oldz;
 
 		pp = newkernel->movelist[i].p->type;
 		pp = *(".PRNBQK" + pp);
-
-		DoPrintf("oldz1=(%02x %02x %c %d) INput=(%02x %02x %c) ", oldz1,
-			newz1,cp, newkernel->movelist[i].spe,
-			 oldz, newz, pp,cp);
+ if(esp==100)
+		DoPrintf("oldz1=(%02x %02x %c) IN=(sp=%d oldz=%02x newz=%02x %c) ",
+		oldz1,	newz1,cp, 	newkernel->movelist[i].spe, oldz, newz, pp,cp);
 
 			if (esp >0 && newkernel->movelist[i].cap == 0)
 			continue;
-		if (esp > 0 && newkernel->movelist[i].spe == esp)
-			{moveindexstack[index++] = i;
-			 return;
-			}
-		if (oldz < 0 && cp < 0 && newz1 == newz)
-			moveindexstack[index++] = i;
+  if(take && cp<0)cp='P';
+  if(oldz>=0) {
+		 if((oldz &7) !=(oldz1&7)) continue;
+  }
+			if(esp==take && newkernel->movelist[i].cap==0) continue;
+
+		if( esp==kingsidecas||esp==queensidecas )  {
+			if ( newkernel->movelist[i].spe == esp)
+				{moveindexstack[index++] = i;		 return; }
+				}
+		if (oldz < 0 && cp < 0 && newz1 == newz) {
+
+			moveindexstack[index++] = i;  }
+
 		if (oldz < 0 && cp > 0 && cp == pp && newz1 == newz)
-			moveindexstack[index++] = i;
-		if (oldz < 0)
-			continue;
+		   {
+			moveindexstack[index++] = i;  }
+		if (oldz < 0) 		continue;
 		if (((oldz1 & 0x0f) == oldz || (oldz1 & 0xf0) == oldz)
 			&& cp == pp && newz1 == newz) {
-		  //	DoPrintf("$$$$$$$$$$$i=%d", i);
+
 			moveindexstack[index++] = i;
 		}
 	}
@@ -434,7 +447,7 @@ bool pushStack(int n, char *str) {
 
 	else if (memcmp(str, "O-O", 3) == 0) {
 			newz=(newkernel->teban==1)?0x06:0x76;
-		xypsearch(newz, -1, -1, kingsidecas);
+		xypsearch(-1, -1, -1, kingsidecas);
 		return(n + 1 == index);
 	}
 
@@ -443,27 +456,47 @@ bool pushStack(int n, char *str) {
 	//
 	cxyp(*str++, &cx, &cy, &cp);
 	if (cx >= 0) { // 1•¶Žš–Ú‚ª‚˜À•W
-		cxyp(*str++, &dummy, &cy, &cp);
-		if (cy >= 0) { // ‚Q•¶Žš–Ú‚ªYÀ•W@ƒm[ƒ}ƒ‹
-			DoPrintf("to=%02x", cy * 16 + cx);
-			xypsearch(cy * 16 + cx, -1, -1, 0);
-			return(index == (n + 1));
-		}
-		else if (cp > 0) // 1•¶Žš–Ú‚ªx ‚Q•¶Žš–Ú‚ª‹î
-			cz1 = cx;
-		cx = -1;
-		xypsearch(cx + 16 * cy, cz1, cp, 0);
-		return(index == n + 1);
-	}
-	else if (cp > 0) { // 1•¶Žš–Ú‚ª‹î
+
 		if (*str == 'x') { // 2•¶Žš–Ú‚ª take X
+             cz1=cx;
 			str++;
 			cap = 1;
 			cxyp(*str++, &cx, &cy, &dummyc);
 			if (cx >= 0) { // 3•¶Žš–Ú‚ªxÀ•W
 				cxyp(*str++, &dummy, &cy, &cp);
+				if (cy >= 0) { // 4•¶Žš–Ú‚ªYÀ•W
+
+					xypsearch(cy * 16 + cx, cz1, -1, take);
+					return(index == n + 1);
+				}
+			}
+
+		}
+		cxyp(*str++, &dummy, &cy, &cp);
+		if (cy >= 0) { // ‚Q•¶Žš–Ú‚ªYÀ•W@ƒm[ƒ}ƒ‹
+	   //		DoPrintf("to=%02x", cy * 16 + cx);
+			xypsearch(cy * 16 + cx, -1, -1, normalz);
+			return(index == (n + 1));
+		}
+
+
+		else if (cp > 0) {  // 1•¶Žš–Ú‚ªx ‚Q•¶Žš–Ú‚ª‹î
+			cz1 = cx;
+		cx = -1;
+		xypsearch(cx + 16 * cy, cz1, cp, normalz);
+		return(index == n + 1);
+		}
+
+	}
+	else if (cp > 0) { // 1•¶Žš–Ú‚ª‹î
+		if (*str == 'x') { // 2•¶Žš–Ú‚ª take X
+			str++;
+
+			cxyp(*str++, &cx, &cy, &dummyc);
+			if (cx >= 0) { // 3•¶Žš–Ú‚ªxÀ•W
+				cxyp(*str++, &dummy, &cy, &cp);
 				if (cy >= 0) { // 3•¶Žš–Ú‚ªYÀ•W
-					xypsearch(cy * 16 + cx, -1, -1, 100);
+					xypsearch(cy * 16 + cx, -1, cp, take);
 					return(index == n + 1);
 				}
 			}
@@ -477,7 +510,7 @@ bool pushStack(int n, char *str) {
 			cxyp(*str++, &cx, &cy, &cp);
 
 			if (cy >= 0) { // 3•¶Žš–Ú‚ªYÀ•W
-				xypsearch(cy * 16 + cxsave, -1, cp, 0); // Kc5
+				xypsearch(cy * 16 + cxsave, -1, cp, normalz); // Kc5
 				return(index == n + 1);
 
 			}
@@ -485,8 +518,9 @@ bool pushStack(int n, char *str) {
 				cxyp(*str++, &cx, &cy, &cp);
 				if (cy >= 0) // 4•¶Žš–Ú‚ª yÀ•W
 					DoPrintf("cxsave =%02x z=%02x ", cxsave, cy * 16 + cx);
-				xypsearch(cy * 16 + cx, cxsave, cp, 0);
+				xypsearch(cy * 16 + cx, cxsave, cp, normalz);
 					DoPrintf("cxsaveend");
+						return(index == n + 1);
 			}
 		}
 		if (cy >= 0) { // 2•¶Žš–Ú‚ªyÀ•W
@@ -496,7 +530,7 @@ bool pushStack(int n, char *str) {
 			if (cx >= 0) { // 3•¶Žš–Ú‚ªxÀ•W     K7c5
 				cxyp(*str++, &dummy, &cy, &dummyc);
 				if (cy >= 0) {
-					xypsearch(cy * 16 + cx, cz1, cp, 0);
+					xypsearch(cy * 16 + cx, cz1, cp, normalz);
 				}
 			}
 
@@ -547,7 +581,7 @@ int algebdecode(char *str, char *m1, char *m2) {
 void __fastcall TForm1::load1Click(TObject *Sender) {
 	DoPrintf("load");
 	AnsiString A;
-	int n;
+	int n,nn;
 	char algeb[2][10];
 		A = "game1.txt";
 if(0){
@@ -562,49 +596,59 @@ if(0){
 	for (int i = 0; i < T->Count; i++) {
 		A = T->Strings[i];
 
-		n = algebdecode(A.c_str(), algeb[0], algeb[1]);
+		nn=n = algebdecode(A.c_str(), algeb[0], algeb[1]);
 		n--;
 		n = n * 2;
 		for (int ii = 0; ii < 2; ii++, n++) {
 			 char w[10];
 			 strcpy(w, algeb[ii]);
-		//	DoPrintf("i=%d ii=%d  n=%d %s ", i, ii, n, algeb[ii]);
+			 if(memcmp(w,"1-0",3)==0) { DoPrintf("White won");goto aa;}
+			  if(memcmp(w,"0-1",3)==0) { DoPrintf("Black won");goto aa;}
+			  if(memcmp(w,"1/2-1/2",7)==0) { DoPrintf("Draw ");goto aa;}
+
+
 			if (!pushStack(n, algeb[ii])) {
 				if (n == index)
-					DoPrintf("can not move to %s",w);
+					DoPrintf("n=%d can not move to %s",nn,w);
 				else
-					DoPrintf("žB–†‚Å‚· %s",w);
-				// DoPrintf("n=%d index=%d step=%d",2*n+1,index,	newkernel->step);
-				goto aa;
+					DoPrintf("n=%d žB–†‚Å‚· %s",nn,w);
+					goto aa;
 			}
 			int k = moveindexstack[index - 1];
-			DoPrintf("k=%d from=%02x to=%02x", k, newkernel->movelist[k].oldz,
-				newkernel->movelist[k].newz);
 			newkernel->Play(newkernel->movelist[k]);
 			Repaint();
 			showStatus( newkernel->teban,newkernel->step);
-		}
 
+		}
+	aa:	//if(nn>15) return ;
 		ListBox1->Items->Add(A);
 
+
 	}
-aa:
+	int k=0;
+		ListBox1->ItemIndex;
+	while(k-->0) { 			newkernel->Back();
+			Repaint();}
 }
 
 // ---------------------------------------------------------------------------
 void xx(int n) {
-	if (n == index)
+	if (n == newkernel->step)
 		return;
-	if (n < index) {
+	else if (n < newkernel->step) {
 		while (newkernel->step > n)
 			index--, newkernel->Back();
 	}
 	else {
-		newkernel->genmove(newkernel->teban);
-		int k = moveindexstack[index++];
-		newkernel->Play(newkernel->movelist[k]);
+		 while (newkernel->step <n)   {
+	   //	newkernel->genmove(newkernel->teban);
+
+		int k = moveindexstack[newkernel->step-1];
+			newkernel->genmove(newkernel->teban);
+			newkernel->Play(newkernel->movelist[k]); }
 	}
-}
+	Form1->Repaint();
+		}
 
 void __fastcall TForm1::listbox1click(TObject *Sender) {
 	int k = ListBox1->ItemIndex;
