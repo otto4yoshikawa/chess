@@ -3,7 +3,7 @@
 #include<vector>
 #include<iostream>
 using namespace std;
-#define VERSION "2.1A"
+#define VERSION "2.1"
 
 const MATEVALUE  = 0x7C80;
 const DEPTHFACTOR  = 0x80;
