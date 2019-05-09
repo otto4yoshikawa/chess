@@ -3,7 +3,12 @@
 #include<vector>
 #include<iostream>
 using namespace std;
-#define VERSION "2.1A"
+#define VERSION "3.1"
+#define V2 *VERSION>'1'
+#define V3 *VERSION>'2'
+#define V4 *VERSION>'4'
+
+#define emptyboard (piece+32)
 
 const MATEVALUE  = 0x7C80;
 const DEPTHFACTOR  = 0x80;

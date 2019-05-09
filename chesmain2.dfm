@@ -47,9 +47,9 @@ object Form1: TForm1
   object Button1: TButton
     Left = 830
     Top = 0
-    Width = 75
+    Width = 107
     Height = 25
-    Caption = 'Button1'
+    Caption = 'computer play'
     TabOrder = 2
     OnClick = Button1Click
   end

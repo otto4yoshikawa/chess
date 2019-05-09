@@ -12,7 +12,7 @@ extern int Depth,Player,Opponent;
 extern int OfficerNo[2], PawnNo[2];
 void DoPrintf(char*szFormat, ...);
 extern int MoveNo;
-int Level;
+static int Level;
 NODEVAL Nodes;
 extern CLOCKTYPE ChessClock;
 bool MultiMove, AutoPlay, SingleStep;
@@ -37,11 +37,10 @@ MOVETYPE Next;
 extern PIECETYPE *piece;
 int BufCount, BufPnt;
 MOVETYPE Buffer[81];
-
+extern  int Depth;
 extern BOARDTYPE Board[0x78];
 int PVTable[2][7][0x78];
 extern  MOVETYPE ZeroMove;
-extern int MoveNo;
 
  COLORTYPE ProgramColor;
 //^-------------------------------------------------
@@ -563,7 +562,7 @@ void GenCastSquare(SQUARETYPE new1, SQUARETYPE* castsquare,
 	*cornersquare = new1 - 2;
   }
 }
- int MoveNo;
+
 //  ˆÚ“®‚ðŒ³‚É–ß‚µA•Ï”‚ðXV‚·‚é
 //
 void
@@ -578,11 +577,21 @@ TakeBackMove(MOVETYPE* move)
 }
 // talk.cpp
 void MakeMove(MOVETYPE * move) {
-Depth++; MoveNo++; Perform(move, 0);
+Depth++;
+MoveNo++;
+Perform(move, 0);
 ProgramColor = Opponent;
 Opponent = Player; Player = ProgramColor;
-DoPrintf("MakeMove %d %d",Depth,Player);
+DoPrintf("MakeMove Deth=%d %d newz=%02x newz=%02x ",Depth,Player,
+move->new1,move->old);
 
+
+
+}
+void
+EnterKeyMove(int dd,MOVETYPE KeyMove) {
+DoPrintf("%d ",MovTab[dd+1] .new1);
+  MovTab[dd+1] = KeyMove;
 
 }
 

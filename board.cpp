@@ -3,7 +3,6 @@
 //----------------------------------------------------------------------------
 
 #include"chessrule.h"
-#include "wcdefs.h"
 #include<assert.h>
 #include"board.h"
  void DoPrintf(char *szFormat,...);
@@ -13,8 +12,8 @@
 
 
 int OfficerNo[2], PawnNo[2];
-DEPTHTYPE Depth;
-static MOVETYPE movetemp[MAXPLY - BACK + 2];   // BACK =0104
+
+static MOVETYPE movetemp[MAXPLY - BACK + 2];   // BACK = -104
 
 MOVETYPE* MovTab = &movetemp[-BACK];
 
@@ -25,6 +24,9 @@ void CalcPieceTab();
 void  ColorToPlay(COLORTYPE color);
 bool MoveCheck(SQUARETYPE startsq, SQUARETYPE endsq);
 COLORTYPE Opponent;
+DEPTHTYPE Depth;
+int MoveNo;
+int UseLib;
 COLORTYPE Player;
 BOARDTYPE Board[0x78];
 PIECETYPE Pieces[8]  = { rook, knight, bishop, queen,
@@ -40,6 +42,7 @@ void 	MovGen();
 extern MOVETYPE Next;
  //----------------------------------------------
  void   Warning(char*){}
+
 //
 //  ボードをクリアしてボードモジュールを初期化
 //
@@ -51,6 +54,8 @@ ClearBoard()
     Board[square].piece = empty;
     Board[square].color = white;
   }
+  UseLib=10;
+  MoveNo=0;
 }
 void
 ClearIndex()
@@ -108,7 +113,7 @@ CalcPieceTab()
 		}
 		while (square);
 	}
-  //	DoPrintf("pa =%d %d",PawnNo[0],PawnNo[1]);
+
 }
 
 //
@@ -177,7 +182,7 @@ ChangeType(PIECETYPE newtype, SQUARETYPE insquare)
    char c,w[9];
    for(y=0;y<8;y++){
 	 for(x=0;x<8;x++) {
-	 z=y*16+x;
+	 z=(7-y)*16+x;
 	 c=*(".KQRBNP"+ Board[z].piece);
 		w[x]=c; }
 	 w[8]=0;
@@ -198,7 +203,7 @@ Perform(MOVETYPE* move, bool resetmove)
   SQUARETYPE castsquare, cornersquare, epsquare;
 
   if (resetmove){        //play
-    MovePiece(move->old, move->new1);
+	MovePiece(move->old, move->new1);
     if (move->content != empty)
       InsertPTabPiece(move->content, Opponent, move->new1);
 
@@ -257,8 +262,15 @@ void  ResetGame()
 {
   ClearBoard();
  Running = false;
-   Depth = 0;
-  MovTab[-1] = ZeroMove;
+
+   Depth =-1;
+   DoPrintf("dep -1 %d",Depth);
+    return ;
+
+ // MovTab[1] = ZeroMove;    //DEAD!!!!!!!!!!!!!!!!!!!!
+   DoPrintf("dep -1 %d  %08x ",Depth, &Depth);
+
+
   for (int i = 0; i < 8; i++) {
 	InsertPiece(Pieces[i], white, i);
 	InsertPiece(pawn, white, i + 0x10);
@@ -266,8 +278,10 @@ void  ResetGame()
 	InsertPiece(Pieces[i], black, i + 0x70);
   }
 
+    MoveNo = 0;
+ CalcPieceTab();
 
-  CalcPieceTab();
+	  DoPrintf("$$$dep -1 %d",Depth);
   Player = white;
 
  // ClearDisplay();
@@ -314,6 +328,7 @@ bool MoveCheck(SQUARETYPE startsq, SQUARETYPE endsq)
    //	StoreMoves();
   }
   return true;  }
+
 
 /*
  ドロー（引き分け

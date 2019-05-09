@@ -1,9 +1,269 @@
-onenter
-cas rookz=77 rooknew=75 
-single click 2 d4 e5
-cas rookz=07 rooknew=05 
-from 76 ==> 77
-single click 3 d4 e5
-back cas 05 07 06
-single click 2 d4 e5
-single click 2 d4 e5
+dep -1 -1
+223MoveNo=0 Depth=65535
+calclib Depth=-1 MN=0
+3MoveNo=0 Depth=65535
+load
+istr=d4
+gensize=22
+from 13 ==> 33
+istr=Nf6
+gensize=22
+from 76 ==> 55
+istr=Bg5
+gensize=30
+from 02 ==> 46
+istr=e6
+gensize=23
+from 64 ==> 54
+istr=e4
+gensize=33
+from 14 ==> 34
+istr=Be7
+gensize=29
+from 75 ==> 64
+istr=Nd2
+gensize=43
+from 01 ==> 13
+istr=Pd5
+gensize=29
+from 63 ==> 43
+istr=e5
+gensize=41
+from 34 ==> 44
+istr=Nfd7
+gensize=31
+cxsave =05 z=63 
+cxsaveend
+from 55 ==> 63
+istr=Be3
+gensize=42
+from 46 ==> 24
+istr=Pb6
+gensize=32
+from 61 ==> 51
+istr=Nh3
+gensize=39
+from 06 ==> 27
+istr=Bb7
+gensize=32
+from 72 ==> 61
+istr=Qg4
+gensize=38
+from 03 ==> 36
+istr=g6
+gensize=34
+from 66 ==> 56
+istr=Ng5
+gensize=45
+from 27 ==> 46
+istr=Nf8
+gensize=31
+from 63 ==> 75
+istr=Ph4
+gensize=47
+from 17 ==> 37
+istr=h6
+gensize=31
+from 67 ==> 57
+istr=Ngf3
+gensize=47
+cxsave =06 z=25 
+cxsaveend
+from 46 ==> 25
+istr=Na6
+gensize=32
+from 71 ==> 50
+istr=c3
+gensize=42
+from 12 ==> 22
+istr=Qd7
+gensize=32
+from 73 ==> 63
+istr=a4
+gensize=41
+from 10 ==> 30
+istr=O-O-O
+gensize=37
+istr=b4
+gensize=42
+from 11 ==> 31
+istr=Pc5
+gensize=28
+from 62 ==> 42
+istr=Bb5
+gensize=43
+from 05 ==> 41
+istr=Qc7
+gensize=27
+from 63 ==> 62
+istr=dxc5
+gensize=48
+from 33 ==> 42
+istr=bxc5
+gensize=31
+from 51 ==> 42
+istr=O-O
+gensize=52
+istr=f5
+gensize=30
+from 65 ==> 45
+istr=exf6
+gensize=49
+from 44 ==> 55
+istr=Bxf6
+gensize=30
+from 64 ==> 55
+istr=Rac1
+gensize=49
+cxsave =00 z=02 
+cxsaveend
+from 00 ==> 02
+istr=h5
+gensize=39
+from 57 ==> 47
+istr=Qh3
+gensize=45
+from 36 ==> 27
+istr=Kb8
+gensize=39
+from 72 ==> 71
+istr=Rfe1
+gensize=41
+cxsave =05 z=04 
+cxsaveend
+from 05 ==> 04
+istr=Bc8
+gensize=40
+from 61 ==> 72
+istr=Bxa6
+gensize=43
+from 41 ==> 50
+istr=Bxa6
+gensize=38
+from 72 ==> 50
+istr=Bxc5
+gensize=36
+from 24 ==> 42
+istr=Bc8
+gensize=45
+from 50 ==> 72
+istr=c4
+gensize=41
+from 22 ==> 32
+istr=Be7
+gensize=42
+from 55 ==> 64
+istr=Bxe7
+gensize=40
+from 42 ==> 64
+istr=Qxe7
+gensize=31
+from 62 ==> 64
+istr=Qg3+
+gensize=35
+from 27 ==> 26
+istr=Qd6
+gensize=32
+from 64 ==> 53
+istr=Ne5
+gensize=35
+from 25 ==> 44
+istr=Rd7
+gensize=26
+from 73 ==> 63
+istr=Nxd7+
+gensize=43
+from 44 ==> 63
+istr=Kc7
+gensize=27
+from 71 ==> 62
+istr=Ne5
+gensize=46
+from 63 ==> 44
+istr=Kb7
+gensize=27
+from 62 ==> 61
+istr=c5
+gensize=43
+from 32 ==> 42
+istr=Qc7
+gensize=26
+from 53 ==> 62
+istr=c6+
+gensize=45
+from 42 ==> 52
+istr=Ka8
+gensize=27
+from 61 ==> 70
+istr=b5
+gensize=44
+from 31 ==> 41
+istr=Rh7
+gensize=27
+from 77 ==> 67
+istr=Qf4
+gensize=44
+from 26 ==> 35
+istr=Rh8
+gensize=28
+from 67 ==> 77
+istr=Ndf3
+gensize=48
+cxsave =03 z=25 
+cxsaveend
+from 13 ==> 25
+istr=a6
+gensize=27
+from 60 ==> 50
+istr=Nd4
+gensize=45
+from 25 ==> 33
+istr=Nh7
+gensize=27
+from 75 ==> 67
+istr=bxa6
+gensize=47
+from 41 ==> 50
+istr=Rf8
+gensize=27
+from 77 ==> 75
+istr=Qe3
+gensize=47
+from 35 ==> 24
+istr=Bxa6
+gensize=32
+from 72 ==> 50
+istr=Nb5
+gensize=45
+from 33 ==> 41
+istr=Bxb5
+gensize=36
+from 50 ==> 41
+istr=axb5
+gensize=43
+from 30 ==> 41
+istr=Kb8
+gensize=33
+from 70 ==> 71
+istr=b6
+gensize=42
+from 41 ==> 51
+istr=Qe7
+gensize=31
+from 62 ==> 64
+istr=Ra1
+gensize=41
+from 02 ==> 00
+istr=Qd6
+gensize=35
+from 64 ==> 53
+istr=Nd7+
+gensize=47
+from 44 ==> 63
+istr=Kc8
+gensize=32
+from 71 ==> 72
+istr=Ra8+
+gensize=47
+from 00 ==> 70
+White won

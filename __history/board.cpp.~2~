@@ -1,0 +1,337 @@
+//----------------------------------------------------------------------------
+// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
+//----------------------------------------------------------------------------
+
+#include"chessrule.h"
+#include "wcdefs.h"
+#include<assert.h>
+#include"board.h"
+ void DoPrintf(char *szFormat,...);
+//
+//  グローバル変数
+//
+
+
+int OfficerNo[2], PawnNo[2];
+DEPTHTYPE Depth;
+static MOVETYPE movetemp[MAXPLY - BACK + 2];   // BACK =0104
+
+MOVETYPE* MovTab = &movetemp[-BACK];
+
+
+void InsertPiece(PIECETYPE p, COLORTYPE c, SQUARETYPE sq) ;
+void ClearBoard( );
+void CalcPieceTab();
+void  ColorToPlay(COLORTYPE color);
+bool MoveCheck(SQUARETYPE startsq, SQUARETYPE endsq);
+COLORTYPE Opponent;
+DEPTHTYPE Depth;
+COLORTYPE Player;
+BOARDTYPE Board[0x78];
+PIECETYPE Pieces[8]  = { rook, knight, bishop, queen,
+						 king, bishop, knight, rook};
+ PIECETAB PieceTab[6][16];
+ MOVETYPE  ZeroMove = { 8, 8, 0, empty, empty };
+ MOVETYPE  KeyMove;
+bool      Running;
+bool ComputerThinking;
+//-------proyotype-------------------------------
+void InitMovGen();
+void 	MovGen();
+extern MOVETYPE Next;
+ //----------------------------------------------
+ void   Warning(char*){}
+//
+//  ボードをクリアしてボードモジュールを初期化
+//
+void
+ClearBoard()
+{
+  SQUARETYPE square;
+  for (square = 0; square <= 0x77; square++) {
+    Board[square].piece = empty;
+    Board[square].color = white;
+  }
+}
+void
+ClearIndex()
+{
+ SQUARETYPE square;
+  int col;
+  INDEXTYPE index;
+
+  for (square = 0; square <= 0x77; square++)
+    Board[square].index = 16;
+  for (col = 0; col <= 1; col++)
+    for (index = 0; index < 16; index++)
+	  PieceTab[col][index].ipiece = empty;
+  OfficerNo[white] = PawnNo[white] = -1;
+  OfficerNo[black] = PawnNo[black] = -1;
+
+}
+
+//
+//  スクラッチから駒テーブルを計算
+//
+void
+CalcPieceTab()
+{
+  SQUARETYPE square;
+	int piece1;
+
+	ClearIndex();
+
+	for (piece1 = 1; piece1 <= 6; piece1++) {
+		if (piece1 == pawn) {
+			OfficerNo[white] = PawnNo[white];
+			OfficerNo[black] = PawnNo[black];
+		}
+		square = 0;
+		do {
+
+			if (Board[square].piece == piece1) {     //0 empty,1 king  .. 6 pawn
+	   //		 	 DoPrintf("sq=%02x color=%d piece=%d", square, Board[square].color,piece1);
+				PawnNo[Board[square].color]++;
+				// assert( 	PawnNo[Board[square].color]<16);
+				PieceTab[Board[square].color][PawnNo[Board[square].color]]
+					.ipiece = piece1;
+				PieceTab[Board[square].color][PawnNo[Board[square].color]]
+					.isquare = square;
+				Board[square].index = short(PawnNo[Board[square].color]);
+			}
+			square ^= 0x77;
+			if (!(square & 4)) {
+				if (square >= 0x70)
+					square = (square + 0x11) & 0x73;
+				else
+					square += 0x10;
+			}
+		}
+		while (square);
+	}
+  //	DoPrintf("pa =%d %d",PawnNo[0],PawnNo[1]);
+}
+
+//
+// ボード上の駒を新しい位置に移動
+//
+inline void MovePiece(SQUARETYPE new1, SQUARETYPE old) {
+	BOARDTYPE b;
+  b = Board[new1];
+  Board[new1] = Board[old];
+  Board[old] = b;
+  PieceTab[Board[new1].color][Board[new1].index].isquare = new1;
+}
+
+//
+//  ルークのキャスリング移動の計算
+//
+void GenCastSquare(SQUARETYPE new1, SQUARETYPE* castsquare,
+					SQUARETYPE* cornersquare)
+{
+  if ((new1 & 7) >= 4) {        // ショートキャッスル
+	*castsquare = new1 - 1;
+	*cornersquare = new1 + 1;
+
+  } else {                      // ロングキャッスル
+	*castsquare = new1 + 1;
+	*cornersquare = new1 - 2;
+  }
+}
+
+//
+//  この関数は、駒を捕獲する時に使用。insquare は空でないこと
+//
+inline void
+DeletePiece(SQUARETYPE insquare)
+{
+  Board[insquare].piece = empty;
+  PieceTab[Board[insquare].color][Board[insquare].index].ipiece = empty;
+}
+
+//
+//  捕獲した駒を戻す
+//
+inline void
+InsertPTabPiece(PIECETYPE inpiece, COLORTYPE incolor,
+   SQUARETYPE insquare)
+{
+    Board[insquare].piece = PieceTab[incolor][Board[insquare].index].ipiece
+            = inpiece;
+    Board[insquare].color = incolor;
+    PieceTab[incolor][Board[insquare].index].isquare = insquare;
+}
+
+//
+//  ポーンが昇格するときに使用
+//
+inline void
+ChangeType(PIECETYPE newtype, SQUARETYPE insquare)
+{
+  Board[insquare].piece
+	= PieceTab[Board[insquare].color][Board[insquare].index].ipiece = newtype;
+  if (OfficerNo[Board[insquare].color] < Board[insquare].index)
+      OfficerNo[Board[insquare].color] = Board[insquare].index;
+}
+ void dump(){
+   int x,y,z;
+   char c,w[9];
+   for(y=0;y<8;y++){
+	 for(x=0;x<8;x++) {
+	 z=(7-y)*16+x;
+	 c=*(".KQRBNP"+ Board[z].piece);
+		w[x]=c; }
+	 w[8]=0;
+	 DoPrintf(w);
+	}
+ }
+//
+//  移動を行うか、元に戻し(resetmove が true のときは元に戻し)、
+//  ボードと駒テーブルを更新する。Player は移動するプレーヤー
+//  の色が、Opponent は相手の色が格納されていなければならない。
+//
+//  MovePiece、DeletePiece、InsertPTabPiece、ChangeType は
+//  ボードモジュールの更新に使用される。
+//
+void
+Perform(MOVETYPE* move, bool resetmove)
+{
+  SQUARETYPE castsquare, cornersquare, epsquare;
+
+  if (resetmove){        //play
+    MovePiece(move->old, move->new1);
+    if (move->content != empty)
+      InsertPTabPiece(move->content, Opponent, move->new1);
+
+  } else {                         //restore
+    if (move->content != empty)
+      DeletePiece(move->new1);
+    MovePiece(move->new1, move->old);
+  }
+
+  if (move->spe) {
+    if (move->movpiece == king) {
+      GenCastSquare(move->new1, &castsquare, &cornersquare);
+      if (resetmove)
+        MovePiece(cornersquare, castsquare);
+      else
+        MovePiece(castsquare, cornersquare);
+
+    } else {
+      if (move->movpiece == pawn) {
+        epsquare = (move->new1 & 7) + (move->old & 0x70); // 通過捕獲
+        if (resetmove)
+          InsertPTabPiece(pawn, Opponent, epsquare);
+        else
+          DeletePiece(epsquare);
+      } else {
+        if (resetmove)
+          ChangeType(pawn, move->old);
+        else
+          ChangeType(move->movpiece,move->new1);
+      }
+    }
+  }
+  dump();
+}
+
+//
+// ２つの移動内容の比較
+//
+bool
+EqMove(MOVETYPE* a, MOVETYPE* b)
+{
+  return a->movpiece == b->movpiece && a->new1 == b->new1 &&
+	a->old == b->old && a->content == b->content && a->spe == b->spe;
+  }
+
+static  void
+InsertPiece(PIECETYPE p, COLORTYPE c, SQUARETYPE sq)
+{
+
+  Board[sq].piece = p;
+  Board[sq].color = c;
+}
+//--------------------------------------------------------
+
+void  ResetGame()
+{
+  ClearBoard();
+ Running = false;
+   Depth = 0;
+  MovTab[-1] = ZeroMove;
+  for (int i = 0; i < 8; i++) {
+	InsertPiece(Pieces[i], white, i);
+	InsertPiece(pawn, white, i + 0x10);
+	InsertPiece(pawn, black, i + 0x60);
+	InsertPiece(Pieces[i], black, i + 0x70);
+  }
+
+
+  CalcPieceTab();
+  Player = white;
+
+ // ClearDisplay();
+//  InitDisplay();
+ // ColorToPlay(Player);        display.cpp
+  Opponent = black;
+}
+
+
+//
+//  入力された移動は正しいか検査
+//
+bool  IllegalMove(MOVETYPE* move)
+{return false;}
+bool MoveCheck(SQUARETYPE startsq, SQUARETYPE endsq)
+{
+  Depth++;
+  KeyMove = ZeroMove;
+ // Next.old = startsq;          //?????
+  InitMovGen();
+  do {
+	MovGen();
+	if (Next.new1 == endsq && Next.old == startsq) {
+	  KeyMove = Next;
+	  break;
+	}
+  } while (Next.movpiece != empty);
+
+  if (KeyMove.movpiece == empty) {
+	DoPrintf("不正な移動です");
+	Depth--;
+	return false;
+  }
+  if (IllegalMove(&KeyMove))
+  {
+   DoPrintf("不正な移動です. ﾁｪｯｸ!");
+	Depth--;
+	return false;
+  }
+  Depth--;
+  if (!ComputerThinking) {
+   //	AdjustMoves();
+  //	EnterKeyMove();
+   //	StoreMoves();
+  }
+  return true;  }
+
+/*
+ ドロー（引き分け
+
+ステイルメイト ： 自分の手番で、チェックされてはいないが、
+ルールに従った手がひとつもない状況を指す。
+合意のドロー： 片方がドローを提案し、
+もう片方がそれを承諾した場合。
+戦力不足：駒が少なくなりすぎて、双方が協力してもチェックメイトが不可能な状態を言う。次の駒の組合せが生じたら即座にドローとなる[6]。
+キング　対　キング
+キング　対　キング + ビショップ1個
+キング　対　キング + ナイト1個
+キング + ビショップ1個　対　キング + ビショップ1個（ビショップどうしが同じ色のマスを動く場合）[7]
+次の場合、一方のプレーヤーの「申請（クレーム）」によりドローとなる[8]。
+
+50手ルール ： 50手連続して両者ともポーンが動かず、またお互いに駒を取らない場合。
+スリーフォー
+ルド・レピティション（同形三復）
+： 同一の局面が3回現れた（または次の手で3回現れることを指摘した）場合。将棋の千日手に相当す
+*/

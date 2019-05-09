@@ -1,13 +1,14 @@
 #include"chessrule.h"
 #include <fstream.h>
 #include"board.h"
-#include "wcdefs.h"
+//#include "wcdefs.h"
 const UNPLAYMARK = 0x3f;
 
 #include "joseki.h"
- extern int Depth;
+extern int UseLib;
+ extern DEPTHTYPE Depth;
  extern  MOVETYPE Next;
-
+ extern int MoveNo;
  extern  MOVETYPE MovTab[];
  void DoPrintf(char *szFormat, ...);
 //
@@ -16,21 +17,28 @@ const UNPLAYMARK = 0x3f;
 void joseki::
 FindNode()
 {
+DoPrintf("enter findNode Depth=%d JibDeprg=%d LibNo=%d MoveNo=%d",
+Depth,LibDepth,LibNo,MoveNo);
   LibNo++;
   if (Depth > LibDepth) {
+  DoPrintf("found");
 	Found = true;
-    return;
+	return;
   }
   OpCount = -1;
   InitMovGen();
   do {
 	OpCount++;
 	MovGen();
+	DoPrintf("opcount=%d",OpCount);
   } while (Next.movpiece != empty && !EqMove(&Next, &MovTab[Depth]));
   if (Next.movpiece != empty) {
-    while ((Openings[LibNo] & 63) != OpCount && Openings[LibNo] < 128)
-      NextLibNo(0);
-    if ((Openings[LibNo] & 127) == 64 + OpCount) {
+	 DoPrintf("JibNo=%d",LibNo);
+	while ((Openings[LibNo] & 0x3f) != OpCount && Openings[LibNo] < 0x80)
+	  NextLibNo(0);
+	  DoPrintf("LibNo=%d Openings=%02x", LibNo,Openings[LibNo]);
+	if ((Openings[LibNo] & 0x7f) == 0x40 + OpCount) {
+
 	  MakeMove(&MovTab[Depth]);
       FindNode();
 	  TakeBackMove(&MovTab[Depth-1]);
@@ -79,6 +87,8 @@ joseki::joseki(){
   fin.close();
   *Openings = 0xFF;
    LibNo=1;
+  CalcLibNo();
+
 }
 //
 //  ブロック内の次の移動を LibNo に設定。
@@ -91,7 +101,7 @@ void joseki::NextLibNo(short skip)
   else {
     int n = 0;
     do {
-      if (Openings[LibNo] & 64)
+	  if (Openings[LibNo] & 64)
 		n++;
       if (Openings[LibNo] >= 128)
         n--;
@@ -105,11 +115,14 @@ void joseki::NextLibNo(short skip)
 void  joseki::
 CalcLibNo()
 {
+DoPrintf("calclib Depth=%d MN=%d",Depth,MoveNo);
+return;
   LibNo = 0;
   if (MoveNo < UseLib) {
     LibDepth = Depth;
-    while (MovTab[Depth].movpiece != empty)
-	  TakeBackMove(&MovTab[Depth]);
+	while (MovTab[Depth].movpiece != 0) {
+	DoPrintf("takeback $1 depth=%d from=%02x",Depth,MovTab[Depth].old);
+	  TakeBackMove(&MovTab[Depth]);  }
 	Found = false;
     if (MovTab[Depth].content == king) {
       Depth++;

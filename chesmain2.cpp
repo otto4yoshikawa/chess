@@ -41,6 +41,8 @@ double WantedTime;
 BOOL GameOver = FALSE;
 char EndGameMessage[80];
 int ComputerColor;
+extern int Depth;
+extern int MoveNo;
 // -------------------------------------------
 
 Graphics::TBitmap *BPawn = new Graphics::TBitmap;
@@ -66,6 +68,7 @@ Graphics::TBitmap *bitmaphd[6][3]; ;
 
 // ttemp=ttemp2= MRook;
 int upsidedown(int z) {
+	 if(V3) return z;
 	return(z & 7) + (0x70 - (z & 0x70));
 }
 // ---------------------------------------------------------------------------
@@ -148,6 +151,7 @@ __fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner) {
 	bitmaphd[5][1] = WKing;
 	MKing->LoadFromFile("KMask.bmp");
 	bitmaphd[5][2] = MKing;
+
 	newkernel = new chessrule();
 	ttemp = 0;
 	ttemp2 = 0;
@@ -155,10 +159,15 @@ __fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner) {
 
 	DoubleBuffered = true;
 	showStatus(newkernel->teban, newkernel->step);
+  	assert(Depth<2000);
+	ResetGame(); // board.cpp
 
+		DoPrintf("223MoveNo=%d Depth=%d",MoveNo,Depth);
+
+		 //	assert(Depth<1000);
 	js = new joseki();
 	assert(js->Openings);
-	ResetGame(); // board.cpp
+		DoPrintf("3MoveNo=%d Depth=%d",MoveNo,Depth);
 	ListBox1->Clear();
 	ListBox1->Items->Add("1 d4 e5");
 	ListBox1->Items->Add("2 d4 e5");
@@ -251,22 +260,17 @@ int GetValidSquare2(TPoint p, int player, bool CheckPiece);
 // -----mose down----------------------------------------------------------------------
 void __fastcall TForm1::onmouse(TObject *Sender, TMouseButton Button,
 	TShiftState Shift, int X, int Y) {
-	int color, type;
+
 	if (movestart)
 		return;
-
+		DoPrintf("Moise down MoveNo=%d Depth=%d",MoveNo,Depth);
 	TPoint point = TPoint(X, Y);
 	int k, n = GetValidSquare2(point, newkernel->teban, true);
 	DoPrintf("mousedwn board  [%d %d] n=%02x", X, Y, n);
 	if (n < 0)
 		return;
 
-	// k=p-piece;
-
-	// DoPrintf("k=%d type=%d color=%d", k, type, color);
-	if (type < 1)
-		return; ;
-	movestart = newkernel->setCurrentP(n);
+	 movestart = newkernel->setCurrentP(n);
 
 }
 
@@ -282,13 +286,15 @@ void __fastcall TForm1::onmoudemove(TObject *Sender, TShiftState Shift, int X,
 	Repaint();
 
 }
+void
+EnterKeyMove(int,MOVETYPE m) ;
 
 void __fastcall TForm1::onmpouseup(TObject *Sender, TMouseButton Button,
 	TShiftState Shift, int X, int Y) {
 	int converttype[] = {
-		6, 3, 5, 4, 2, 1
+	  0,6, 3, 5, 4, 2, 1
 	};
-
+		DoPrintf("MoveNo=%d Depth=%d",MoveNo,Depth);
 	if (!movestart)
 		return;
 	movestart = false;
@@ -301,21 +307,24 @@ void __fastcall TForm1::onmpouseup(TObject *Sender, TMouseButton Button,
 	if (!newkernel->CheckAndPlay(n))
 		DoPrintf("invalid");
 	else {
+	DoPrintf("MoveNo=%d Depth=%d",MoveNo,Depth);
 		MOVE Move = newkernel->record[newkernel->step - 2];
 		MOVETYPE move;
 		int pp = newkernel->board[n]->type;
 		move.old = Move.oldz;
 		move.new1 = Move.newz;
 		move.spe = Move.spe;
+		 PIECETYPE ppp=  converttype[pp];
 
-		move.movpiece = pp;
+		move.movpiece = ppp;
 		if (Move.cap) {
-			move.content = Move.cap->type;
+			move.content = converttype[Move.cap->type];
 		}
-		else
-			move.content = 0;
-		MakeMove(&move);
+		else  	move.content = 0;
 
+		EnterKeyMove(Depth,move )	;
+		MakeMove(&move);
+	  DoPrintf("afterMoveNo=%d Depth=%d",MoveNo,Depth);
 	}
 	showStatus(newkernel->teban, newkernel->step);
 	Repaint();
@@ -331,18 +340,26 @@ int GetValidSquare2(TPoint p, int player, bool CheckPiece) {
 	y = (p.y - basey) / sz;
 	if (x < 0 || x > 7 || y < 0 || y > 7)
 		return-1;
+	if(V2) y=7-y;
 	return 16 * y + x;
 }
 
 // ---------------------------------------------------------------------------
 
 void __fastcall TForm1::Button1Click(TObject *Sender) {
-	DoPrintf("computer play");
+	DoPrintf("computer play moveno=%d ",MoveNo);
 	MOVETYPE move;
 	MOVE Move;
+
+	js->CalcLibNo();
+	DoPrintf("MN=%d",MoveNo);
+//	Depth=0;
+ //	if(LibNo>=0){
 	move = js->FindOpeningMove();
+
 	if (move.new1 < 0x88) {
-		// DoPrintf(" FT= %02x %03x", move.old, move.new1);
+		 DoPrintf(" FT= %02x %03x", move.old, move.new1);
+		 assert(move.new1<0x80);
 		MakeMove(&move);
 		Move.newz = upsidedown(move.new1);
 		Move.oldz = upsidedown(move.old);
@@ -383,16 +400,12 @@ static void cxyp(char c, int *cx, int *cy, char *cp) {
 }
 
 static void xypsearch(int newza, int oldz, char cp, SPE esp) {
-
+	 int indexa=index;
 
 	char newz ,newz1, oldz1;
 	newz=newza;
 	bool capture=false;
 	char pp;
-	newz = (newz & 7) + 16 * (7 - newz / 16); // depend on version
-	if (oldz >= 16)
-		oldz = 16 * (7 - oldz / 16);   // depend on version
-	
 	for (int i = 0; i < newkernel->movelist.size(); i++) {
 		newz1 = newkernel->movelist[i].newz;
 		oldz1 = newkernel->movelist[i].oldz;
@@ -416,17 +429,22 @@ static void xypsearch(int newza, int oldz, char cp, SPE esp) {
 				{moveindexstack[index++] = i;		 return; }
 				}
 		if (oldz < 0 && cp < 0 && newz1 == newz) {
+    if(index>34)
+		DoPrintf("Aoldz1=(%02x %02x %c) IN=(sp=%d oldz=%02x newz=%02x %c) ",
+		oldz1,	newz1,cp, 	newkernel->movelist[i].spe, oldz, newz, pp,cp);
 
 			moveindexstack[index++] = i;  }
 
 		if (oldz < 0 && cp > 0 && cp == pp && newz1 == newz)
 		   {
+
 			moveindexstack[index++] = i;  }
 		if (oldz < 0) 		continue;
 		if (((oldz1 & 0x0f) == oldz || (oldz1 & 0xf0) == oldz)
 			&& cp == pp && newz1 == newz) {
 
 			moveindexstack[index++] = i;
+			 if(newkernel->movelist[i].spe==empassant) return;
 		}
 	}
 }
@@ -436,18 +454,19 @@ bool pushStack(int n, char *str) {
 		return false;
 	DoPrintf("istr=%s", str);
 		newkernel->genmove(newkernel->teban);
+
 	int csp, cx, cy, dummy, cz1,newz;
 	char cp, cap, dummyc;
 	cx = cy = cp = cz1 = -1;
-	// castling
-    if (memcmp(str, "O-O-O", 5) == 0) {
-		newz=(newkernel->teban==1)?0x03:0x73;
+	// queen side castling
+	if (memcmp(str, "O-O-O", 5) == 0) {
+		newz=(newkernel->teban==2)?0x03:0x73;
 		xypsearch(newz, -1, -1, queensidecas);
 		return(n + 1 == index);
 	}
-
+	 // king side castling
 	else if (memcmp(str, "O-O", 3) == 0) {
-			newz=(newkernel->teban==1)?0x06:0x76;
+			newz=(newkernel->teban==2)?0x06:0x76;
 		xypsearch(-1, -1, -1, kingsidecas);
 		return(n + 1 == index);
 	}
@@ -613,7 +632,8 @@ if(0){
 					DoPrintf("n=%d can not move to %s",nn,w);
 				else
 					DoPrintf("n=%d žB–†‚Å‚· %s",nn,w);
-					goto aa;
+					nn=50;
+					return;
 			}
 			int k = moveindexstack[index - 1];
 			newkernel->Play(newkernel->movelist[k]);
@@ -624,7 +644,7 @@ if(0){
 	aa:	//if(nn>15) return ;
 		ListBox1->Items->Add(A);
 
-
+	 //if(nn>18) break;
 	}
 	int k=0;
 		ListBox1->ItemIndex;

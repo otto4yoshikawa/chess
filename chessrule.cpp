@@ -1,5 +1,9 @@
 // ---------------------------------------------------------------------------
+//V1  (ox00 は左上
+//V2 y =7-y
+//V3 emptyboard
 #include"chessrule.h"
+#include<assert.h>
 void DoPrintf(char*szFormat, ...);
 int drtb[] = {
 	1, -1, 0x10, -0x10, 0x11, -0x11, 0x0f, -0x0f,
@@ -11,7 +15,7 @@ bool safespot(xPIECE *p1, xPIECE*p2) {
 //２点を含めてその 間に相手の効きがあるか
 	int z1, z, z2;
 
-	return true;
+	return false;
 }
 
 bool moved(xPIECE *p, vector<MOVE> *record) {
@@ -29,26 +33,26 @@ bool moved(xPIECE *p, vector<MOVE> *record) {
 // -----------------------------------------------------------
 void chessrule::castling(xPIECE *p) {
 	if (moved(p, &record)) 		return;   //動かしたことあり
-	xPIECE *rook;
+	xPIECE *prook;
 	int t = p->t;
-	if(step>24)
-	 t=t;
 	// king side castling
-	int rookz = (t == 1) ? 0x07 : 0x77;
-	rook = board[rookz];
-	if (moved(rook, &record)) 	goto aa;
-	if (!safespot(p, rook))		goto aa;
+	int rookz ;
+	int newz;
+	rookz = (t ==2) ? 0x07 : 0x77;
+	prook = board[rookz];
+	newz= (t ==2) ? 0x06 : 0x76;
+	if (moved(prook, &record)) 	goto aa;
+ //	if (!safespot(p, rook))		goto aa;
+	generate(newz, p, prook, kingsidecas);
 
-	generate(rookz, p, rook, kingsidecas);
-
-	// qeen side  castling
+	// queen side  castling
 aa:
-	rookz = (t == 1) ? 0x00 : 0x70;
-	rook = board[rookz];
-	if (moved(rook, &record))		return;
-	if (!safespot(p, rook)) 		return;
-
-	generate(rookz, p, rook, queensidecas);
+	rookz = (t ==2) ? 0x00 : 0x70;
+	newz= (t ==2) ? 0x02 : 0x72;
+	prook = board[rookz];
+	if (moved(prook, &record))		return;
+   //	if (!safespot(p, rook)) 		return;
+	generate(newz, p, prook, queensidecas);
 }
 
 // --------------------------
@@ -60,14 +64,21 @@ chessrule::chessrule() {
 	PN = 0;
 
 	for (int z = 0; z < 0x80; z++) {
-		if (z & 0x08)
-			continue;
-		board[z] = 0;
+			board[z] = 0;
+			if(V3) 	board[z] = emptyboard;
 	}
-
+   emptyboard->t=0; emptyboard->type=0;
+   if(*VERSION=='1'){
 	PlacePiece(0x04, "K");
 	PlacePiece(0x00, "RNBQ BNR");
 	PlacePiece(0x10, "PPPPPPPP");
+	}
+	else{
+	PlacePiece(0x74, "K");
+	PlacePiece(0x70, "RNBQ BNR");
+	PlacePiece(0x60, "PPPPPPPP") ;
+
+	}
 	stat = 0;
 	teban = 2;
 	// showBoard();
@@ -77,41 +88,51 @@ chessrule::chessrule() {
 void chessrule::Play(MOVE m) {
 	xPIECE *temp, *p = m.p;     //from
 	xPIECE *cap = m.cap;
-	int z3;
-	int rookz,rooknew,kingy,rookxold,rookxnew,kingnewx,oldking;
+	int y2,y,z3;
+	int rooknewz,oldkingz,rookoldz,rookxnew;
 	rookxnew=-1;
 	if (m.spe == kingsidecas) {
-		rookxold=7,rookxnew=5;kingnewx=6;
+	rookxnew=5;
 	 }
 	if( m.spe==queensidecas) {
-		 rookxold=0,rookxnew=3; kingnewx=2;
+		 rookxnew=3;
 	}
 	if(rookxnew>0){  // castling
-		  oldking =(teban==1)?0x04:0x74;
-	 p=board[oldking];
-			kingy=oldking&0x70;
 
-			oldking=p->z;
-			rookz=kingy+rookxold;
-			temp= board[rookz];
-		temp = board[rookz];
-		rooknew=kingy+rookxnew;
-		p->z= kingy+kingnewx;
-		temp->z=rooknew;
-		board[oldking] = 0;
-		board[rookz] = 0;
-		board[p->z]=p;
-		board[rooknew]=temp;
-		DoPrintf("cas rookz=%02x rooknew=%02x ",rookz,rooknew);
+ //	DoPrintf("m.new=%03x m.old=%02x p->z=%02x",m.newz,m.oldz,m.p->z);
+			p=m.p ;
+			rookoldz=m.cap->z;
+			rooknewz = (rookoldz&0x70)+ rookxnew;
+
+
+		board[m.newz] = p;
+		p->z = m.newz;
+		board[m.oldz]=emptyboard;
+
+		temp=m.cap;
+	//	DoPrintf("cast rookz=%02x rooknew=%02x rook=%c",
+	//	rookoldz,rooknewz,temp->rank);
+
+		board[temp->z] = emptyboard;   //old rook
+		temp->z=	rooknewz;
+		board[rooknewz]=temp;         //
+
+
+		//rook display
 	   temp->showx = basex + (sz * (temp->z & 7));
-	   temp->showy = basey + (temp->z) / 16 * sz;
+	   y=(temp->z)/16;
+	   y=7-y;
+
+		temp->showy = basey + y  * sz;
 	}
 
 	else {
 		DoPrintf("from %02x ==> %02x",m.oldz,m.newz);
 		board[m.newz] = p;
 		p->z = m.newz;
-		board[m.oldz] = 0;
+		if(V3)			board[m.oldz] = emptyboard;
+		else board[m.oldz] = 0;
+
 		if (cap)cap->t = 0;    //	board[cap->z] = 0;
 		if(m.spe==2) board[m.cap->z]=0;
 		if (m.spe ==queening) p->rank += ('Q' - 'P');
@@ -119,7 +140,9 @@ void chessrule::Play(MOVE m) {
 	}
 	// p->z=m.newz;
 	p->showx = basex + (sz * (p->z & 7));
-	p->showy = basey + (p->z) / 16 * sz;
+    	y2=(p->z) / 16;
+		y2=7-y2;
+	p->showy = basey + y2 * sz;
 	record.push_back(m);
 	step++;
 	teban = 3 - teban;
@@ -128,7 +151,7 @@ void chessrule::Play(MOVE m) {
 void chessrule::Back() {
 
 	int rookz,rooknew,kingy,rookxold,rookxnew,kingnewx,oldking;
-	int newking;
+	int y2,newking;
 	rookxnew=-1;
 	step--;
 	teban = 3 - teban;
@@ -161,7 +184,9 @@ void chessrule::Back() {
 		board[rooknew]= temp;
 		DoPrintf("back cas %02x %02x %02x",rookz,rooknew,newking);
 		temp->showx = basex + (sz * (temp->z & 7));
-		temp->showy = basey + (temp->z) / 16 * sz;
+		y2=(temp->z) / 16;
+		if(V2) y2=7-y2;
+		temp->showy = basey +y2  * sz;
 
 	}
 
@@ -179,7 +204,9 @@ void chessrule::Back() {
 	}
 	p->z = m.oldz;
 	p->showx = basex + (sz * (p->z & 7));
-	p->showy = basey + (p->z) / 16 * sz;
+		y2=(p->z) / 16;
+		if(V2) y2=7-y2;
+	p->showy = basey + y2 * sz;
 
 }
 
@@ -196,10 +223,12 @@ bool chessrule::CheckAndPlay(int to) {
 	}
 	movelist.clear();
 	message = "no move";
-	p1 = board[z1];
+	p1 = board[z1]; y1=z1/16;
+	if(*VERSION>'1') y1=7-y1;
 	DoPrintf("rank=%c z=%02x", p1->rank, p1->z);
 	 currentP->showx=  basex + sz * (z1 % 8);
-	  currentP->showy=  basey + sz * (z1 /16);
+
+	 currentP->showy=  basey + sz * y1;    //$$$$$$
 	// p2=board[y2][x2];
 	if (p1->t != teban) {
 		message = "不正な駒";
@@ -209,7 +238,8 @@ bool chessrule::CheckAndPlay(int to) {
 
 	DoPrintf("movelist= %d", movelist.size());
 	for (ii = 0; ii < movelist.size(); ii++) {
-	DoPrintf("%02x %03x==>%02x %02x",movelist[ii].oldz ,z1, movelist[ii].newz ,z2);
+  //	DoPrintf("%c %02x %02x==>%02x %02x",movelist[ii].p->rank,
+  //	movelist[ii].oldz ,z1, movelist[ii].newz ,z2);
 		if ((movelist[ii].oldz == z1) && (movelist[ii].newz == z2))
 			break;
 		}
@@ -243,12 +273,15 @@ bool chessrule::CheckAndPlay(int to) {
 
 char * chessrule::showBoard() {
 	char *p = display;
-	int x, y;
+	int x, y,y2;
 	for (y = 0; y < 8; y++) {
 		*p++ = ' ';
 		*p++ = ' ';
+		y2=y;
+		if(V2) y2=7-y2;
 		for (x = 0; x < 8; x++) {
-			*p++ = board[x + 16 * y]->rank;
+		if( board[x + 16 * y2]==0) *p++='#';
+		 else *p++ = board[x + 16 * y2]->rank;
 		}
 		*p++ = '\n';
 
@@ -276,18 +309,22 @@ bool chessrule::Checkmate(int t) {
 void chessrule::PlacePiece(int startz, char *p) {
 	int t, z, len = strlen(p);
 	int y = startz & 0xf0;
-	int k, dz = 0x70 - y * 2;
-	// cout <<len<< " "<<startz<<" s="<<p<<endl;
+	int k, dz;
+
+	dz = 0x70 - y * 2;
+	if(V2)
+	if(y==0x70)	dz=-(0x70); else dz=-(0x50);
+  //	DoPrintf ("vr=%c %02x %02x %s ",*VERSION,startz,dz,p);
 	for (int i = 0; i < len; i++, startz++) {
 
 		char c = *p++;
 		for (t = 1; t <= 2; t++) {
 			z = startz;
-			if (t == 2)
-				z = z + dz;
-			if (t == 2)
+			if (t == 2)    //$$$$$$$$$$$$
+				{z = z + dz; z&=0x77;    }
+			if (t == 1)
 				c |= 0x20;
-			// cout<<"t="<<t<<" PN="<<PN<<" c="<<c;
+
 			if (c == ' ')
 				continue;
 			for (k = 1; k < 8; k++)
@@ -299,7 +336,9 @@ void chessrule::PlacePiece(int startz, char *p) {
 			piece[PN].t = t;
 			piece[PN].type = k;
 			piece[PN].showx = basex + sz * (z % 8);
-			piece[PN].showy = basey + sz * (z / 16);
+			y=z/16;   	if(V2)y=7-y;
+			piece[PN].showy = basey + sz * y;
+
 			board[z] = piece + PN;
 			PN++;
 		}
@@ -360,7 +399,7 @@ bool chessrule::Stealmate() {
 void chessrule::generate(int z, xPIECE *p, xPIECE *cap, SPE spe) {
 	MOVE m;
 
- //if(z==0x33) DoPrintf("bz =%02x %c %02x",p->z,p->rank,z);
+ //if(V3) DoPrintf("old =%02x %c new=%02x",p->z,p->rank,z);
 	m.newz = z;
 	m.oldz = p->z;
 	m.p = p;
@@ -397,12 +436,13 @@ bool chessrule::genmove(int t) {
 			break;
 		case 'k':
 			gensearch2(0, 8, 1, p->z);
-		  	castling(p);
+			castling(p);
 			break;
 
 		}
 
 	}
+	DoPrintf("gensize=%d",movelist.size());
 	return movelist.size() > 0;
 
 }
@@ -439,24 +479,38 @@ void chessrule::gensearch2(int dirstart, int dirend, int count, int startz) {
 
 void chessrule::pawnsearch(int oldz, int t) {
 	xPIECE *p, *q, *cap;
+		xPIECE *temp;
 	// １マス前進
-	// cout<<"pawn";]\]\\\
+	int col,newz;
 
-   //	DoPrintf("enter parn search");
-	int newz;
-	int dz = (t == 1) ? 0x10 :- 0x10;
-	int originaly = (t == 1) ? 0x10 : 0x60;
+	int dz ,newz1;
+	int originaly;
+
+	 dz = (t == 2) ? 0x10 :- 0x10;
+	 originaly = (t == 2) ? 0x10 : 0x60;
 	newz =oldz+ dz;
+
+	temp=emptyboard;
 
 	if (newz & 0x80)  		return;
 	// cout<<"pawn "<<hex<<newz<<endl;
 	p = board[oldz];
-	// DoPrintf("dz=%02x newz=%02x old=%02x",dz,newz,p->z);
-	if (board[newz] == 0) {
+	temp = board[newz] ;
+			 col=temp->t;
+
+
+	if (col == 0) {
 		generate(newz, p, 0, 0);
 		if ((oldz & 0xf0) == originaly) {
+			// 2マス前進
 			newz = newz+ dz;
-			if (board[newz] == 0) {
+
+
+	 temp = board[newz] ;
+			 col=temp->t;
+
+
+			if (col== 0) {
 				generate(newz, p, 0, 0);
 			}
 		}
@@ -474,25 +528,28 @@ void chessrule::pawnsearch(int oldz, int t) {
   //			DoPrintf ("Pawn tkw%02x %02x q=%02x ", newz,p->z, q->z);
 
 			generate(newz, p, q, 0);   }
-	}
+		 if(q->t) continue;
 	// empassant
-	int midy = (t == 0) ? 0x40 : 0x30;
-	if ((oldz & 0xf0) != midy)
+	int midy = (t == 1) ? 0x50 : 0x40;
+	if ((oldz & 0x70) != midy)
 		return;
+
+   //	  assert(p->z==oldz);
 	if(step<3) return;
 	MOVE *mm = &record[step - 2];
 	q = mm->p;
-   //	DoPrintf("mm %02x %02x rank=%c",mm->newz,mm->oldz,mm->p->rank);
+  //	DoPrintf("i=%d oldz= %02x %02x mm %02x %02x rank=%c",i, oldz,newz,
+  //	mm->newz,mm->oldz,mm->p->rank);
 
 	if (!(q->rank == 'p' || q->rank =='P'))return;  //pawn に限る
 	if (abs(mm->oldz/16 - mm->newz / 16) != 2)	return;
 	if (abs((mm->oldz & 0x07)-(oldz&0x0f)) != 1) return;
 	newz=(mm->newz+mm->oldz)/2;//中点
-  //	DoPrintf ("emp %02x %02x q=%02x ", newz,p->z, q->z);
+ //	DoPrintf ("emp %02x %02x q=%02x ", newz,p->z, q->z);
 
 
 	generate(newz, p, q, empassant);
-
+	 }
 }
 
 
@@ -501,7 +558,8 @@ bool chessrule::getxyrt(int x, int y, int *showx, int *showy, int *col,
 	int *type) {
 	int z = y * 16 + x;
 	xPIECE *p = board[z];
-	if (p == 0)	return false;
+	if(V3){p->t=p->t;}
+	else if (p == 0)	return false;
 	*showx = p->showx;
 	*showy = p->showy;
 	*type = p->type;
@@ -512,8 +570,10 @@ bool chessrule::getxyrt(int x, int y, int *showx, int *showy, int *col,
 // ---------------------------------------------------------------------------
 bool chessrule::setCurrentP(int z) {
 	currentP = board[z];
-	if (board[z] == 0)
-		return false;
+	if(V3){
+		if (board[z] == emptyboard) 		return false ;
+	}
+	else 	if (board[z] == 0) 		return false;
 	return(currentP->t == teban);
 };
 
