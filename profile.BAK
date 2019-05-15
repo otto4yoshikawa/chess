@@ -1,0 +1,63 @@
+
+#include <stdio.h>
+#include <tchar.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <windows.h>
+ 
+ 
+ 
+/*
+    iniファイルへ書き込む
+*/
+int _tmain
+(
+      int argc
+    , _TCHAR* argv[]
+)
+{
+    /*
+        std::wcoutのロケールを設定
+        　これを設定するだけで、std::wcoutで日本語が表示される
+        　ようになります。
+    */
+    std::wcout.imbue( std::locale( "", std::locale::ctype ) );
+ 
+    // iniファイルパス
+    std::wstring strInfilePath = L".\\TestUnicode.ini";
+ char *q=".\\TestUnicode.ini";
+ 
+    /*
+        iniファイル書き込み
+    */
+    if (!WritePrivateProfileString( 
+  "SECTION", "key_str", "テスト文字列", q ) ){
+ 
+        std::wcout << L"iniファイルへの書き込みに失敗しました。" << std::endl;
+    }
+    else {
+ 
+        std::wcout << L"iniファイルへ書き込みました。" << std::endl;
+    }
+ 
+ 
+    /*
+        iniファイル書き込み(数値)
+     読み出しではも、GetProfileInt()が存在しますが、WritePrivateProfileIntは
+        存在しないので、数値は文字列化して書き込みます。
+    */
+    if ( 0 == ::WritePrivateProfileString( "SECTION", "key_value", "1234",
+     strInfilePath.c_str() ) ) {
+ 
+        std::wcout << L"iniファイルへの書き込みに失敗しました。" << std::endl;
+    }
+    else {
+ 
+        std::wcout << L"iniファイルへ書き込みました。" << std::endl;
+    }
+ 
+    // 正常終了
+    return( 0 );
+}
+

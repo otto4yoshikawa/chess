@@ -57,40 +57,46 @@
 			<TASM_Debugging>None</TASM_Debugging>
 		</PropertyGroup>
 		<ItemGroup>
-			<CppCompile Include="chess2.cpp">
-				<BuildOrder>0</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="chessrule.cpp">
-				<BuildOrder>5</BuildOrder>
-			</CppCompile>
-			<ResFiles Include="chess2.res">
-				<BuildOrder>1</BuildOrder>
-			</ResFiles>
-			<None Include="joseki.h">
-				<BuildOrder>9</BuildOrder>
+			<None Include="board.h">
+				<BuildOrder>10</BuildOrder>
 			</None>
-			<CppCompile Include="evalu.cpp">
-				<BuildOrder>6</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="genmove2.cpp">
-				<BuildOrder>5</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="board.cpp">
-				<BuildOrder>7</BuildOrder>
-			</CppCompile>
-			<CppCompile Include="joseki.cpp">
-				<BuildOrder>8</BuildOrder>
-			</CppCompile>
 			<CppCompile Include="chesmain2.cpp">
 				<Form>Form1</Form>
 				<DependentOn>chesmain2.h</DependentOn>
 				<BuildOrder>2</BuildOrder>
 			</CppCompile>
-			<CppCompile Include="timelib.cpp">
+			<CppCompile Include="joseki.cpp">
+				<BuildOrder>8</BuildOrder>
+			</CppCompile>
+			<None Include="timelib2.h">
+				<BuildOrder>13</BuildOrder>
+			</None>
+			<CppCompile Include="timelib2.cpp">
+				<BuildOrder>12</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="search2.cpp">
+				<BuildOrder>11</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="board.cpp">
 				<BuildOrder>7</BuildOrder>
 			</CppCompile>
-			<None Include="board.h">
-				<BuildOrder>10</BuildOrder>
+			<ResFiles Include="chess2.res">
+				<BuildOrder>1</BuildOrder>
+			</ResFiles>
+			<CppCompile Include="chessrule.cpp">
+				<BuildOrder>5</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="chess2.cpp">
+				<BuildOrder>0</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="genmove2.cpp">
+				<BuildOrder>5</BuildOrder>
+			</CppCompile>
+			<CppCompile Include="evalu.cpp">
+				<BuildOrder>6</BuildOrder>
+			</CppCompile>
+			<None Include="joseki.h">
+				<BuildOrder>9</BuildOrder>
 			</None>
 			<FormResources Include="chesmain2.dfm"/>
 			<BuildConfiguration Include="Base">

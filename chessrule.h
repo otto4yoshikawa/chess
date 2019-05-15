@@ -3,7 +3,7 @@
 #include<vector>
 #include<iostream>
 using namespace std;
-#define VERSION "3.1"
+#define VERSION "5.1"
 #define V2 *VERSION>'1'
 #define V3 *VERSION>'2'
 #define V4 *VERSION>'4'
@@ -12,12 +12,12 @@ using namespace std;
 
 const MATEVALUE  = 0x7C80;
 const DEPTHFACTOR  = 0x80;
-const COMMANDLENGTH  = 10;
-const MAXLEN         = 64;
+
+
 const SQUARE_SIZE = 36;
 const MAXBDSIZE = 8;
 const MYFRAMESIZE = 3;
-enum SPE {normal,kingsidecas,queensidecas,
+enum SPE {normalspe,kingsidecas,queensidecas,
 empassant,queening,take,check};
 const BACK  =  -104;
 const MAXPLY  =  23;
@@ -86,16 +86,18 @@ typedef struct {
   STR6 s;
 } PICTURETYPE[3];
 
+ #define MAXINT 32000
 
-
-typedef char MAXSTRING[MAXLEN];
+typedef char MAXSTRING[100];
 
 struct PIECETAB {
   SQUARETYPE isquare;
   PIECETYPE ipiece;
 };
+typedef MOVETYPE LINETYPE[MAXPLY + 1]; // Principal variation type
 
 
+#define COMMANDLENGTH 100
 enum CASTDIRTYPE {zero, lng, shrt};
 typedef CASTDIRTYPE CASTTYPE;
 typedef unsigned char FIFTYTYPE;
@@ -148,9 +150,10 @@ bool getxyrt(int x,int y,int *showx,int *showy, int *col,int *type) ;
 bool setCurrentP(int);
 void moveCurrent(int x,int y);
 bool Translate(char *in,MMM *);
+bool safespot(xPIECE *p1, xPIECE*p2);
 //void empassant();
 void castling(xPIECE *);
-vector<MOVE> record,movelist;
+vector<MOVE> record2,record,movelist;
 int step,teban,stat,PN;
 char *message;
 char display[200];

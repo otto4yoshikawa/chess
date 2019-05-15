@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 694
+  ClientHeight = 725
   ClientWidth = 998
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,10 +19,10 @@ object Form1: TForm1
   PixelsPerInch = 96
   TextHeight = 13
   object Memo1: TMemo
-    Left = 736
-    Top = 352
+    Left = 680
+    Top = 357
     Width = 233
-    Height = 281
+    Height = 198
     Lines.Strings = (
       'Memo1')
     TabOrder = 0
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 675
+    Top = 706
     Width = 998
     Height = 19
     Panels = <
@@ -42,6 +42,12 @@ object Form1: TForm1
       end
       item
         Width = 50
+      end
+      item
+        Width = 60
+      end
+      item
+        Width = 100
       end>
   end
   object Button1: TButton
@@ -50,14 +56,14 @@ object Form1: TForm1
     Width = 107
     Height = 25
     Caption = 'computer play'
-    TabOrder = 2
+    TabOrder = 3
     OnClick = Button1Click
   end
   object ListBox1: TListBox
-    Left = 736
+    Left = 696
     Top = 31
     Width = 136
-    Height = 282
+    Height = 114
     ItemHeight = 13
     Items.Strings = (
       '11111'
@@ -87,10 +93,20 @@ object Form1: TForm1
       '3')
     MultiSelect = True
     ScrollWidth = 4
-    TabOrder = 3
-    OnClick = listbox1click
-    OnDblClick = doubleclick
+    TabOrder = 4
     OnEnter = onenter
+  end
+  object StringGrid1: TStringGrid
+    Left = 680
+    Top = 151
+    Width = 185
+    Height = 200
+    ColCount = 3
+    FixedColor = clMedGray
+    RowCount = 45
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected]
+    TabOrder = 1
+    OnSelectCell = cellselected
   end
   object MainMenu1: TMainMenu
     Left = 440
@@ -104,10 +120,26 @@ object Form1: TForm1
     end
     object game1: TMenuItem
       Caption = 'game'
+      object newgame1: TMenuItem
+        Caption = 'newgame'
+        OnClick = newgame1Click
+      end
+      object undo1: TMenuItem
+        Caption = 'undo'
+        OnClick = undo1Click
+      end
+      object resign1: TMenuItem
+        Caption = 'resign'
+      end
     end
   end
   object OpenDialog1: TOpenDialog
     Left = 496
     Top = 64
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    Left = 624
+    Top = 208
   end
 end

@@ -1,0 +1,39 @@
+//---------------------------------------------------------------------------
+
+#pragma hdrstop
+#include <fstream>
+#include <iostream>
+//-----------------------------------------
+ using namespace std;
+#pragma argsused
+unsigned char *Openings;
+int main(int argc, char* argv[])
+{
+  int i,LibNo,Depth;
+  char *head="         +0 +1 +2 +3 +4 +5 +6 +7 +8 +9 +A +B +C +D +E +F  ";
+  char w[100];
+ const char *libfilename = "../opening.mvs";
+  ifstream fin(libfilename, ios::in | ios::binary);
+
+  if (!fin) {
+   cout<<"OPENING.LIBj‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ", "´×°";
+	Openings = new unsigned char;
+    *Openings = 0;
+	return 0;
+  }
+  Openings = new unsigned char[32000];
+  fin.read(Openings, 32000);
+  fin.close();
+  *Openings = 0xFF;
+   LibNo=1;
+   //------------------
+   for(i=0;i<0x400;i++){
+   if((i%0x200)==0) cout<<head<<endl;
+   if( (i%0x10)==0) {sprintf(w,"%08x",i);}
+	sprintf(w+8+3*(i&0x0f)," %02x",Openings[i]);
+   if( (i%0x10)==15) cout<<w<<endl;
+	}
+
+	return 0;
+}
+//---------------------------------------------------------------------------

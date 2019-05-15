@@ -1,0 +1,9 @@
+ #include"genmove3.h"
+
+  extern short MovTab[];
+ void MakeMove( short){}
+  void TakeBackMove(){}
+  int  InitMovGen(short *){}
+  void initBoardandPiece(){}
+
+

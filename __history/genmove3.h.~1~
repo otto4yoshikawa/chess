@@ -1,0 +1,4 @@
+
+  void MakeMlve( int);
+  void TakeBackMove(int);
+  int  InitMovGen(short *);

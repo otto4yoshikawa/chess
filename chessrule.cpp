@@ -9,13 +9,30 @@ int drtb[] = {
 	1, -1, 0x10, -0x10, 0x11, -0x11, 0x0f, -0x0f,
 	0x0E, -0x0E, 0x12, -0x12, 0x1f, -0x1f, 0x21, -0x21};
 
+extern vector<MOVE> record2;
+
+bool chessrule:: safespot(xPIECE *p1, xPIECE*p2) {
+//‚Q“_‚Æ‚»‚Ì ŠÔ‚É‘ŠŽè‚ÌŒø‚«‚ª‚ ‚é‚©
+	int z1, z, z2 ,dz,n;
+	int opponent = 3 - teban;
+	int i, start;
+	z1=p1->z;z2=p2->z  ;
+	n=abs(z1-z2);
+	dz= (z2-z1)/n;
+
+	for(z=z1;n>=0;z+=dz,n--){     //target
+	if (!(z==p1->z ||z==p2->z) )
+	if(board[z]!=emptyboard) return false;
+	start = (opponent == 1) ? 0 : 1;
+	for (i = start; i < 32; i++, i++) {
+		if (piece[i].t == 0)		continue;
+		if (Attack(z, &piece[i]))  return false;;
+
+	}
+	}//target
+	return true;
 
 
-bool safespot(xPIECE *p1, xPIECE*p2) {
-//‚Q“_‚ðŠÜ‚ß‚Ä‚»‚Ì ŠÔ‚É‘ŠŽè‚ÌŒø‚«‚ª‚ ‚é‚©
-	int z1, z, z2;
-
-	return false;
 }
 
 bool moved(xPIECE *p, vector<MOVE> *record) {
@@ -42,7 +59,7 @@ void chessrule::castling(xPIECE *p) {
 	prook = board[rookz];
 	newz= (t ==2) ? 0x06 : 0x76;
 	if (moved(prook, &record)) 	goto aa;
- //	if (!safespot(p, rook))		goto aa;
+	if (!safespot(p, prook))		goto aa;
 	generate(newz, p, prook, kingsidecas);
 
 	// queen side  castling
@@ -51,7 +68,7 @@ aa:
 	newz= (t ==2) ? 0x02 : 0x72;
 	prook = board[rookz];
 	if (moved(prook, &record))		return;
-   //	if (!safespot(p, rook)) 		return;
+	if (!safespot(p, prook)) 		return;
 	generate(newz, p, prook, queensidecas);
 }
 
@@ -64,10 +81,13 @@ chessrule::chessrule() {
 	PN = 0;
 
 	for (int z = 0; z < 0x80; z++) {
-			board[z] = 0;
-			if(V3) 	board[z] = emptyboard;
+
+			board[z] = emptyboard;
 	}
-   emptyboard->t=0; emptyboard->type=0;
+   emptyboard->t=0;
+   emptyboard->z=0;
+
+   emptyboard->type=0;
    if(*VERSION=='1'){
 	PlacePiece(0x04, "K");
 	PlacePiece(0x00, "RNBQ BNR");
@@ -83,25 +103,35 @@ chessrule::chessrule() {
 	teban = 2;
 	// showBoard();
 }
-
+//-----------------------------------
+// Play                      m.cap can be omitted
 // ----------------------------------
 void chessrule::Play(MOVE m) {
 	xPIECE *temp, *p = m.p;     //from
 	xPIECE *cap = m.cap;
+	 int newz=m.newz;
 	int y2,y,z3;
-	int rooknewz,oldkingz,rookoldz,rookxnew;
+	int capa='$' ;
+	int oldz,rooknewz,oldkingz,rookoldz,rookxnew;
 	rookxnew=-1;
 	if (m.spe == kingsidecas) {
-	rookxnew=5;
+	rookxnew=5;   rookoldz=7;
 	 }
 	if( m.spe==queensidecas) {
-		 rookxnew=3;
+		 rookxnew=3;  	rookoldz=0;
+	}
+	if( m.spe==empassant) {
+		int epsquare = (m.newz & 7) + (m.oldz & 0x70); // ’Ê‰ß•ßŠl
+		temp=board[epsquare];temp->t=0;
+		board[epsquare] = emptyboard;
 	}
 	if(rookxnew>0){  // castling
+			 oldz= 4 + newz&0x70;
 
- //	DoPrintf("m.new=%03x m.old=%02x p->z=%02x",m.newz,m.oldz,m.p->z);
+  //	DoPrintf("m.new=%03x m.old=%02x p->z=%02x",m.newz,m.oldz,m.p->z);
 			p=m.p ;
-			rookoldz=m.cap->z;
+			rookoldz=    m.cap->z;    // +=newz&0x70;
+
 			rooknewz = (rookoldz&0x70)+ rookxnew;
 
 
@@ -127,36 +157,54 @@ void chessrule::Play(MOVE m) {
 	}
 
 	else {
-		DoPrintf("from %02x ==> %02x",m.oldz,m.newz);
+	DoPrintf("from %02x ==> %02x ",m.oldz,m.newz);
+	temp=	board[m.newz];
+		board[m.oldz] = emptyboard;
 		board[m.newz] = p;
 		p->z = m.newz;
-		if(V3)			board[m.oldz] = emptyboard;
-		else board[m.oldz] = 0;
+	 if(temp->t>0){
 
-		if (cap)cap->t = 0;    //	board[cap->z] = 0;
-		if(m.spe==2) board[m.cap->z]=0;
+	  DoPrintf("%02x",m.newz);
+		 capa= temp->rank;
+		 temp->t=0;
+
+		 }
+
 		if (m.spe ==queening) p->rank += ('Q' - 'P');
-
 	}
+		;
+
+		//	assert(capa!='u');
+
+		DoPrintf("from %02x ==> %02x P=%c cap=%c "
+			,m.oldz,m.newz,p->rank,capa);
+
+
 	// p->z=m.newz;
 	p->showx = basex + (sz * (p->z & 7));
     	y2=(p->z) / 16;
 		y2=7-y2;
 	p->showy = basey + y2 * sz;
 	record.push_back(m);
+  //	record2.push_back(m);
+
+	assert( record.size()==step);
 	step++;
 	teban = 3 - teban;
 }
-
+//--------------------------
+//    Back
+//-------------------------
 void chessrule::Back() {
 
 	int rookz,rooknew,kingy,rookxold,rookxnew,kingnewx,oldking;
 	int y2,newking;
 	rookxnew=-1;
+	if(step==78)
+	step=step;
 	step--;
 	teban = 3 - teban;
 	MOVE m = record[step-1];
-
 	if (m.spe == kingsidecas) {
 		rookxold=7,rookxnew=5;kingnewx=6;
 	 }
@@ -167,9 +215,12 @@ void chessrule::Back() {
 	xPIECE *temp,*p = m.p;
 	xPIECE *cap = m.cap;
 
-	if(rookxnew>0){
+	DoPrintf("Back step=%d%02x %02x",step,m.newz,m.oldz);
+
+	if(rookxnew>=0){
 	  //castling
-		oldking =(teban==1)?0x04:0x74;  //depend on  vwesion
+
+		oldking =(teban==2)?0x04:0x74;  //depend on  vwesion
 		kingy=oldking&0x70;
 		newking= p->z;
 		rookz=kingy+rookxnew;
@@ -177,12 +228,12 @@ void chessrule::Back() {
 		rooknew=kingy+rookxnew;
 		p->z= oldking;
 		temp->z=kingy+rookxold;
-		board[newking] = 0;
-		board[rookz] = 0;
+		board[newking] = emptyboard;
+		board[rookz] = emptyboard;
 		board[oldking]=p;
 		rooknew= rookxold+kingy;
 		board[rooknew]= temp;
-		DoPrintf("back cas %02x %02x %02x",rookz,rooknew,newking);
+	 	DoPrintf("back cas %02x %02x %02x",rookz,rooknew,newking);
 		temp->showx = basex + (sz * (temp->z & 7));
 		y2=(temp->z) / 16;
 		if(V2) y2=7-y2;
@@ -191,21 +242,22 @@ void chessrule::Back() {
 	}
 
 	else {
+	   //	 temp= 	board[m.oldz]:
+
 		board[m.oldz] = p;
-		board[m.newz] = 0;
+		board[m.newz] = emptyboard;
 		if (cap) {
 			cap->t = 3 - teban;
 			board[m.newz] = cap;
-			if (m.spe == 2)
+			if (m.spe == empassant)
 				board[cap->z] = cap;
 		}
-		if (m.spe == 3)
-			p->rank -= ('Q' - 'P');
+		if (m.spe == queening)	p->rank -= ('Q' - 'P');
 	}
 	p->z = m.oldz;
 	p->showx = basex + (sz * (p->z & 7));
 		y2=(p->z) / 16;
-		if(V2) y2=7-y2;
+		y2=7-y2;
 	p->showy = basey + y2 * sz;
 
 }
@@ -294,7 +346,7 @@ bool chessrule::Checkmate(int t) {
 	int opponent = 3 - t;
 	int targetz = piece[t - 1].z;
 	int i, start;
-	start = (opponent == 1) ? 0 : 1;
+	start = (opponent == 1) ? 0 : 32;
 	for (i = start; i < 32; i++, i++) {
 
 		if (piece[i].t == 0)		continue;
@@ -399,11 +451,12 @@ bool chessrule::Stealmate() {
 void chessrule::generate(int z, xPIECE *p, xPIECE *cap, SPE spe) {
 	MOVE m;
 
- //if(V3) DoPrintf("old =%02x %c new=%02x",p->z,p->rank,z);
+//if(step>=30) DoPrintf("old =%02x %c new=%02x",p->z,p->rank,z);
 	m.newz = z;
 	m.oldz = p->z;
 	m.p = p;
 	m.cap = cap;
+	if(cap)DoPrintf("z=%02x p->z=%02x %02x", z,p->z,cap->z);
 	m.spe = spe;
 	movelist.push_back(m);
 }
@@ -426,6 +479,7 @@ bool chessrule::genmove(int t) {
 			gensearch2(0, 4, 7, p->z);
 			break;
 		case 'n':
+	 //	if(step>17) DoPrintf("knight %02x",p->z);
 			gensearch2(8, 16, 1, p->z);
 			break;
 		case 'b':
@@ -468,8 +522,8 @@ void chessrule::gensearch2(int dirstart, int dirend, int count, int startz) {
 			// cout<<dec<<" i="<<i<<" j="<<j<<" t="<<t<<" z="<<hex<<z<<endl;
 
 			if (isMyColor(z, teban, board[z])) 		break;
-
-			generate(z, p,board[z] , 0);
+			   q=board[z];if(q->t==0  ) q=0;
+			generate(z, p,q, 0);
 			if (isMyColor(z, 3 - teban, board[z]))
 				break;
 		}
@@ -523,32 +577,36 @@ void chessrule::pawnsearch(int oldz, int t) {
 
 		if (newz & 0x88)	continue;
 		q = board[newz];
+	if(q!=emptyboard){
 	  //	DoPrintf("newz=%02x",newz);
 		if (q  && ( q->t) == (3 - teban)) {
   //			DoPrintf ("Pawn tkw%02x %02x q=%02x ", newz,p->z, q->z);
 
 			generate(newz, p, q, 0);   }
-		 if(q->t) continue;
+		// if(q->t) continue;
+		 }
+   else{
+
 	// empassant
 	int midy = (t == 1) ? 0x50 : 0x40;
-	if ((oldz & 0x70) != midy)
-		return;
+	if ((oldz & 0x70) != midy) 		continue;
 
    //	  assert(p->z==oldz);
 	if(step<3) return;
 	MOVE *mm = &record[step - 2];
 	q = mm->p;
-  //	DoPrintf("i=%d oldz= %02x %02x mm %02x %02x rank=%c",i, oldz,newz,
-  //	mm->newz,mm->oldz,mm->p->rank);
+   //	DoPrintf("i=%d oldz= %02x %02x mm %02x %02x rank=%c",i, oldz,newz,
+	//mm->newz,mm->oldz,mm->p->rank);
 
 	if (!(q->rank == 'p' || q->rank =='P'))return;  //pawn ‚ÉŒÀ‚é
-	if (abs(mm->oldz/16 - mm->newz / 16) != 2)	return;
-	if (abs((mm->oldz & 0x07)-(oldz&0x0f)) != 1) return;
+	if (abs(mm->oldz/16 - mm->newz / 16) != 2)	continue;
+	if (abs((mm->oldz & 0x07)-(oldz&0x0f)) != 1) continue;;
 	newz=(mm->newz+mm->oldz)/2;//’†“_
- //	DoPrintf ("emp %02x %02x q=%02x ", newz,p->z, q->z);
+  //	DoPrintf ("emp %02x %02x q=%02x ", newz,p->z, q->z);
 
 
 	generate(newz, p, q, empassant);
+	 }
 	 }
 }
 

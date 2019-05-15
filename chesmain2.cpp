@@ -31,18 +31,59 @@ int BORDERSIZE;
 const BORDERYEXTRA = 4; // ‚SƒsƒNƒZƒ‹‚ÌŒ„ŠÔ
 short INFOXSIZE, INFOYSIZE;
 bool SoundOn;
+bool doLoadFile(AnsiString FileName);
+#include <Registry.hpp>
+void WriteManager(AnsiString Key, AnsiString V) {
+	AnsiString S, KeyS;
+	int i;
+	TRegistry *Reg;
+	AnsiString KeyName = "\\Software\\monte";
+	try {
+
+		Reg = new TRegistry(KEY_WRITE);
+		Reg->RootKey = HKEY_CURRENT_USER;
+		Reg->OpenKey(KeyName, true);
+
+		Reg->WriteString(Key, V);
+	}
+
+	__finally {
+		delete Reg;
+	}
+}
+
+AnsiString ReadManager(AnsiString Key) {
+
+	AnsiString V="none";
+	TRegistry *Reg;
+	AnsiString KeyName = "\\Software\\monte";
+	try {
+		Reg = new TRegistry(KEY_READ);
+		Reg->RootKey = HKEY_CURRENT_USER;
+		Reg->OpenKey(KeyName, false);
+
+		V = Reg->ReadString(Key);
+	}
+
+	__finally {
+		delete Reg;
+	}
+	return V;
+}
 
 // ----------samll.cpp----------------------------
 // VETYPE  ZeroMove = { 8, 8, 0, empty, empty };
 // MOVETYPE KeyMove;
-int RunColor;
-BOOL Analysis, Opan;
+//int RunColor;
+bool Analysis, Opan;
 double WantedTime;
-BOOL GameOver = FALSE;
+//BOOL GameOver = FALSE;
 char EndGameMessage[80];
-int ComputerColor;
-extern int Depth;
+//int ComputerColor;
+extern DEPTHTYPE Depth;
+bool OnSolving;
 extern int MoveNo;
+long MyTime,MyTime1,RemainTime[2];
 // -------------------------------------------
 
 Graphics::TBitmap *BPawn = new Graphics::TBitmap;
@@ -71,6 +112,19 @@ int upsidedown(int z) {
 	 if(V3) return z;
 	return(z & 7) + (0x70 - (z & 0x70));
 }
+bool blink=0;
+void ShowTime(int msec){
+	RemainTime[newkernel->teban-1]-=msec;
+	blink^=1;
+	for(int i=0;i<2;i++){
+   char w[18];
+   int sec= RemainTime[i]/1000;
+	bool blink1=(i==newkernel->teban-1)?blink:true;
+   sprintf(w,"[%02d%c%02d]",sec/60,(blink1)?':':' ',sec%60);
+   Form1->StatusBar1->Panels->Items[3+i]->Text=w;
+   }
+
+}
 // ---------------------------------------------------------------------------
 void FindMove(int maxlevel);
 bool movestart;
@@ -97,16 +151,20 @@ void DoPrintf(char *szFormat, ...) {
 
 }
 joseki *js;
-
+ int converttype[] = {
+	  0,6, 3, 5, 4, 2, 1
+	};
+ int convertSpe[]={0,1,1,2,4,5,6};
 // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 void showStatus(int t, int s) {
 	char w[10];
 	sprintf(w, "step=%d", s);
-	Form1->StatusBar1->Panels->Items[0]->Text = (t == 2) ? "White" : "Blck";
+	Form1->StatusBar1->Panels->Items[0]->Text = (t == 2) ? "White" : "Black";
 	Form1->StatusBar1->Panels->Items[1]->Text = w;
 }
 extern MOVETYPE Next;
-
+ //---------------------------------------------------------------------------
+ //constructer
 // ---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner) {
 
@@ -159,24 +217,26 @@ __fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner) {
 
 	DoubleBuffered = true;
 	showStatus(newkernel->teban, newkernel->step);
-  	assert(Depth<2000);
+	assert(Depth<2000);
 	ResetGame(); // board.cpp
-
-		DoPrintf("223MoveNo=%d Depth=%d",MoveNo,Depth);
-
+	RemainTime[0]=RemainTime[1]=30*60*1000;
 		 //	assert(Depth<1000);
 	js = new joseki();
-	assert(js->Openings);
-		DoPrintf("3MoveNo=%d Depth=%d",MoveNo,Depth);
-	ListBox1->Clear();
-	ListBox1->Items->Add("1 d4 e5");
-	ListBox1->Items->Add("2 d4 e5");
-	ListBox1->Items->Add("3 d4 e5");
+
+;
 	 char w[30];
 	 strcpy( w,"VERSION ");
 	 strcat(w,VERSION);
 	Caption=w;
+	StringGrid1->ColWidths[0]=32;
+	StringGrid1->	Cells[0][0]="n";
+	StringGrid1->	Cells[1][0]="white";
+	StringGrid1->	Cells[2][0]="black";
+   AnsiString A=  ReadManager( "chessfn");
 
+   if(A!="none")   {  DoPrintf("Reg=%s",A.c_str());
+	doLoadFile(A) ;}
+  // StringGrid1->Options  = goDrawFocusSelected;
 }
 
 void drawPiece(int x, int y, int pieceid, int color) {
@@ -204,20 +264,29 @@ void drawPiece(int x, int y, int pieceid, int color) {
 #define GRAYSIZE 25
 
 void __fastcall TForm1::paint(TObject *Sender) {
-	int i, x, y;
+	int i, x, y,x3,y3,z3,x4,y4,z4;
 	int showx, showy, type, col;
 	TColor c;
-	if (1) {
-		Canvas->Brush->Color = clGray;
+	xPIECE *p;
+	Canvas->Brush->Color = clGray;
 		Canvas->Rectangle(basex - GRAYSIZE, basey - GRAYSIZE,
 			basex + sz * 8 + GRAYSIZE, basey + sz * 8 + GRAYSIZE);
-	}
 	// Form1->Canvas->Brush->Color = clWhite;
 	Canvas->Font->Color = clBlack;
+	   //	if(newkernel->step>10) return;
+	if(newkernel->step>1){
+	  z3=newkernel->record[newkernel->step-2].newz;
+	  x3=z3&7 ;y3=7-z3/16;
+	   z4=newkernel->record[newkernel->step-2].oldz;
+	  x4=z4&7 ;y4=7-z4/16;
+
+	  }
 	for (x = 0; x < 8; x++)
 		for (y = 0; y < 8; y++) {
 
 			c = !((x ^ y) & 1) ? clWhite : clGreen;
+			 if(x==x3 && y==y3) c=clYellow;
+			 if(x==x4 && y==y4) c=clYellow;
 			// if (x == 0 && y == 0) 		c = clRed;
 			Canvas->Brush->Color = c;
 			Canvas->Rectangle(basex + x * sz, basey + sz * y, basex + sz *
@@ -229,7 +298,7 @@ void __fastcall TForm1::paint(TObject *Sender) {
 			// if(x==0 && y==0) continue;
 			if (!newkernel->getxyrt(x, y, &showx, &showy, &col, &type))
 				continue;
-			 if(col==0) continue;
+			 if(col==0||type==0) continue;
 			// DoPrintf("%d %d &d %d",showx,showy,type,col);
 			drawPiece(showx, showy, type, col);
 		}
@@ -289,11 +358,23 @@ void __fastcall TForm1::onmoudemove(TObject *Sender, TShiftState Shift, int X,
 void
 EnterKeyMove(int,MOVETYPE m) ;
 
+ void convertMove(MOVE Move,MOVETYPE *move){
+
+		int pp = newkernel->board[Move.newz]->type;
+		move->old = Move.oldz;
+		move->new1 = Move.newz;
+		move->spe = convertSpe[Move.spe];
+		 PIECETYPE ppp=  converttype[pp];
+
+		move->movpiece = ppp;
+		if (Move.cap) {
+			move->content = converttype[Move.cap->type];
+		}
+		else  	move->content = 0;
+ }
 void __fastcall TForm1::onmpouseup(TObject *Sender, TMouseButton Button,
 	TShiftState Shift, int X, int Y) {
-	int converttype[] = {
-	  0,6, 3, 5, 4, 2, 1
-	};
+
 		DoPrintf("MoveNo=%d Depth=%d",MoveNo,Depth);
 	if (!movestart)
 		return;
@@ -309,18 +390,11 @@ void __fastcall TForm1::onmpouseup(TObject *Sender, TMouseButton Button,
 	else {
 	DoPrintf("MoveNo=%d Depth=%d",MoveNo,Depth);
 		MOVE Move = newkernel->record[newkernel->step - 2];
-		MOVETYPE move;
-		int pp = newkernel->board[n]->type;
-		move.old = Move.oldz;
-		move.new1 = Move.newz;
-		move.spe = Move.spe;
-		 PIECETYPE ppp=  converttype[pp];
+			MOVETYPE move;
+	 convertMove(Move,&move);
 
-		move.movpiece = ppp;
-		if (Move.cap) {
-			move.content = converttype[Move.cap->type];
-		}
-		else  	move.content = 0;
+
+
 
 		EnterKeyMove(Depth,move )	;
 		MakeMove(&move);
@@ -328,6 +402,7 @@ void __fastcall TForm1::onmpouseup(TObject *Sender, TMouseButton Button,
 	}
 	showStatus(newkernel->teban, newkernel->step);
 	Repaint();
+	MyTime1=MyTime;
 	return;
 
 }
@@ -358,8 +433,7 @@ void __fastcall TForm1::Button1Click(TObject *Sender) {
 	move = js->FindOpeningMove();
 
 	if (move.new1 < 0x88) {
-		 DoPrintf(" FT= %02x %03x", move.old, move.new1);
-		 assert(move.new1<0x80);
+
 		MakeMove(&move);
 		Move.newz = upsidedown(move.new1);
 		Move.oldz = upsidedown(move.old);
@@ -376,6 +450,7 @@ void __fastcall TForm1::Button1Click(TObject *Sender) {
 	showStatus(newkernel->teban, newkernel->step);
 
 	Repaint();
+	FindMove(12);
 
 }
 int index, moveindexstack[40];
@@ -400,20 +475,39 @@ static void cxyp(char c, int *cx, int *cy, char *cp) {
 }
 
 static void xypsearch(int newza, int oldz, char cp, SPE esp) {
-	 int indexa=index;
+	 int i,indexa=index;
 
 	char newz ,newz1, oldz1;
 	newz=newza;
 	bool capture=false;
 	char pp;
-	for (int i = 0; i < newkernel->movelist.size(); i++) {
+	 int match=0;
+	 int pcount=0;
+	 for (i = 0; i < newkernel->movelist.size(); i++) {
+		newz1 = newkernel->movelist[i].newz;
+		oldz1 = newkernel->movelist[i].oldz;
+		if(newz1==newza ) {
+		pp = newkernel->movelist[i].p->type;
+		pp = *(".PRNBQK" + pp);
+		match++;
+		 if(pp=='P') pcount++;
+		 }
+		}
+		if (esp==normalspe && (match>1) )
+		if (esp==normalspe && (match>1) && cp<0 && pcount>0 )  {
+		  cp='P';		
+		}
+		if (esp==normalspe && (match>1) && cp<0 && pcount==0 )  {
+		  index+=2; return;		
+		}
+
+	for (i = 0; i < newkernel->movelist.size(); i++) {
 		newz1 = newkernel->movelist[i].newz;
 		oldz1 = newkernel->movelist[i].oldz;
 
 		pp = newkernel->movelist[i].p->type;
 		pp = *(".PRNBQK" + pp);
- if(esp==100)
-		DoPrintf("oldz1=(%02x %02x %c) IN=(sp=%d oldz=%02x newz=%02x %c) ",
+ if(newza==0x171)		DoPrintf("oldz1=(%02x %02x %c) IN=(sp=%d oldz=%02x newz=%02x %c) ",
 		oldz1,	newz1,cp, 	newkernel->movelist[i].spe, oldz, newz, pp,cp);
 
 			if (esp >0 && newkernel->movelist[i].cap == 0)
@@ -452,7 +546,7 @@ static void xypsearch(int newza, int oldz, char cp, SPE esp) {
 bool pushStack(int n, char *str) {
 	if (n != index)
 		return false;
-	DoPrintf("istr=%s", str);
+	DoPrintf("n=%d istr=%s", n,str);
 		newkernel->genmove(newkernel->teban);
 
 	int csp, cx, cy, dummy, cz1,newz;
@@ -495,7 +589,7 @@ bool pushStack(int n, char *str) {
 		cxyp(*str++, &dummy, &cy, &cp);
 		if (cy >= 0) { // ‚Q•¶Žš–Ú‚ªYÀ•W@ƒm[ƒ}ƒ‹
 	   //		DoPrintf("to=%02x", cy * 16 + cx);
-			xypsearch(cy * 16 + cx, -1, -1, normalz);
+			xypsearch(cy * 16 + cx, -1, -1, normalspe);
 			return(index == (n + 1));
 		}
 
@@ -503,7 +597,7 @@ bool pushStack(int n, char *str) {
 		else if (cp > 0) {  // 1•¶Žš–Ú‚ªx ‚Q•¶Žš–Ú‚ª‹î
 			cz1 = cx;
 		cx = -1;
-		xypsearch(cx + 16 * cy, cz1, cp, normalz);
+		xypsearch(cx + 16 * cy, cz1, cp, normalspe);
 		return(index == n + 1);
 		}
 
@@ -530,7 +624,7 @@ bool pushStack(int n, char *str) {
 			cxyp(*str++, &cx, &cy, &cp);
 
 			if (cy >= 0) { // 3•¶Žš–Ú‚ªYÀ•W
-				xypsearch(cy * 16 + cxsave, -1, cp, normalz); // Kc5
+				xypsearch(cy * 16 + cxsave, -1, cp, normalspe); // Kc5
 				return(index == n + 1);
 
 			}
@@ -538,7 +632,7 @@ bool pushStack(int n, char *str) {
 				cxyp(*str++, &cx, &cy, &cp);
 				if (cy >= 0) // 4•¶Žš–Ú‚ª yÀ•W
 					DoPrintf("cxsave =%02x z=%02x ", cxsave, cy * 16 + cx);
-				xypsearch(cy * 16 + cx, cxsave, cp, normalz);
+				xypsearch(cy * 16 + cx, cxsave, cp, normalspe);
 					DoPrintf("cxsaveend");
 						return(index == n + 1);
 			}
@@ -550,7 +644,7 @@ bool pushStack(int n, char *str) {
 			if (cx >= 0) { // 3•¶Žš–Ú‚ªxÀ•W     K7c5
 				cxyp(*str++, &dummy, &cy, &dummyc);
 				if (cy >= 0) {
-					xypsearch(cy * 16 + cx, cz1, cp, normalz);
+					xypsearch(cy * 16 + cx, cz1, cp, normalspe);
 				}
 			}
 
@@ -598,30 +692,49 @@ int algebdecode(char *str, char *m1, char *m2) {
 	return n;
 }
 
+
 void __fastcall TForm1::load1Click(TObject *Sender) {
 	DoPrintf("load");
 	AnsiString A;
+
+		A = "game1.txt"; //  StringGrid1->Col=12;
+
+
+if(1){
+	if (!OpenDialog1->Execute()) 		return;
+	A = OpenDialog1->FileName;
+	  WriteManager("chessfn",A);
+   //  WritePrivateProfileInt("aaaaa",123);
+  // Level = (LEVELTYPE)GetPrivateProfileInt("WCHESS", "Level",
+  // (int)easygame, INIFile);
+
+	}
+	doLoadFile(A);
+
+}
+bool doLoadFile(AnsiString FileName){
 	int n,nn;
 	char algeb[2][10];
-		A = "game1.txt";
-if(0){
-	if (!OpenDialog1->Execute()) 		return;
-	ListBox1->Clear();
-	 A = OpenDialog1->FileName;
-	}
- //
+	char w[10];
+	AnsiString A;
+if(!FileExists (FileName)) return false;
 	TStringList *T = new TStringList;
-	T->LoadFromFile(A);
+	T->LoadFromFile(FileName);
 	index = 0;
+  Form1->	 StringGrid1->RowCount= T->Count+1;
 	for (int i = 0; i < T->Count; i++) {
 		A = T->Strings[i];
 
 		nn=n = algebdecode(A.c_str(), algeb[0], algeb[1]);
+
+	Form1->	StringGrid1->	Cells[0][i+1]=IntToStr(n);
 		n--;
 		n = n * 2;
 		for (int ii = 0; ii < 2; ii++, n++) {
-			 char w[10];
+
 			 strcpy(w, algeb[ii]);
+		  Form1->	  StringGrid1->	Cells[ii+1][i+1]=w;
+ //select
 			 if(memcmp(w,"1-0",3)==0) { DoPrintf("White won");goto aa;}
 			  if(memcmp(w,"0-1",3)==0) { DoPrintf("Black won");goto aa;}
 			  if(memcmp(w,"1/2-1/2",7)==0) { DoPrintf("Draw ");goto aa;}
@@ -633,102 +746,73 @@ if(0){
 				else
 					DoPrintf("n=%d žB–†‚Å‚· %s",nn,w);
 					nn=50;
-					return;
+					return false;
 			}
 			int k = moveindexstack[index - 1];
+
 			newkernel->Play(newkernel->movelist[k]);
-			Repaint();
+			 Form1->Repaint();
+			 newkernel->record2.push_back(newkernel->movelist[k]);
+				MOVETYPE MM;
+			convertMove(newkernel->movelist[k],&MM);
+
+			MakeMove(&MM);
+			 Form1->		Repaint();
 			showStatus( newkernel->teban,newkernel->step);
 
 		}
 	aa:	//if(nn>15) return ;
-		ListBox1->Items->Add(A);
 
-	 //if(nn>18) break;
 	}
-	int k=0;
-		ListBox1->ItemIndex;
-	while(k-->0) { 			newkernel->Back();
-			Repaint();}
+	int k= newkernel->step;
+	DoPrintf("size=%d",  newkernel->record.size());
+
+
+
+	while(k>2) { newkernel->Back();
+				TakeBackMove(&MovTab[Depth]);
+	//  TGridRect AA=  StringGrid1->Selection  ;
+	 // DoPrintf("x=%d",AA.
+		Form1->	Repaint();
+				showStatus( newkernel->teban,newkernel->step);
+			  k--;
+
+			}
+	 return true;
 }
 
 // ---------------------------------------------------------------------------
 void xx(int n) {
+	MOVETYPE MM;
 	if (n == newkernel->step)
 		return;
 	else if (n < newkernel->step) {
 		while (newkernel->step > n)
-			index--, newkernel->Back();
+		   {
+			 newkernel->Back();
+			TakeBackMove(&MovTab[Depth]);}
 	}
 	else {
 		 while (newkernel->step <n)   {
 	   //	newkernel->genmove(newkernel->teban);
 
-		int k = moveindexstack[newkernel->step-1];
-			newkernel->genmove(newkernel->teban);
-			newkernel->Play(newkernel->movelist[k]); }
+		int k =newkernel->step;
+		 //moveindexstack[newkernel->step-1];
+			newkernel->Play(newkernel->record2[k-1]);
+
+			convertMove(newkernel->record2[k-1],&MM);
+
+			MakeMove( &MM);
+			 }
 	}
 	Form1->Repaint();
+
+
 		}
 
-void __fastcall TForm1::listbox1click(TObject *Sender) {
-	int k = ListBox1->ItemIndex;
-
-	AnsiString A = ListBox1->Items->Strings[k];
-	char *str = A.c_str();
-	int n = atoi(str);
-	if (*str != ' ')
-		str++;
-	if (*str != ' ')
-		str++;
-	while (*str == ' ') {
-		if (*str == 0)
-			break;
-		str++;
-	}
-	xx(2 * n - 2);
-	// newkernel->Tranlate(str);
-
-	DoPrintf("single click %s", A.c_str());
-}
-// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 
-void __fastcall TForm1::doubleclick(TObject *Sender) {
-	int k = ListBox1->ItemIndex; // DoPrintf("double click %d",k);
-	AnsiString A = ListBox1->Items->Strings[k];
-	MMM nnn;
-	char *str = A.c_str();
-	char *str1;
-	int n = atoi(str);
-	while (*str != ' ') {
-		if (*str == 0)
-			break;
-		str++;
-	}
-	while (*str == ' ') {
-		if (*str == 0)
-			break;
-		str++;
-	}
-	str1 = str;
-	while (*str != ' ') {
-		if (*str == 0)
-			break;
-		str++;
-	}
-	while (*str == ' ') {
-		if (*str == 0)
-			break;
-		str++;
-	}
-	xx(2 * n - 1);
-	newkernel->Translate(str, &nnn);
-	DoPrintf("B=%s str=%s n=%d", A.c_str(), str, n);
-
-}
-// ---------------------------------------------------------------------------
 
 void __fastcall TForm1::onkeydown(TObject *Sender, WORD &Key,
 	TShiftState Shift) {
@@ -748,3 +832,50 @@ void __fastcall TForm1::onenter(TObject *Sender) {
 	DoPrintf("onenter");
 }
 // ---------------------------------------------------------------------------
+
+ extern  MOVETYPE Next;
+ extern int MoveNo;
+
+void __fastcall TForm1::undo1Click(TObject *Sender)
+{
+   DoPrintf("undo");
+	newkernel->Back();
+		showStatus( newkernel->teban,newkernel->step);
+
+	Repaint();
+
+	TakeBackMove(&MovTab[Depth]);
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Timer1Timer(TObject *Sender)
+{
+	  if(OnSolving){
+MyTime=  GetTickCount();
+ ShowTime(MyTime-MyTime1); MyTime1=MyTime;
+ }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::newgame1Click(TObject *Sender)
+{
+	 OnSolving=true;
+	 MyTime1=GetTickCount(  );
+   //	 StringGrid1->Objects[1][1]->ToString();
+
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm1::cellselected(TObject *Sender, int ACol, int ARow, bool &CanSelect)
+
+{
+int	pstep= newkernel->step;
+int newstep=(ARow-1)*2+(ACol)+1;
+DoPrintf("%d %d pstep%d newstep=%d",ACol,ARow,pstep,newstep);
+xx(newstep);
+//StringGrid1->Cells[ACol][ARow]  ="KKKK";
+}
+//---------------------------------------------------------------------------
+

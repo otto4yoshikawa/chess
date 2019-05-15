@@ -1,19 +1,13 @@
-// ----------------------------------------------------------------------------
-// ObjectWindows - (C) Copyright 1991, 1993 by Borland International
-// ----------------------------------------------------------------------------
-
 // #include "wcdefs.h"
 #include "mychess.h"
 #include "wcdefs.h"
 
 #include"chessrule.h"
 #include"board.h"
-extern int Depth,Player,Opponent;
-extern int OfficerNo[2], PawnNo[2];
+#include<assert.h>
 void DoPrintf(char*szFormat, ...);
-extern int MoveNo;
-static int Level;
-NODEVAL Nodes;
+
+
 extern CLOCKTYPE ChessClock;
 bool MultiMove, AutoPlay, SingleStep;
 //
@@ -34,13 +28,9 @@ int PawnDir[2] = {
 	0x10, -0x10
 };
 MOVETYPE Next;
-extern PIECETYPE *piece;
+//extern PIECETYPE *piece;
 int BufCount, BufPnt;
-MOVETYPE Buffer[81];
-extern  int Depth;
-extern BOARDTYPE Board[0x78];
-int PVTable[2][7][0x78];
-extern  MOVETYPE ZeroMove;
+static MOVETYPE Buffer[81];
 
  COLORTYPE ProgramColor;
 //^-------------------------------------------------
@@ -49,10 +39,10 @@ int  CastMove[2][2][2] = {   2, 4,  6, 4,
 
 extern PIECETAB PieceTab[6][16];
 
-static MOVETYPE movetemp[MAXPLY - BACK + 2];
+MOVETYPE movetemp[MAXPLY - BACK + 2];
 
 
-extern MOVETYPE* MovTab ;//= &movetemp[-BACK];
+//extern MOVETYPE* MovTab ;//= &movetemp[-BACK];
 
 void CalcAttackTab() {
 	for (int sq = -0x77; sq <= 0x77; sq++) {
@@ -563,6 +553,26 @@ void GenCastSquare(SQUARETYPE new1, SQUARETYPE* castsquare,
   }
 }
 
+ void dump(bool sw){
+ DoPrintf("dump from %s depth=%d",sw?"takebuck":"makemove",Depth);
+   int x,y,z;
+   char c,w[9];
+   for(y=0;y<8;y++){
+	 for(x=0;x<8;x++) {
+	 z=(7-y)*16+x;
+	  c=*(".KQRBNP"+ Board[z].piece);
+	  if(Board[z].piece>7) {
+	  DoPrintf("# %d z=%02x", Board[z].piece,z);
+	  c='#';  }
+   //assert( Board[z].piece<7);
+
+	 if(Board[z].color==white) c|=' ';
+	  w[x]=c;
+	 }
+	 w[8]=0;
+	 DoPrintf(w);
+	}
+	}
 //  ˆÚ“®‚ðŒ³‚É–ß‚µA•Ï”‚ðXV‚·‚é
 //
 void
@@ -572,18 +582,30 @@ TakeBackMove(MOVETYPE* move)
   Opponent = Player;
   Player = ProgramColor;
   Perform(move, 1);
+
   MoveNo--;
   Depth--;
+   dump(1);
+  DoPrintf("TakeBackMove Deth=%d %d newz=%02x newz=%02x ",Depth,Player,
+move->new1,move->old);
 }
-// talk.cpp
+// makeMove()
+//                    talk.cpp
 void MakeMove(MOVETYPE * move) {
+
+
 Depth++;
 MoveNo++;
+MovTab[Depth]=*move;
+
 Perform(move, 0);
+ dump(0);
 ProgramColor = Opponent;
 Opponent = Player; Player = ProgramColor;
-DoPrintf("MakeMove Deth=%d %d newz=%02x newz=%02x ",Depth,Player,
+DoPrintf("MakeMove Deth=%d %d newz=%02x oldz=%02x ",Depth,Player,
 move->new1,move->old);
+
+
 
 
 

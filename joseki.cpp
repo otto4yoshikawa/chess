@@ -9,7 +9,7 @@ extern int UseLib;
  extern DEPTHTYPE Depth;
  extern  MOVETYPE Next;
  extern int MoveNo;
- extern  MOVETYPE MovTab[];
+
  void DoPrintf(char *szFormat, ...);
 //
 //  正しいブロックに一致するノードを見つける
@@ -116,18 +116,17 @@ void  joseki::
 CalcLibNo()
 {
 DoPrintf("calclib Depth=%d MN=%d",Depth,MoveNo);
-return;
   LibNo = 0;
   if (MoveNo < UseLib) {
     LibDepth = Depth;
-	while (MovTab[Depth].movpiece != 0) {
+	while (Depth>0) {
 	DoPrintf("takeback $1 depth=%d from=%02x",Depth,MovTab[Depth].old);
 	  TakeBackMove(&MovTab[Depth]);  }
 	Found = false;
-    if (MovTab[Depth].content == king) {
+    if (1) {
       Depth++;
       FindNode();
-      Depth--;
+	  Depth--;
     }
     while(Depth < LibDepth)
       MakeMove(&MovTab[Depth + 1]);
@@ -138,6 +137,7 @@ return;
       LibNo = 0;
 	}
   }
+ DoPrintf("clac libno foun=%d libno=%d",Found,LibNo);
 }
 
 //

@@ -1,269 +1,1901 @@
-dep -1 -1
-223MoveNo=0 Depth=65535
-calclib Depth=-1 MN=0
-3MoveNo=0 Depth=65535
-load
-istr=d4
-gensize=22
-from 13 ==> 33
-istr=Nf6
-gensize=22
-from 76 ==> 55
-istr=Bg5
+dep -1 0
+dep -1 0  00502d9c 
+calclib Depth=0 MN=0
+enter findNode Depth=1 JibDeprg=0 LibNo=0 MoveNo=0
+found
+clac libno foun=1 libno=1
+Reg=C:\puzzle\chess\game2.txt
+n=0 istr=e4
+gensize=20
+from 14 ==> 34 
+from 14 ==> 34 P=p cap=$ 
+dump from makemove depth=1
+RNBQKBNR
+PPPPPPPP
+........
+........
+....p...
+........
+pppp.ppp
+rnbqkbnr
+MakeMove Deth=1 1 newz=34 oldz=14 
+n=1 istr=c5
+gensize=20
+from 62 ==> 42 
+from 62 ==> 42 P=p cap=$ 
+dump from makemove depth=2
+RNBQKBNR
+PP.PPPPP
+........
+..P.....
+....p...
+........
+pppp.ppp
+rnbqkbnr
+MakeMove Deth=2 0 newz=42 oldz=62 
+n=2 istr=Nf3
 gensize=30
-from 02 ==> 46
-istr=e6
-gensize=23
-from 64 ==> 54
-istr=e4
-gensize=33
-from 14 ==> 34
-istr=Be7
-gensize=29
-from 75 ==> 64
-istr=Nd2
-gensize=43
-from 01 ==> 13
-istr=Pd5
-gensize=29
-from 63 ==> 43
-istr=e5
-gensize=41
-from 34 ==> 44
-istr=Nfd7
-gensize=31
-cxsave =05 z=63 
-cxsaveend
-from 55 ==> 63
-istr=Be3
-gensize=42
-from 46 ==> 24
-istr=Pb6
-gensize=32
-from 61 ==> 51
-istr=Nh3
-gensize=39
-from 06 ==> 27
-istr=Bb7
-gensize=32
-from 72 ==> 61
-istr=Qg4
-gensize=38
-from 03 ==> 36
-istr=g6
+from 06 ==> 25 
+from 06 ==> 25 P=n cap=$ 
+dump from makemove depth=3
+RNBQKBNR
+PP.PPPPP
+........
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqkb.r
+MakeMove Deth=3 1 newz=25 oldz=06 
+n=3 istr=d6
+gensize=22
+from 63 ==> 53 
+from 63 ==> 53 P=p cap=$ 
+dump from makemove depth=4
+RNBQKBNR
+PP..PPPP
+...P....
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqkb.r
+MakeMove Deth=4 0 newz=53 oldz=63 
+n=4 istr=Bb5+
+gensize=28
+from 05 ==> 41 
+from 05 ==> 41 P=b cap=$ 
+dump from makemove depth=5
+RNBQKBNR
+PP..PPPP
+...P....
+.bP.....
+....p...
+.....n..
+pppp.ppp
+rnbqk..r
+MakeMove Deth=5 1 newz=41 oldz=05 
+n=5 istr=Bd7
+gensize=28
+from 72 ==> 63 
+from 72 ==> 63 P=b cap=$ 
+dump from makemove depth=6
+RN.QKBNR
+PP.BPPPP
+...P....
+.bP.....
+....p...
+.....n..
+pppp.ppp
+rnbqk..r
+MakeMove Deth=6 0 newz=63 oldz=72 
+n=6 istr=Bxd7+
+z=06 p->z=04 07
+z=63 p->z=41 63
 gensize=34
-from 66 ==> 56
-istr=Ng5
-gensize=45
-from 27 ==> 46
-istr=Nf8
-gensize=31
-from 63 ==> 75
-istr=Ph4
-gensize=47
-from 17 ==> 37
-istr=h6
-gensize=31
-from 67 ==> 57
-istr=Ngf3
-gensize=47
-cxsave =06 z=25 
-cxsaveend
-from 46 ==> 25
-istr=Na6
-gensize=32
-from 71 ==> 50
-istr=c3
-gensize=42
-from 12 ==> 22
-istr=Qd7
-gensize=32
-from 73 ==> 63
-istr=a4
-gensize=41
-from 10 ==> 30
-istr=O-O-O
-gensize=37
-istr=b4
-gensize=42
-from 11 ==> 31
-istr=Pc5
-gensize=28
-from 62 ==> 42
-istr=Bb5
-gensize=43
-from 05 ==> 41
-istr=Qc7
-gensize=27
-from 63 ==> 62
-istr=dxc5
-gensize=48
-from 33 ==> 42
-istr=bxc5
-gensize=31
-from 51 ==> 42
-istr=O-O
-gensize=52
-istr=f5
-gensize=30
-from 65 ==> 45
-istr=exf6
-gensize=49
-from 44 ==> 55
-istr=Bxf6
-gensize=30
-from 64 ==> 55
-istr=Rac1
-gensize=49
-cxsave =00 z=02 
-cxsaveend
-from 00 ==> 02
-istr=h5
-gensize=39
-from 57 ==> 47
-istr=Qh3
-gensize=45
-from 36 ==> 27
-istr=Kb8
-gensize=39
-from 72 ==> 71
-istr=Rfe1
-gensize=41
-cxsave =05 z=04 
-cxsaveend
-from 05 ==> 04
-istr=Bc8
-gensize=40
-from 61 ==> 72
-istr=Bxa6
-gensize=43
-from 41 ==> 50
-istr=Bxa6
-gensize=38
-from 72 ==> 50
-istr=Bxc5
-gensize=36
-from 24 ==> 42
-istr=Bc8
-gensize=45
-from 50 ==> 72
-istr=c4
-gensize=41
-from 22 ==> 32
-istr=Be7
-gensize=42
-from 55 ==> 64
-istr=Bxe7
-gensize=40
-from 42 ==> 64
-istr=Qxe7
-gensize=31
-from 62 ==> 64
-istr=Qg3+
-gensize=35
-from 27 ==> 26
-istr=Qd6
-gensize=32
-from 64 ==> 53
-istr=Ne5
-gensize=35
-from 25 ==> 44
-istr=Rd7
+from 41 ==> 63 
+63
+from 41 ==> 63 P=b cap=b 
+content 63
+dump from makemove depth=7
+RN.QKBNR
+PP.bPPPP
+...P....
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqk..r
+MakeMove Deth=7 1 newz=63 oldz=41 
+n=7 istr=Nxd7
+z=63 p->z=74 63
+z=63 p->z=71 63
+z=63 p->z=73 63
+gensize=25
+from 71 ==> 63 
+63
+from 71 ==> 63 P=n cap=b 
+content 63
+dump from makemove depth=8
+R..QKBNR
+PP.NPPPP
+...P....
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqk..r
+MakeMove Deth=8 0 newz=63 oldz=71 
+n=8 istr=O-O
+z=06 p->z=04 07
 gensize=26
-from 73 ==> 63
-istr=Nxd7+
-gensize=43
-from 44 ==> 63
-istr=Kc7
+from 04 ==> 06 P=k cap=$ 
+content 06
+dump from makemove depth=9
+R..QKBNR
+PP.NPPPP
+...P....
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbq.rk.
+MakeMove Deth=9 1 newz=06 oldz=04 
+n=9 istr=Ngf6
 gensize=27
-from 71 ==> 62
-istr=Ne5
-gensize=46
-from 63 ==> 44
-istr=Kb7
-gensize=27
-from 62 ==> 61
-istr=c5
-gensize=43
-from 32 ==> 42
-istr=Qc7
-gensize=26
-from 53 ==> 62
-istr=c6+
-gensize=45
-from 42 ==> 52
-istr=Ka8
-gensize=27
-from 61 ==> 70
-istr=b5
-gensize=44
-from 31 ==> 41
-istr=Rh7
-gensize=27
-from 77 ==> 67
-istr=Qf4
-gensize=44
-from 26 ==> 35
-istr=Rh8
-gensize=28
-from 67 ==> 77
-istr=Ndf3
-gensize=48
-cxsave =03 z=25 
+cxsave =06 z=55 
 cxsaveend
-from 13 ==> 25
-istr=a6
-gensize=27
-from 60 ==> 50
-istr=Nd4
-gensize=45
-from 25 ==> 33
-istr=Nh7
-gensize=27
-from 75 ==> 67
-istr=bxa6
-gensize=47
-from 41 ==> 50
-istr=Rf8
-gensize=27
-from 77 ==> 75
-istr=Qe3
-gensize=47
-from 35 ==> 24
-istr=Bxa6
-gensize=32
-from 72 ==> 50
-istr=Nb5
-gensize=45
-from 33 ==> 41
-istr=Bxb5
-gensize=36
-from 50 ==> 41
-istr=axb5
-gensize=43
-from 30 ==> 41
-istr=Kb8
+from 76 ==> 55 
+from 76 ==> 55 P=n cap=$ 
+dump from makemove depth=10
+R..QKB.R
+PP.NPPPP
+...P.N..
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbq.rk.
+MakeMove Deth=10 0 newz=55 oldz=76 
+n=10 istr=d3
+gensize=24
+from 13 ==> 23 
+from 13 ==> 23 P=p cap=$ 
+dump from makemove depth=11
+R..QKB.R
+PP.NPPPP
+...P.N..
+..P.....
+....p...
+...p.n..
+ppp..ppp
+rnbq.rk.
+MakeMove Deth=11 1 newz=23 oldz=13 
+n=11 istr=e6
+z=34 p->z=55 34
+gensize=28
+from 64 ==> 54 
+from 64 ==> 54 P=p cap=$ 
+dump from makemove depth=12
+R..QKB.R
+PP.N.PPP
+...PPN..
+..P.....
+....p...
+...p.n..
+ppp..ppp
+rnbq.rk.
+MakeMove Deth=12 0 newz=54 oldz=64 
+n=12 istr=Ng5
+gensize=31
+from 25 ==> 46 
+from 25 ==> 46 P=n cap=$ 
+dump from makemove depth=13
+R..QKB.R
+PP.N.PPP
+...PPN..
+..P...n.
+....p...
+...p....
+ppp..ppp
+rnbq.rk.
+MakeMove Deth=13 1 newz=46 oldz=25 
+n=13 istr=Be7
+z=34 p->z=55 34
+gensize=29
+from 75 ==> 64 
+from 75 ==> 64 P=b cap=$ 
+dump from makemove depth=14
+R..QK..R
+PP.NBPPP
+...PPN..
+..P...n.
+....p...
+...p....
+ppp..ppp
+rnbq.rk.
+MakeMove Deth=14 0 newz=64 oldz=75 
+n=14 istr=f4
+z=54 p->z=46 54
+z=65 p->z=46 65
+z=67 p->z=46 67
 gensize=33
-from 70 ==> 71
-istr=b6
-gensize=42
-from 41 ==> 51
-istr=Qe7
-gensize=31
-from 62 ==> 64
-istr=Ra1
-gensize=41
-from 02 ==> 00
-istr=Qd6
+from 15 ==> 35 
+from 15 ==> 35 P=p cap=$ 
+dump from makemove depth=15
+R..QK..R
+PP.NBPPP
+...PPN..
+..P...n.
+....pp..
+...p....
+ppp...pp
+rnbq.rk.
+MakeMove Deth=15 1 newz=35 oldz=15 
+n=15 istr=O-O
+z=76 p->z=74 77
+z=34 p->z=55 34
+z=25 p->z=54 35
+z=25 p->z=54 35
+gensize=33
+from 74 ==> 76 P=k cap=$ 
+content 76
+dump from makemove depth=16
+R..Q.RK.
+PP.NBPPP
+...PPN..
+..P...n.
+....pp..
+...p....
+ppp...pp
+rnbq.rk.
+MakeMove Deth=16 0 newz=76 oldz=74 
+n=16 istr=c4
+z=54 p->z=46 54
+z=65 p->z=46 65
+z=67 p->z=46 67
+gensize=34
+from 12 ==> 32 
+from 12 ==> 32 P=p cap=$ 
+dump from makemove depth=17
+R..Q.RK.
+PP.NBPPP
+...PPN..
+..P...n.
+..p.pp..
+...p....
+pp....pp
+rnbq.rk.
+MakeMove Deth=17 1 newz=32 oldz=12 
+n=17 istr=Nb8
+z=34 p->z=55 34
+z=22 p->z=53 32
+gensize=28
+from 63 ==> 71 
+from 63 ==> 71 P=n cap=$ 
+dump from makemove depth=18
+RN.Q.RK.
+PP..BPPP
+...PPN..
+..P...n.
+..p.pp..
+...p....
+pp....pp
+rnbq.rk.
+MakeMove Deth=18 0 newz=71 oldz=63 
+n=18 istr=Nc3
+z=54 p->z=46 54
+z=65 p->z=46 65
+z=67 p->z=46 67
 gensize=35
-from 64 ==> 53
-istr=Nd7+
-gensize=47
-from 44 ==> 63
-istr=Kc8
-gensize=32
-from 71 ==> 72
-istr=Ra8+
-gensize=47
-from 00 ==> 70
+from 01 ==> 22 
+from 01 ==> 22 P=n cap=$ 
+dump from makemove depth=19
+RN.Q.RK.
+PP..BPPP
+...PPN..
+..P...n.
+..p.pp..
+..np....
+pp....pp
+r.bq.rk.
+MakeMove Deth=19 1 newz=22 oldz=01 
+n=19 istr=Nc6
+z=34 p->z=55 34
+gensize=26
+from 71 ==> 52 
+from 71 ==> 52 P=n cap=$ 
+dump from makemove depth=20
+R..Q.RK.
+PP..BPPP
+..NPPN..
+..P...n.
+..p.pp..
+..np....
+pp....pp
+r.bq.rk.
+MakeMove Deth=20 0 newz=52 oldz=71 
+n=20 istr=Be3
+z=54 p->z=46 54
+z=65 p->z=46 65
+z=67 p->z=46 67
+gensize=38
+from 02 ==> 24 
+from 02 ==> 24 P=b cap=$ 
+dump from makemove depth=21
+R..Q.RK.
+PP..BPPP
+..NPPN..
+..P...n.
+..p.pp..
+..npb...
+pp....pp
+r..q.rk.
+MakeMove Deth=21 1 newz=24 oldz=02 
+n=21 istr=d5
+z=34 p->z=55 34
+gensize=31
+from 53 ==> 43 
+from 53 ==> 43 P=p cap=$ 
+dump from makemove depth=22
+R..Q.RK.
+PP..BPPP
+..N.PN..
+..PP..n.
+..p.pp..
+..npb...
+pp....pp
+r..q.rk.
+MakeMove Deth=22 0 newz=43 oldz=53 
+n=22 istr=Bf2
+z=43 p->z=22 43
+z=42 p->z=24 42
+z=54 p->z=46 54
+z=65 p->z=46 65
+z=67 p->z=46 67
+z=43 p->z=32 43
+z=43 p->z=34 43
+gensize=46
+from 24 ==> 15 
+from 24 ==> 15 P=b cap=$ 
+dump from makemove depth=23
+R..Q.RK.
+PP..BPPP
+..N.PN..
+..PP..n.
+..p.pp..
+..np....
+pp...bpp
+r..q.rk.
+MakeMove Deth=23 1 newz=15 oldz=24 
+n=23 istr=h6
+z=34 p->z=55 34
+z=34 p->z=43 34
+z=32 p->z=43 32
+gensize=34
+from 67 ==> 57 
+from 67 ==> 57 P=p cap=$ 
+dump from makemove depth=24
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..PP..n.
+..p.pp..
+..np....
+pp...bpp
+r..q.rk.
+MakeMove Deth=24 0 newz=57 oldz=67 
+n=24 istr=Nf3
+z=43 p->z=22 43
+z=42 p->z=15 42
+z=54 p->z=46 54
+z=65 p->z=46 65
+z=43 p->z=32 43
+z=43 p->z=34 43
+gensize=44
+from 46 ==> 25 
+from 46 ==> 25 P=n cap=$ 
+dump from makemove depth=25
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..PP....
+..p.pp..
+..np.n..
+pp...bpp
+r..q.rk.
+MakeMove Deth=25 1 newz=25 oldz=46 
+n=25 istr=dxe4
+z=34 p->z=55 34
+z=34 p->z=43 34
+z=32 p->z=43 32
+gensize=36
+from 43 ==> 34 
+34
+from 43 ==> 34 P=p cap=p 
+content 34
+dump from makemove depth=26
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..P.....
+..p.Pp..
+..np.n..
+pp...bpp
+r..q.rk.
+MakeMove Deth=26 0 newz=34 oldz=43 
+n=26 istr=dxe4
+z=34 p->z=22 34
+z=42 p->z=15 42
+z=34 p->z=23 34
+gensize=41
+from 23 ==> 34 
+34
+from 23 ==> 34 P=p cap=p 
+content 34
+dump from makemove depth=27
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..P.....
+..p.pp..
+..n..n..
+pp...bpp
+r..q.rk.
+MakeMove Deth=27 1 newz=34 oldz=23 
+n=27 istr=e5
+z=03 p->z=73 03
+z=34 p->z=55 34
+gensize=39
+from 54 ==> 44 
+from 54 ==> 44 P=p cap=$ 
+dump from makemove depth=28
+R..Q.RK.
+PP..BPP.
+..N..N.P
+..P.P...
+..p.pp..
+..n..n..
+pp...bpp
+r..q.rk.
+MakeMove Deth=28 0 newz=44 oldz=54 
+n=28 istr=f5
+z=42 p->z=15 42
+z=73 p->z=03 73
+z=44 p->z=25 44
+z=44 p->z=35 44
+gensize=45
+from 35 ==> 45 
+from 35 ==> 45 P=p cap=$ 
+dump from makemove depth=29
+R..Q.RK.
+PP..BPP.
+..N..N.P
+..P.Pp..
+..p.p...
+..n..n..
+pp...bpp
+r..q.rk.
+MakeMove Deth=29 1 newz=45 oldz=35 
+n=29 istr=Re8
+z=03 p->z=73 03
+z=34 p->z=55 34
+gensize=37
+from 75 ==> 74 
+from 75 ==> 74 P=r cap=$ 
+dump from makemove depth=30
+R..QR.K.
+PP..BPP.
+..N..N.P
+..P.Pp..
+..p.p...
+..n..n..
+pp...bpp
+r..q.rk.
+MakeMove Deth=30 0 newz=74 oldz=75 
+n=30 istr=Re1
+z=42 p->z=15 42
+z=73 p->z=03 73
+z=44 p->z=25 44
+gensize=43
+from 05 ==> 04 
+from 05 ==> 04 P=r cap=$ 
+dump from makemove depth=31
+R..QR.K.
+PP..BPP.
+..N..N.P
+..P.Pp..
+..p.p...
+..n..n..
+pp...bpp
+r..qr.k.
+MakeMove Deth=31 1 newz=04 oldz=05 
+n=31 istr=Nd4
+z=03 p->z=73 03
+z=34 p->z=55 34
+gensize=37
+from 52 ==> 33 
+from 52 ==> 33 P=n cap=$ 
+dump from makemove depth=32
+R..QR.K.
+PP..BPP.
+.....N.P
+..P.Pp..
+..pNp...
+..n..n..
+pp...bpp
+r..qr.k.
+MakeMove Deth=32 0 newz=33 oldz=52 
+n=32 istr=Nxe5
+z=33 p->z=15 33
+z=33 p->z=03 33
+z=33 p->z=25 33
+z=44 p->z=25 44
+gensize=38
+from 25 ==> 44 
+44
+from 25 ==> 44 P=n cap=p 
+content 44
+dump from makemove depth=33
+R..QR.K.
+PP..BPP.
+.....N.P
+..P.np..
+..pNp...
+..n.....
+pp...bpp
+r..qr.k.
+MakeMove Deth=33 1 newz=44 oldz=25 
+n=33 istr=Bd6
+z=45 p->z=33 45
+z=34 p->z=55 34
+gensize=37
+from 64 ==> 53 
+from 64 ==> 53 P=b cap=$ 
+dump from makemove depth=34
+R..QR.K.
+PP...PP.
+...B.N.P
+..P.np..
+..pNp...
+..n.....
+pp...bpp
+r..qr.k.
+MakeMove Deth=34 0 newz=53 oldz=64 
+n=34 istr=Nf3
+z=33 p->z=15 33
+z=33 p->z=03 33
+z=65 p->z=44 65
+gensize=43
+from 44 ==> 25 
+from 44 ==> 25 P=n cap=$ 
+dump from makemove depth=35
+R..QR.K.
+PP...PP.
+...B.N.P
+..P..p..
+..pNp...
+..n..n..
+pp...bpp
+r..qr.k.
+MakeMove Deth=35 1 newz=25 oldz=44 
+n=35 istr=Ng4
+z=25 p->z=33 25
+z=45 p->z=33 45
+z=17 p->z=53 17
+z=34 p->z=55 34
+z=34 p->z=74 34
+gensize=46
+from 55 ==> 36 
+from 55 ==> 36 P=n cap=$ 
+dump from makemove depth=36
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp.N.
+..n..n..
+pp...bpp
+r..qr.k.
+MakeMove Deth=36 0 newz=36 oldz=55 
+n=36 istr=h3
+z=33 p->z=15 33
+z=33 p->z=03 33
+z=33 p->z=25 33
+gensize=39
+from 17 ==> 27 
+from 17 ==> 27 P=p cap=$ 
+dump from makemove depth=37
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp.N.
+..n..n.p
+pp...bp.
+r..qr.k.
+MakeMove Deth=37 1 newz=27 oldz=17 
+n=37 istr=Nxf2
+z=25 p->z=33 25
+z=45 p->z=33 45
+z=15 p->z=36 15
+z=34 p->z=74 34
+gensize=49
+from 36 ==> 15 
+15
+from 36 ==> 15 P=n cap=b 
+content 15
+dump from makemove depth=38
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp...
+..n..n.p
+pp...Np.
+r..qr.k.
+MakeMove Deth=38 0 newz=15 oldz=36 
+n=38 istr=Kxf2
+z=15 p->z=06 15
+z=33 p->z=03 33
+z=33 p->z=25 33
+gensize=38
+from 06 ==> 15 
+15
+from 06 ==> 15 P=k cap=n 
+content 15
+dump from makemove depth=39
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp...
+..n..n.p
+pp...kp.
+r..qr...
+MakeMove Deth=39 1 newz=15 oldz=06 
+n=39 istr=Qb6
+z=25 p->z=33 25
+z=45 p->z=33 45
+z=34 p->z=74 34
+gensize=44
+from 73 ==> 51 
+from 73 ==> 51 P=q cap=$ 
+dump from makemove depth=40
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..pNp...
+..n..n.p
+pp...kp.
+r..qr...
+MakeMove Deth=40 0 newz=51 oldz=73 
+n=40 istr=b3
+z=33 p->z=03 33
+z=33 p->z=25 33
+gensize=42
+from 11 ==> 21 
+from 11 ==> 21 P=p cap=$ 
+dump from makemove depth=41
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..pNp...
+.pn..n.p
+p....kp.
+r..qr...
+MakeMove Deth=41 1 newz=21 oldz=11 
+n=41 istr=Nxf3
+z=25 p->z=33 25
+z=45 p->z=33 45
+z=21 p->z=33 21
+z=21 p->z=51 21
+z=34 p->z=74 34
+gensize=44
+from 33 ==> 25 
+25
+from 33 ==> 25 P=n cap=n 
+content 25
+dump from makemove depth=42
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..p.p...
+.pn..N.p
+p....kp.
+r..qr...
+MakeMove Deth=42 0 newz=25 oldz=33 
+n=42 istr=Qxf3
+z=25 p->z=15 25
+z=53 p->z=03 53
+z=25 p->z=03 25
+z=25 p->z=16 25
+gensize=37
+from 03 ==> 25 
+25
+from 03 ==> 25 P=q cap=n 
+content 25
+dump from makemove depth=43
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..p.p...
+.pn..q.p
+p....kp.
+r...r...
+MakeMove Deth=43 1 newz=25 oldz=03 
+n=43 istr=Be5
+z=21 p->z=51 21
+z=34 p->z=74 34
+gensize=36
+from 53 ==> 44 
+from 53 ==> 44 P=b cap=$ 
+dump from makemove depth=44
+R...R.K.
+PP...PP.
+.Q.....P
+..P.Bp..
+..p.p...
+.pn..q.p
+p....kp.
+r...r...
+MakeMove Deth=44 0 newz=44 oldz=53 
+n=44 istr=Nd5
+gensize=37
+from 22 ==> 43 
+from 22 ==> 43 P=n cap=$ 
+dump from makemove depth=45
+R...R.K.
+PP...PP.
+.Q.....P
+..PnBp..
+..p.p...
+.p...q.p
+p....kp.
+r...r...
+MakeMove Deth=45 1 newz=43 oldz=22 
+n=45 istr=Qa5
+z=21 p->z=51 21
+z=00 p->z=44 00
+gensize=41
+from 51 ==> 40 
+from 51 ==> 40 P=q cap=$ 
+dump from makemove depth=46
+R...R.K.
+PP...PP.
+.......P
+Q.PnBp..
+..p.p...
+.p...q.p
+p....kp.
+r...r...
+MakeMove Deth=46 0 newz=40 oldz=51 
+n=46 istr=Rad1
+gensize=40
+cxsave =00 z=03 
+cxsaveend
+from 00 ==> 03 
+from 00 ==> 03 P=r cap=$ 
+dump from makemove depth=47
+R...R.K.
+PP...PP.
+.......P
+Q.PnBp..
+..p.p...
+.p...q.p
+p....kp.
+...rr...
+MakeMove Deth=47 1 newz=03 oldz=00 
+n=47 istr=Qxa2+
+z=10 p->z=40 10
+z=04 p->z=40 04
+gensize=42
+from 40 ==> 10 
+10
+from 40 ==> 10 P=q cap=p 
+content 10
+dump from makemove depth=48
+R...R.K.
+PP...PP.
+.......P
+..PnBp..
+..p.p...
+.p...q.p
+Q....kp.
+...rr...
+MakeMove Deth=48 0 newz=10 oldz=40 
+n=48 istr=Re2
+gensize=37
+from 04 ==> 14 
+from 04 ==> 14 P=r cap=$ 
+dump from makemove depth=49
+R...R.K.
+PP...PP.
+.......P
+..PnBp..
+..p.p...
+.p...q.p
+Q...rkp.
+...r....
+MakeMove Deth=49 1 newz=14 oldz=04 
+n=49 istr=Qa5
+z=14 p->z=10 14
+z=21 p->z=10 21
+gensize=42
+from 10 ==> 40 
+from 10 ==> 40 P=q cap=$ 
+dump from makemove depth=50
+R...R.K.
+PP...PP.
+.......P
+Q.PnBp..
+..p.p...
+.p...q.p
+....rkp.
+...r....
+MakeMove Deth=50 0 newz=40 oldz=10 
+n=50 istr=f6
+gensize=41
+from 45 ==> 55 
+from 45 ==> 55 P=p cap=$ 
+dump from makemove depth=51
+R...R.K.
+PP...PP.
+.....p.P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+MakeMove Deth=51 1 newz=55 oldz=45 
+n=51 istr=Re6
+z=55 p->z=44 55
+z=55 p->z=66 55
+gensize=43
+from 74 ==> 54 
+from 74 ==> 54 P=r cap=$ 
+dump from makemove depth=52
+R.....K.
+PP...PP.
+....Rp.P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+MakeMove Deth=52 0 newz=54 oldz=74 
+n=52 istr=fxg7
+z=66 p->z=55 66
+gensize=41
+from 55 ==> 66 
+66
+from 55 ==> 66 P=p cap=p 
+content 66
+dump from makemove depth=53
+R.....K.
+PP...Pp.
+....R..P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+MakeMove Deth=53 1 newz=66 oldz=55 
+n=53 istr=Rae8
+z=66 p->z=76 66
+z=66 p->z=44 66
+gensize=48
+cxsave =00 z=74 
+cxsaveend
+from 70 ==> 74 
+from 70 ==> 74 P=r cap=$ 
+dump from makemove depth=54
+....R.K.
+PP...Pp.
+....R..P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+MakeMove Deth=54 0 newz=74 oldz=70 
+n=54 istr=Kg1
+z=65 p->z=25 65
+gensize=43
+from 15 ==> 06 
+from 15 ==> 06 P=k cap=$ 
+dump from makemove depth=55
+....R.K.
+PP...Pp.
+....R..P
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+...r..k.
+MakeMove Deth=55 1 newz=06 oldz=15 
+n=55 istr=Rg6
+z=66 p->z=76 66
+z=66 p->z=44 66
+gensize=48
+from 54 ==> 56 
+from 54 ==> 56 P=r cap=$ 
+dump from makemove depth=56
+....R.K.
+PP...Pp.
+......RP
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+...r..k.
+MakeMove Deth=56 0 newz=56 oldz=54 
+n=56 istr=Rf1
+z=65 p->z=25 65
+gensize=43
+from 03 ==> 05 
+from 03 ==> 05 P=r cap=$ 
+dump from makemove depth=57
+....R.K.
+PP...Pp.
+......RP
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....rk.
+MakeMove Deth=57 1 newz=05 oldz=03 
+n=57 istr=Rxg7
+z=66 p->z=76 66
+z=66 p->z=44 66
+z=66 p->z=56 66
+z=16 p->z=56 16
+gensize=53
+from 56 ==> 66 
+66
+from 56 ==> 66 P=r cap=p 
+content 66
+dump from makemove depth=58
+....R.K.
+PP...PR.
+.......P
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....rk.
+MakeMove Deth=58 0 newz=66 oldz=56 
+n=58 istr=Kh1
+z=65 p->z=25 65
+gensize=39
+from 06 ==> 07 
+from 06 ==> 07 P=k cap=$ 
+dump from makemove depth=59
+....R.K.
+PP...PR.
+.......P
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....r.k
+MakeMove Deth=59 1 newz=07 oldz=06 
+n=59 istr=Qd8
+z=16 p->z=66 16
+gensize=46
+from 40 ==> 73 
+from 40 ==> 73 P=q cap=$ 
+dump from makemove depth=60
+...QR.K.
+PP...PR.
+.......P
+..PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....r.k
+MakeMove Deth=60 0 newz=73 oldz=40 
+n=60 istr=Qe3
+z=65 p->z=25 65
+gensize=39
+from 25 ==> 24 
+from 25 ==> 24 P=q cap=$ 
+dump from makemove depth=61
+...QR.K.
+PP...PR.
+.......P
+..PnB...
+..p.p...
+.p..q..p
+....r.p.
+.....r.k
+MakeMove Deth=61 1 newz=24 oldz=25 
+n=61 istr=Qd6
+z=43 p->z=73 43
+z=16 p->z=66 16
+gensize=43
+from 73 ==> 53 
+from 73 ==> 53 P=q cap=$ 
+dump from makemove depth=62
+....R.K.
+PP...PR.
+...Q...P
+..PnB...
+..p.p...
+.p..q..p
+....r.p.
+.....r.k
+MakeMove Deth=62 0 newz=53 oldz=73 
+n=62 istr=Rf5
+z=65 p->z=05 65
+z=57 p->z=24 57
+z=42 p->z=24 42
+gensize=44
+from 05 ==> 45 
+from 05 ==> 45 P=r cap=$ 
+dump from makemove depth=63
+....R.K.
+PP...PR.
+...Q...P
+..PnBr..
+..p.p...
+.p..q..p
+....r.p.
+.......k
+MakeMove Deth=63 1 newz=45 oldz=05 
+n=63 istr=Qg6
+z=43 p->z=53 43
+z=16 p->z=66 16
+gensize=43
+from 53 ==> 56 
+from 53 ==> 56 P=q cap=$ 
+dump from makemove depth=64
+....R.K.
+PP...PR.
+......QP
+..PnBr..
+..p.p...
+.p..q..p
+....r.p.
+.......k
+MakeMove Deth=64 0 newz=56 oldz=53 
+n=64 istr=Qf3
+z=44 p->z=45 44
+z=65 p->z=45 65
+z=57 p->z=24 57
+z=42 p->z=24 42
+gensize=41
+from 24 ==> 25 
+from 24 ==> 25 P=q cap=$ 
+dump from makemove depth=65
+....R.K.
+PP...PR.
+......QP
+..PnBr..
+..p.p...
+.p...q.p
+....r.p.
+.......k
+MakeMove Deth=65 1 newz=25 oldz=24 
+n=65 istr=Re6
+z=16 p->z=56 16
+z=45 p->z=56 45
+gensize=41
+from 74 ==> 54 
+from 74 ==> 54 P=r cap=$ 
+dump from makemove depth=66
+......K.
+PP...PR.
+....R.QP
+..PnBr..
+..p.p...
+.p...q.p
+....r.p.
+.......k
+MakeMove Deth=66 0 newz=54 oldz=74 
+n=66 istr=Rd2
+z=44 p->z=45 44
+z=65 p->z=45 65
+gensize=36
+from 14 ==> 13 
+from 14 ==> 13 P=r cap=$ 
+dump from makemove depth=67
+......K.
+PP...PR.
+....R.QP
+..PnBr..
+..p.p...
+.p...q.p
+...r..p.
+.......k
+MakeMove Deth=67 1 newz=13 oldz=14 
+n=67 istr=Kh7
+z=16 p->z=56 16
+z=45 p->z=56 45
+gensize=36
+from 76 ==> 67 
+from 76 ==> 67 P=k cap=$ 
+dump from makemove depth=68
+........
+PP...PRK
+....R.QP
+..PnBr..
+..p.p...
+.p...q.p
+...r..p.
+.......k
+MakeMove Deth=68 0 newz=67 oldz=76 
+n=68 istr=Rxe5
+z=44 p->z=45 44
+z=65 p->z=45 65
+gensize=39
+from 45 ==> 44 
+44
+from 45 ==> 44 P=r cap=b 
+content 44
+dump from makemove depth=69
+........
+PP...PRK
+....R.QP
+..Pnr...
+..p.p...
+.p...q.p
+...r..p.
+.......k
+MakeMove Deth=69 1 newz=44 oldz=45 
 White won
+size=69
+Back step=6944 45
+dump from takebuck depth=68
+........
+PP...PRK
+....R.QP
+..PnBr..
+..p.p...
+.p...q.p
+...r..p.
+.......k
+TakeBackMove Deth=68 0 newz=44 newz=45 
+Back step=6867 76
+dump from takebuck depth=67
+......K.
+PP...PR.
+....R.QP
+..PnBr..
+..p.p...
+.p...q.p
+...r..p.
+.......k
+TakeBackMove Deth=67 1 newz=67 newz=76 
+Back step=6713 14
+dump from takebuck depth=66
+......K.
+PP...PR.
+....R.QP
+..PnBr..
+..p.p...
+.p...q.p
+....r.p.
+.......k
+TakeBackMove Deth=66 0 newz=13 newz=14 
+Back step=6654 74
+dump from takebuck depth=65
+....R.K.
+PP...PR.
+......QP
+..PnBr..
+..p.p...
+.p...q.p
+....r.p.
+.......k
+TakeBackMove Deth=65 1 newz=54 newz=74 
+Back step=6525 24
+dump from takebuck depth=64
+....R.K.
+PP...PR.
+......QP
+..PnBr..
+..p.p...
+.p..q..p
+....r.p.
+.......k
+TakeBackMove Deth=64 0 newz=25 newz=24 
+Back step=6456 53
+dump from takebuck depth=63
+....R.K.
+PP...PR.
+...Q...P
+..PnBr..
+..p.p...
+.p..q..p
+....r.p.
+.......k
+TakeBackMove Deth=63 1 newz=56 newz=53 
+Back step=6345 05
+dump from takebuck depth=62
+....R.K.
+PP...PR.
+...Q...P
+..PnB...
+..p.p...
+.p..q..p
+....r.p.
+.....r.k
+TakeBackMove Deth=62 0 newz=45 newz=05 
+Back step=6253 73
+dump from takebuck depth=61
+...QR.K.
+PP...PR.
+.......P
+..PnB...
+..p.p...
+.p..q..p
+....r.p.
+.....r.k
+TakeBackMove Deth=61 1 newz=53 newz=73 
+Back step=6124 25
+dump from takebuck depth=60
+...QR.K.
+PP...PR.
+.......P
+..PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....r.k
+TakeBackMove Deth=60 0 newz=24 newz=25 
+Back step=6073 40
+dump from takebuck depth=59
+....R.K.
+PP...PR.
+.......P
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....r.k
+TakeBackMove Deth=59 1 newz=73 newz=40 
+Back step=5907 06
+dump from takebuck depth=58
+....R.K.
+PP...PR.
+.......P
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....rk.
+TakeBackMove Deth=58 0 newz=07 newz=06 
+Back step=5866 56
+dump from takebuck depth=57
+....R.K.
+PP...Pp.
+......RP
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+.....rk.
+TakeBackMove Deth=57 1 newz=66 newz=56 
+Back step=5705 03
+dump from takebuck depth=56
+....R.K.
+PP...Pp.
+......RP
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+...r..k.
+TakeBackMove Deth=56 0 newz=05 newz=03 
+Back step=5656 54
+dump from takebuck depth=55
+....R.K.
+PP...Pp.
+....R..P
+Q.PnB...
+..p.p...
+.p...q.p
+....r.p.
+...r..k.
+TakeBackMove Deth=55 1 newz=56 newz=54 
+Back step=5506 15
+dump from takebuck depth=54
+....R.K.
+PP...Pp.
+....R..P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+TakeBackMove Deth=54 0 newz=06 newz=15 
+Back step=5474 70
+dump from takebuck depth=53
+R.....K.
+PP...Pp.
+....R..P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+TakeBackMove Deth=53 1 newz=74 newz=70 
+Back step=5366 55
+dump from takebuck depth=52
+R.....K.
+PP...PP.
+....Rp.P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+TakeBackMove Deth=52 0 newz=66 newz=55 
+Back step=5254 74
+dump from takebuck depth=51
+R...R.K.
+PP...PP.
+.....p.P
+Q.PnB...
+..p.p...
+.p...q.p
+....rkp.
+...r....
+TakeBackMove Deth=51 1 newz=54 newz=74 
+Back step=5155 45
+dump from takebuck depth=50
+R...R.K.
+PP...PP.
+.......P
+Q.PnBp..
+..p.p...
+.p...q.p
+....rkp.
+...r....
+TakeBackMove Deth=50 0 newz=55 newz=45 
+Back step=5040 10
+dump from takebuck depth=49
+R...R.K.
+PP...PP.
+.......P
+..PnBp..
+..p.p...
+.p...q.p
+Q...rkp.
+...r....
+TakeBackMove Deth=49 1 newz=40 newz=10 
+Back step=4914 04
+dump from takebuck depth=48
+R...R.K.
+PP...PP.
+.......P
+..PnBp..
+..p.p...
+.p...q.p
+Q....kp.
+...rr...
+TakeBackMove Deth=48 0 newz=14 newz=04 
+Back step=4810 40
+dump from takebuck depth=47
+R...R.K.
+PP...PP.
+.......P
+Q.PnBp..
+..p.p...
+.p...q.p
+p....kp.
+...rr...
+TakeBackMove Deth=47 1 newz=10 newz=40 
+Back step=4703 00
+dump from takebuck depth=46
+R...R.K.
+PP...PP.
+.......P
+Q.PnBp..
+..p.p...
+.p...q.p
+p....kp.
+r...r...
+TakeBackMove Deth=46 0 newz=03 newz=00 
+Back step=4640 51
+dump from takebuck depth=45
+R...R.K.
+PP...PP.
+.Q.....P
+..PnBp..
+..p.p...
+.p...q.p
+p....kp.
+r...r...
+TakeBackMove Deth=45 1 newz=40 newz=51 
+Back step=4543 22
+dump from takebuck depth=44
+R...R.K.
+PP...PP.
+.Q.....P
+..P.Bp..
+..p.p...
+.pn..q.p
+p....kp.
+r...r...
+TakeBackMove Deth=44 0 newz=43 newz=22 
+Back step=4444 53
+dump from takebuck depth=43
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..p.p...
+.pn..q.p
+p....kp.
+r...r...
+TakeBackMove Deth=43 1 newz=44 newz=53 
+Back step=4325 03
+dump from takebuck depth=42
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..p.p...
+.pn..N.p
+p....kp.
+r..qr...
+TakeBackMove Deth=42 0 newz=25 newz=03 
+Back step=4225 33
+dump from takebuck depth=41
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..pNp...
+.pn..n.p
+p....kp.
+r..qr...
+TakeBackMove Deth=41 1 newz=25 newz=33 
+Back step=4121 11
+dump from takebuck depth=40
+R...R.K.
+PP...PP.
+.Q.B...P
+..P..p..
+..pNp...
+..n..n.p
+pp...kp.
+r..qr...
+TakeBackMove Deth=40 0 newz=21 newz=11 
+Back step=4051 73
+dump from takebuck depth=39
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp...
+..n..n.p
+pp...kp.
+r..qr...
+TakeBackMove Deth=39 1 newz=51 newz=73 
+Back step=3915 06
+dump from takebuck depth=38
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp...
+..n..n.p
+pp...Np.
+r..qr.k.
+TakeBackMove Deth=38 0 newz=15 newz=06 
+Back step=3815 36
+dump from takebuck depth=37
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp.N.
+..n..n.p
+pp...bp.
+r..qr.k.
+TakeBackMove Deth=37 1 newz=15 newz=36 
+Back step=3727 17
+dump from takebuck depth=36
+R..QR.K.
+PP...PP.
+...B...P
+..P..p..
+..pNp.N.
+..n..n..
+pp...bpp
+r..qr.k.
+TakeBackMove Deth=36 0 newz=27 newz=17 
+Back step=3636 55
+dump from takebuck depth=35
+R..QR.K.
+PP...PP.
+...B.N.P
+..P..p..
+..pNp...
+..n..n..
+pp...bpp
+r..qr.k.
+TakeBackMove Deth=35 1 newz=36 newz=55 
+Back step=3525 44
+dump from takebuck depth=34
+R..QR.K.
+PP...PP.
+...B.N.P
+..P.np..
+..pNp...
+..n.....
+pp...bpp
+r..qr.k.
+TakeBackMove Deth=34 0 newz=25 newz=44 
+Back step=3453 64
+dump from takebuck depth=33
+R..QR.K.
+PP..BPP.
+.....N.P
+..P.np..
+..pNp...
+..n.....
+pp...bpp
+r..qr.k.
+TakeBackMove Deth=33 1 newz=53 newz=64 
+Back step=3344 25
+dump from takebuck depth=32
+R..QR.K.
+PP..BPP.
+.....N.P
+..P.Pp..
+..pNp...
+..n..n..
+pp...bpp
+r..qr.k.
+TakeBackMove Deth=32 0 newz=44 newz=25 
+Back step=3233 52
+dump from takebuck depth=31
+R..QR.K.
+PP..BPP.
+..N..N.P
+..P.Pp..
+..p.p...
+..n..n..
+pp...bpp
+r..qr.k.
+TakeBackMove Deth=31 1 newz=33 newz=52 
+Back step=3104 05
+dump from takebuck depth=30
+R..QR.K.
+PP..BPP.
+..N..N.P
+..P.Pp..
+..p.p...
+..n..n..
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=30 0 newz=04 newz=05 
+Back step=3074 75
+dump from takebuck depth=29
+R..Q.RK.
+PP..BPP.
+..N..N.P
+..P.Pp..
+..p.p...
+..n..n..
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=29 1 newz=74 newz=75 
+Back step=2945 35
+dump from takebuck depth=28
+R..Q.RK.
+PP..BPP.
+..N..N.P
+..P.P...
+..p.pp..
+..n..n..
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=28 0 newz=45 newz=35 
+Back step=2844 54
+dump from takebuck depth=27
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..P.....
+..p.pp..
+..n..n..
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=27 1 newz=44 newz=54 
+Back step=2734 23
+dump from takebuck depth=26
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..P.....
+..p.Pp..
+..np.n..
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=26 0 newz=34 newz=23 
+Back step=2634 43
+dump from takebuck depth=25
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..PP....
+..p.pp..
+..np.n..
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=25 1 newz=34 newz=43 
+Back step=2525 46
+dump from takebuck depth=24
+R..Q.RK.
+PP..BPP.
+..N.PN.P
+..PP..n.
+..p.pp..
+..np....
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=24 0 newz=25 newz=46 
+Back step=2457 67
+dump from takebuck depth=23
+R..Q.RK.
+PP..BPPP
+..N.PN..
+..PP..n.
+..p.pp..
+..np....
+pp...bpp
+r..q.rk.
+TakeBackMove Deth=23 1 newz=57 newz=67 
+Back step=2315 24
+dump from takebuck depth=22
+R..Q.RK.
+PP..BPPP
+..N.PN..
+..PP..n.
+..p.pp..
+..npb...
+pp....pp
+r..q.rk.
+TakeBackMove Deth=22 0 newz=15 newz=24 
+Back step=2243 53
+dump from takebuck depth=21
+R..Q.RK.
+PP..BPPP
+..NPPN..
+..P...n.
+..p.pp..
+..npb...
+pp....pp
+r..q.rk.
+TakeBackMove Deth=21 1 newz=43 newz=53 
+Back step=2124 02
+dump from takebuck depth=20
+R..Q.RK.
+PP..BPPP
+..NPPN..
+..P...n.
+..p.pp..
+..np....
+pp....pp
+r.bq.rk.
+TakeBackMove Deth=20 0 newz=24 newz=02 
+Back step=2052 71
+dump from takebuck depth=19
+RN.Q.RK.
+PP..BPPP
+...PPN..
+..P...n.
+..p.pp..
+..np....
+pp....pp
+r.bq.rk.
+TakeBackMove Deth=19 1 newz=52 newz=71 
+Back step=1922 01
+dump from takebuck depth=18
+RN.Q.RK.
+PP..BPPP
+...PPN..
+..P...n.
+..p.pp..
+...p....
+pp....pp
+rnbq.rk.
+TakeBackMove Deth=18 0 newz=22 newz=01 
+Back step=1871 63
+dump from takebuck depth=17
+R..Q.RK.
+PP.NBPPP
+...PPN..
+..P...n.
+..p.pp..
+...p....
+pp....pp
+rnbq.rk.
+TakeBackMove Deth=17 1 newz=71 newz=63 
+Back step=1732 12
+dump from takebuck depth=16
+R..Q.RK.
+PP.NBPPP
+...PPN..
+..P...n.
+....pp..
+...p....
+ppp...pp
+rnbq.rk.
+TakeBackMove Deth=16 0 newz=32 newz=12 
+Back step=1676 74
+back cas 75 77 76
+dump from takebuck depth=15
+R..QK.rR
+PP.NBPPP
+...PPN..
+..P...n.
+....pp..
+...p....
+ppp...pp
+rnbq.rk.
+TakeBackMove Deth=15 1 newz=76 newz=74 
+Back step=1535 15
+dump from takebuck depth=14
+R..QK.rR
+PP.NBPPP
+...PPN..
+..P...n.
+....p...
+...p....
+ppp..ppp
+rnbq.rk.
+TakeBackMove Deth=14 0 newz=35 newz=15 
+Back step=1464 75
+dump from takebuck depth=13
+R..QKBrR
+PP.N.PPP
+...PPN..
+..P...n.
+....p...
+...p....
+ppp..ppp
+rnbq.rk.
+TakeBackMove Deth=13 1 newz=64 newz=75 
+Back step=1346 25
+dump from takebuck depth=12
+R..QKBrR
+PP.N.PPP
+...PPN..
+..P.....
+....p...
+...p.n..
+ppp..ppp
+rnbq.rk.
+TakeBackMove Deth=12 0 newz=46 newz=25 
+Back step=1254 64
+dump from takebuck depth=11
+R..QKBrR
+PP.NPPPP
+...P.N..
+..P.....
+....p...
+...p.n..
+ppp..ppp
+rnbq.rk.
+TakeBackMove Deth=11 1 newz=54 newz=64 
+Back step=1123 13
+dump from takebuck depth=10
+R..QKBrR
+PP.NPPPP
+...P.N..
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbq.rk.
+TakeBackMove Deth=10 0 newz=23 newz=13 
+Back step=1055 76
+dump from takebuck depth=9
+R..QKBNR
+PP.NPPPP
+...P.r..
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbq.rk.
+TakeBackMove Deth=9 1 newz=55 newz=76 
+Back step=906 04
+back cas 05 07 06
+dump from takebuck depth=8
+R..QKBNR
+PP.NPPPP
+...P.r..
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqk.Rr
+TakeBackMove Deth=8 0 newz=06 newz=04 
+Back step=863 71
+dump from takebuck depth=7
+RN.QKBNR
+PP.bPPPP
+...P.r..
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqk.Rr
+TakeBackMove Deth=7 1 newz=63 newz=71 
+Back step=763 41
+dump from takebuck depth=6
+RN.QKBNR
+PP.BPPPP
+...P.r..
+.bP.....
+....p...
+.....n..
+pppp.ppp
+rnbqk.Rr
+TakeBackMove Deth=6 0 newz=63 newz=41 
+Back step=663 72
+dump from takebuck depth=5
+RNBQKBNR
+PP..PPPP
+...P.r..
+.bP.....
+....p...
+.....n..
+pppp.ppp
+rnbqk.Rr
+TakeBackMove Deth=5 1 newz=63 newz=72 
+Back step=541 05
+dump from takebuck depth=4
+RNBQKBNR
+PP..PPPP
+...P.r..
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqkbRr
+TakeBackMove Deth=4 0 newz=41 newz=05 
+Back step=453 63
+dump from takebuck depth=3
+RNBQKBNR
+PP.PPPPP
+.....r..
+..P.....
+....p...
+.....n..
+pppp.ppp
+rnbqkbRr
+TakeBackMove Deth=3 1 newz=53 newz=63 
+Back step=325 06
+dump from takebuck depth=2
+RNBQKBNR
+PP.PPPPP
+.....r..
+..P.....
+....p...
+.....R..
+pppp.ppp
+rnbqkbnr
+TakeBackMove Deth=2 0 newz=25 newz=06 
+Back step=242 62
+dump from takebuck depth=1
+RNBQKBNR
+PPPPPPPP
+.....r..
+........
+....p...
+.....R..
+pppp.ppp
+rnbqkbnr
+TakeBackMove Deth=1 1 newz=42 newz=62 

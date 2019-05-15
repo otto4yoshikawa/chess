@@ -13,9 +13,8 @@
 
 int OfficerNo[2], PawnNo[2];
 
-static MOVETYPE movetemp[MAXPLY - BACK + 2];   // BACK = -104
-
-MOVETYPE* MovTab = &movetemp[-BACK];
+MOVETYPE movetemp[MAXPLY - BACK + 2];   // BACK = -104
+MOVETYPE  MovTab[100];// = &movetemp[-BACK];
 
 
 void InsertPiece(PIECETYPE p, COLORTYPE c, SQUARETYPE sq) ;
@@ -29,11 +28,14 @@ int MoveNo;
 int UseLib;
 COLORTYPE Player;
 BOARDTYPE Board[0x78];
+int PVTable[2][7][0x78];
 PIECETYPE Pieces[8]  = { rook, knight, bishop, queen,
+
 						 king, bishop, knight, rook};
  PIECETAB PieceTab[6][16];
  MOVETYPE  ZeroMove = { 8, 8, 0, empty, empty };
  MOVETYPE  KeyMove;
+ NODEVAL Nodes;
 bool      Running;
 bool ComputerThinking;
 //-------proyotype-------------------------------
@@ -177,18 +179,8 @@ ChangeType(PIECETYPE newtype, SQUARETYPE insquare)
   if (OfficerNo[Board[insquare].color] < Board[insquare].index)
       OfficerNo[Board[insquare].color] = Board[insquare].index;
 }
- void dump(){
-   int x,y,z;
-   char c,w[9];
-   for(y=0;y<8;y++){
-	 for(x=0;x<8;x++) {
-	 z=(7-y)*16+x;
-	 c=*(".KQRBNP"+ Board[z].piece);
-		w[x]=c; }
-	 w[8]=0;
-	 DoPrintf(w);
-	}
- }
+
+
 //
 //  移動を行うか、元に戻し(resetmove が true のときは元に戻し)、
 //  ボードと駒テーブルを更新する。Player は移動するプレーヤー
@@ -202,15 +194,17 @@ Perform(MOVETYPE* move, bool resetmove)
 {
   SQUARETYPE castsquare, cornersquare, epsquare;
 
-  if (resetmove){        //play
+  if (resetmove){        // back is true
 	MovePiece(move->old, move->new1);
     if (move->content != empty)
       InsertPTabPiece(move->content, Opponent, move->new1);
 
-  } else {                         //restore
-    if (move->content != empty)
-      DeletePiece(move->new1);
-    MovePiece(move->new1, move->old);
+  } else {                         //play
+	if (move->content != empty)    {
+	DoPrintf("content %02x",move->new1);
+	  DeletePiece(move->new1);  }
+	MovePiece(move->new1, move->old);
+
   }
 
   if (move->spe) {
@@ -222,9 +216,10 @@ Perform(MOVETYPE* move, bool resetmove)
         MovePiece(castsquare, cornersquare);
 
     } else {
-      if (move->movpiece == pawn) {
-        epsquare = (move->new1 & 7) + (move->old & 0x70); // 通過捕獲
-        if (resetmove)
+	  if (move->movpiece == pawn) {
+		epsquare = (move->new1 & 7) + (move->old & 0x70); // 通過捕獲
+
+		if (resetmove)
           InsertPTabPiece(pawn, Opponent, epsquare);
         else
           DeletePiece(epsquare);
@@ -234,9 +229,10 @@ Perform(MOVETYPE* move, bool resetmove)
         else
           ChangeType(move->movpiece,move->new1);
       }
-    }
+	}
+
   }
-  dump();
+
 }
 
 //
@@ -258,16 +254,34 @@ InsertPiece(PIECETYPE p, COLORTYPE c, SQUARETYPE sq)
 }
 //--------------------------------------------------------
 
+void
+InitNode(NODEVAL* nodes)
+{
+  nodes->nodebase = 0;
+  nodes->nodeoffset = 0;
+}
+//
+// 移動を元に戻し、変数を更新する
+//
+
+void IncNode(NODEVAL * nodes) {
+if (nodes->nodeoffset >= MAXINT) {nodes->nodebase++; nodes->nodeoffset = 0;
+
+}
+else
+	nodes->nodeoffset++; }
+
 void  ResetGame()
 {
   ClearBoard();
  Running = false;
 
-   Depth =-1;
-   DoPrintf("dep -1 %d",Depth);
-    return ;
 
- // MovTab[1] = ZeroMove;    //DEAD!!!!!!!!!!!!!!!!!!!!
+   Depth =0;
+
+   DoPrintf("dep -1 %d",Depth);
+
+  MovTab[-1] = ZeroMove;    //DEAD!!!!!!!!!!!!!!!!!!!!
    DoPrintf("dep -1 %d  %08x ",Depth, &Depth);
 
 
@@ -281,7 +295,7 @@ void  ResetGame()
     MoveNo = 0;
  CalcPieceTab();
 
-	  DoPrintf("$$$dep -1 %d",Depth);
+
   Player = white;
 
  // ClearDisplay();

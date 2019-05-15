@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2019/05/10 18:40:48.030.cpp,C:\Users\otto\Documents\RAD Studio\Projects\File3.cpp=C:\puzzle\chess\jsx3.cpp</Transaction>
+    <Transaction>2019/05/10 18:41:12.415.cbproj,C:\Users\otto\Documents\RAD Studio\Projects\Project1.cbproj=C:\puzzle\chess\jss3.cbproj</Transaction>
+    <Transaction>2019/05/10 20:42:12.161.h,C:\puzzle\chess\File1.h=C:\puzzle\chess\genmove3.h</Transaction>
+    <Transaction>2019/05/10 21:13:04.593.cpp,C:\puzzle\chess\File1.cpp=C:\puzzle\chess\govegen3.cpp</Transaction>
+  </Transactions>
+</BorlandProject>
